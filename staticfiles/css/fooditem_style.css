@@ -1,0 +1,139 @@
+* {
+    font-family: "Nunito", sans-serif;
+}
+
+:root {
+    --color: #5e6790;
+  }
+
+.food-item-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px;
+    width: 100%;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    margin-top: 10px;
+}
+
+.fooditem-detail-table {
+    background-color: #f9f9f9;
+    font-size: 16px;
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+
+.fooditem-detail-table th {
+    padding: 10px;
+    text-align: left;
+    font-weight: bold;
+    border-bottom: 2px solid #333;
+}
+
+.fooditem-detail-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.fooditem-detail-table th:first-child,
+.fooditem-detail-table td:first-child {
+    border-left: none;
+}
+
+.fooditem-detail-table th:last-child,
+.fooditem-detail-table td:last-child {
+    border-right: none;
+}
+
+.search-container {
+    display: flex;
+    gap: 8px;
+    position: relative;
+    margin-left: auto;
+}
+
+.search-input {
+    padding: 3px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    transition: 0.3s;
+    display: block;
+    width: 250;
+}
+
+.search-btn {
+    background-color: #F9C784;
+    color: black;
+    border: none;
+    padding: 7px;
+    height: 40px;
+    width: 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.search-btn i {
+    font-size: 15px;
+}
+
+
+@media (max-width: 768px) {
+    .food-item-title {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .fooditem-detail-table {
+        font-size: 14px;
+    }
+
+    .search-input {
+        display: none;
+        width: 0;
+    }
+
+    .search-container.active .search-input {
+        display: block;
+        width: 180px;
+    }
+
+}
+
+.food-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+}
+
+.status-dropdown {
+    padding: 5px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.status-active {
+    background-color: #28a745;
+    color: white;
+}
+
+.status-inactive {
+    background-color: #dc3545;
+    color: white;
+}
+
+

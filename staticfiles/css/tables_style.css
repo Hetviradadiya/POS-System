@@ -1,0 +1,163 @@
+.table-bar {
+  width: 60%;
+  height: 45px;
+  background-color: white;
+  align-content: center;
+}
+.nav-item a {
+  font-weight: bold;
+  color: #000;
+}
+.nav-pills .nav-link:hover {
+  color: #4e598c;
+}
+.nav-pills .nav-link.active {
+  background-color: #4e598c;
+  border: #4e598c;
+  color: white;
+}
+
+.table-card {
+  width: 200px;
+  height: 200px;
+  background: #ffffff;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  margin: 10px;
+  position: relative;
+}
+
+.table-shape {
+  width: 80px;
+  height: 80px;
+  background: #b7b9bc;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+}
+
+.table-text {
+  font-weight: bold;
+  color: #000;
+}
+.seat {
+  width: 25px;
+  height: 8px;
+  background: #4e598c;
+  border-radius: 5px;
+  position: absolute;
+}
+.seat.top.left {
+  top: 45px;
+  left: 35%;
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.seat.top.right {
+  top: 45px;
+  right: 35%;
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.seat.bottom.left {
+  bottom: 40px;
+  left: 35%;
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.seat.bottom.right {
+  bottom: 40px;
+  right: 35%;
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.seat.top {
+  top: 45px;
+}
+.seat.bottom {
+  bottom: 45px;
+}
+.seat.left {
+  left: 40px;
+  transform: rotate(90deg);
+}
+
+.seat.right {
+  right: 40px;
+  transform: rotate(90deg);
+}
+p {
+  margin-bottom: 0;
+}
+
+.vacant {
+  border-bottom: 5px solid #2a9c00;
+}
+.occupied {
+  border-bottom: 5px solid #ff0000;
+}
+.reserved {
+  border-bottom: 5px solid #f7c93c;
+}
+@media screen and (max-width: 960px) {
+  .table-bar {
+    width: 80%;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .table-bar {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .table-bar {
+    padding-top: 1px;
+    overflow-x: auto;
+    white-space: nowrap;
+    display: flex;
+  }
+  .nav-pills {
+    flex-wrap: nowrap;
+  }
+
+  .nav-item {
+    flex: 0 0 auto;
+  }
+}
+
+@media screen and (max-width: 350px) {
+  .seat.left {
+    left: 20px;
+  }
+
+  .seat.right {
+    right: 20px;
+  }
+}
+
+@media screen and (max-width: 330px) {
+  .seat.top.left {
+    left: 32%;
+  }
+
+  .seat.top.right {
+    right: 32%;
+  }
+
+  .seat.bottom.left {
+    left: 32%;
+  }
+
+  .seat.bottom.right {
+    right: 32%;
+  }
+}

@@ -1,0 +1,50 @@
+{% load static %} {% block title %}
+<title>STAFF</title>
+{% endblock %} {% block css %}
+<link rel="stylesheet" href="{% static 'css/staff_style.css' %}" />
+{% endblock %}
+
+
+   
+    <button class="open-button add-staff-button rounded-3" onclick="openForm()">
+      <span class="btn-text">
+         Pay Now
+      </span>
+      <span class="btn-icon"><i class="fa-solid fa-plus plus-icon"></i></span>
+    </button>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+  <div class="form-popup" id="myForm">
+    <form id="staffForm" class="form-container">
+      <h2 class="mb-3">Payment</h2>
+      <div class="input-group">
+        <label for="email"><b>Due Ammount</b></label>
+        {% for i in data%}
+            {{i.balance}}
+        {% endfor%}
+      </div>
+
+      <div class="input-group">
+        <label for="password" ><b>Enter Payment Ammount</b></label>
+        <input
+          type="number"
+          id="ammount_ent"
+          placeholder="Pay Minimun Due Ammount"
+          required 
+        />
+      </div>
+
+      <div class="form-buttons">
+        <button type="submit" class="btn">Submit</button>
+        <button type="button" class="btn cancel" onclick="closeForm()">
+          Close
+        </button>
+      </div>
+    </form>
+  </div>
+
+  
+</div>
+
+<script src="{% static 'js/staff_scripts.js' %}"></script>

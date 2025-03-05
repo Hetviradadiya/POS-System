@@ -1,0 +1,84 @@
+/* Centering the content */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+    text-align: center;
+}
+
+/* Profile Picture Container */
+.profile-pic-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+/* Profile Picture */
+.profile-pic {
+    width: 400px;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Edit Icon */
+.edit-icon {
+    position: absolute;
+    bottom: 5px;
+    right: 40px;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.edit-icon i.fa-circle {
+    color: black;
+    font-size: 70px;
+}
+
+.edit-icon i.fa-plus {
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 52%;
+    transform: translate(-50%, -50%);
+    font-size: 35px;
+}
+
+/* Modal Upload Button */
+.upload-btn {
+    background-color: #4E598C;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.upload-btn:hover {
+    background-color: #3a446c;
+}
+
+@media screen and (max-width: 768px) {
+    .profile-pic {
+        width: 200px;
+        height: 200px;
+    }
+    .edit-icon {
+        bottom: 0px;
+        right: 5px;
+    }
+    
+    .edit-icon i.fa-circle {
+        font-size: 50px;
+    }
+    
+    .edit-icon i.fa-plus {
+        top: 49%;
+        left: 52%;
+        font-size: 25px;
+    }
+}

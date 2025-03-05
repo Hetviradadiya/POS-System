@@ -1,0 +1,103 @@
+{% load static %}
+{% block title %}
+<title>Suppliers</title>
+{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/supplier_style.css' %}">
+{% endblock %}
+
+<div class="food-items-page">
+    <div class="food-item-title mt-4">
+        <h3>SUPPLIER</h3>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search by company or name">
+            <button class="search-btn" onclick="toggleSearch()">
+                <i class="fa fa-search"></i>
+            </button>
+        </div>
+
+        <button class="open-button add-fooditems-button rounded-3" onclick="openForm()">
+            <span class="btn-text">
+                <i class="fa-solid fa-plus plus-icon"></i> Add Supplier
+            </span>
+            <span class="btn-icon"><i class="fa-solid fa-plus plus-icon"></i></span>
+        </button>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closeForm()"></div>
+    <div class="form-popup" id="myForm">
+        <form id="supplierForm" class="form-container">
+            <h1 class="mb-3">Add Supplier</h1>
+
+            <div class="input-group">
+                <label for="supplierName"><b>Name</b></label>
+                <input type="text" id="supplierName" placeholder="Enter Supplier Name">
+                <span class="error-message" id="nameError"></span>
+            </div>
+            <div class="input-group">
+                <label for="companyName"><b>Company Name</b></label>
+                <input type="text" id="companyName" placeholder="Enter Company Name">
+                <span class="error-message" id="companyError"></span>
+            </div>
+
+            <div class="input-group">
+                <label for="supplierEmail"><b>Email</b></label>
+                <input type="email" id="supplierEmail" placeholder="Enter Email">
+                <span class="error-message" id="emailError"></span>
+            </div>
+
+            <div class="input-group">
+                <label for="supplierAddress"><b>Address</b></label>
+                <textarea id="supplierAddress" placeholder="Enter Address"></textarea>
+                <span class="error-message" id="addressError"></span>
+            </div>
+
+            <div class="input-group">
+                <label for="supplierPhone"><b>Phone</b></label>
+                <input type="text" id="supplierPhone" placeholder="Enter Phone Number">
+                <span class="error-message" id="phoneError"></span>
+            </div>
+
+            <div class="input-group">
+                <label for="supplierStore"><b>Store</b></label>
+                <select id="supplierStore">
+                    <option value="">Select Store</option>
+                </select>
+                <span class="error-message" id="storeError"></span>
+            </div>
+            
+            <div class="form-buttons">
+                <button type="submit" class="btn">Add</button>
+                <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="table-responsive">
+    <table class="table fooditem-detail-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Company Name</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Store</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="supplierTableBody"></tbody>
+    </table>
+</div>
+</div>
+
+<script>
+    function addSupplier() {
+        console.log("addSupplier function called!");
+    }
+</script>
+
+<script src="{% static 'js/supplier_scripts.js' %}"></script>

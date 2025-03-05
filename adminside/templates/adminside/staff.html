@@ -1,0 +1,136 @@
+{% load static %} {% block title %}
+<title>Staff</title>
+{% endblock %} {% block css %}
+<link rel="stylesheet" href="{% static 'css/staff_style.css' %}" />
+{% endblock %}
+
+<div class="staff-page">
+  <div class="staff-title mt-4">
+    <h3>STAFF</h3>
+
+    <div class="search-container">
+      <input
+        type="text"
+        id="searchInput"
+        class="search-input"
+        placeholder="Search by name"
+      />
+      <button class="search-btn" onclick="toggleSearch()">
+        <i class="fa fa-search"></i>
+      </button>
+    </div>
+
+    <button
+      class="open-button add-staff-button rounded-3"
+      onclick="openForm(false)"
+    >
+      <span class="btn-text">
+        <i class="fa-solid fa-plus plus-icon"></i> Add Staff
+      </span>
+      <span class="btn-icon"><i class="fa-solid fa-plus plus-icon"></i></span>
+    </button>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+  <div class="form-popup" id="myForm">
+    <form id="staffForm" class="form-container">
+      <h1 class="mb-3">Add Staff</h1>
+
+      <div class="form-group">
+        <div class="input-group">
+          <label for="fullName"><b>FullName</b></label>
+          <input
+            type="text"
+            id="fullName"
+            placeholder="Enter Full Name"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="userName"><b>UserName</b></label>
+          <input
+            type="text"
+            id="userName"
+            placeholder="Enter User Name"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="staffImage"><b>Image</b></label>
+        <input type="file" id="staffImage" accept="image/*" />
+      </div>
+
+      <div class="input-group">
+        <label for="email"><b>E-mail</b></label>
+        <input type="email" id="email" placeholder="Enter email" required />
+      </div>
+
+      <div class="input-group">
+        <label for="password"><b>Password</b></label>
+        <input
+          type="password"
+          id="password"
+          placeholder="Generate password"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <div class="input-group">
+          <label for="staffRole"><b>StaffRole</b></label>
+          <select id="staffRole">
+            <option value="" disabled selected hidden>Choose staff role</option>
+            <option value="Manager">Manager</option>
+            <option value="Waiter">Waiter</option>
+            <option value="Chef">Chef</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="branches"><b>Branch</b></label>
+          <select id="branches">
+            <option value="" disabled selected hidden>Choose Branch</option>
+            <option value="Branch1">Branch1</option>
+            <option value="Branch2">Branch2</option>
+            <option value="Branch3">Branch3</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-buttons">
+        <button type="submit" class="btn">Add</button>
+        <button type="button" class="btn cancel" onclick="closeForm()">
+          Close
+        </button>
+      </div>
+      <span
+        id="defaultImagePath"
+        data-path="{% static 'images/default-profile.jpg'%}"
+        hidden
+      ></span>
+    </form>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table staff-detail-table">
+      <thead>
+        <tr>
+          <th>Staff ID</th>
+          <th>Image</th>
+          <th>FullName</th>
+          <th>UserName</th>
+          <th>E-mail</th>
+          <th>Password</th>
+          <th>StaffRole</th>
+          <th>Branch</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="staffBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script src="{% static 'js/staff_scripts.js' %}"></script>

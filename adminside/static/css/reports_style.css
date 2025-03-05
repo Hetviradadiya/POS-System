@@ -1,0 +1,225 @@
+
+
+.sales-box {
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    text-align: left;
+    width: 300px; 
+    height: 380px;
+}
+.btn-report {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #6a11cb;
+    color: white;
+    border-radius: 20px;
+    padding: 7px 15px;
+    text-decoration: none;
+    font-size: 14px;
+}
+.sales-title {
+    font-size: 15px;
+    font-weight: 700;
+}
+.sales-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #6a11cb;
+}
+.sales-percentage {
+    color: green;
+    font-size: 12px;
+    font-weight: 500;
+}
+.sales-img {
+    width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 10px;
+}
+
+
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    padding: 10px;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    color: white;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+}
+
+.stat-card h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.stat-card p {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.stat-card small {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.btn-primary {
+    background-color: #2575fc;
+    border: none;
+    border-radius: 5px;
+    padding: 6px 15px; 
+    font-size: 0.9rem;
+}
+
+.btn-primary:hover {
+    background-color: #1a5bbf;
+}
+
+.dashboard-container {
+    padding: 0px; 
+}
+
+.stat-card-income {
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    position: relative;
+    width: 100%;
+    height: 380px;     
+}
+.stat-card1 {
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    position: relative;
+    width: 100%;
+    height: 169px;
+}
+.stat-icon {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: rgba(255, 165, 0, 0.2);
+    padding: 8px;
+    border-radius: 50%;
+}
+.stat-icon-green {
+    background-color: rgba(0, 200, 83, 0.2);
+}
+.stat-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #555;
+}
+.stat-percentage {
+    font-size: 12px;
+    font-weight: 500;
+}
+.stat-percentage.negative {
+    color: red;
+}
+.stat-percentage.positive {
+    color: green;
+}
+.stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+.progress {
+    height: 4px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+.progress-bar {
+    background-color: orange;
+}
+.progress-bar-green {
+    background-color: green;
+}
+
+h21 {
+    text-align: center;
+    font-family: "Verdana", sans-serif;
+    font-size: 40px;
+}
+
+.chart-container {
+    width: 100%;
+    height: 300px;
+    margin-top: 10px;
+}
+
+canvas {
+    max-width: 100%;
+    height: 100%;
+}
+
+.graph-card {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.metric {
+    font-size: 26px;
+    font-weight: bold;
+    color: #6c5ce7;
+}
+
+.green-text {
+    color: green;
+    font-size: 14px;
+}
+
+.red-text {
+    color: red;
+    font-size: 14px;
+}
+
+.view-report {
+    background-color: #6c5ce7;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 14px;
+    float: right;
+}
+
+@media (max-width: 768px) {
+    .chart-container {
+        height: 200px;
+    }
+}

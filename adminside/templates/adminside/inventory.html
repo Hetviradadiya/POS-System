@@ -1,0 +1,160 @@
+{% load static %} {% block title %}
+<title>Inventory</title>
+{% endblock %} {% block css %}
+<link rel="stylesheet" href="{% static 'css/inventory_style.css' %}" />
+{% endblock %}
+
+<div class="food-items-page">
+  <div class="food-item-title mt-4">
+    <h3>INVENTORY</h3>
+
+    <div class="search-container">
+      <input
+        type="text"
+        id="searchInput"
+        class="search-input"
+        placeholder="Search by food-item name"
+      />
+      <button class="search-btn" onclick="toggleSearch()">
+        <i class="fa fa-search"></i>
+      </button>
+    </div>
+
+    <button
+      class="open-button add-fooditems-button rounded-3"
+      onclick="openForm()"
+    >
+      <span class="btn-text">
+        <i class="fa-solid fa-plus plus-icon"></i> Add Food Item
+      </span>
+      <span class="btn-icon"><i class="fa-solid fa-plus plus-icon"></i></span>
+    </button>
+  </div>
+
+  <div class="overlay" id="overlay" onclick="closeForm()"></div>
+  <div class="form-popup" id="myForm">
+    <form id="foodItemForm" class="form-container">
+      <h1 class="mb-3">Add Food Item</h1>
+
+      <div class="form-group">
+        <div class="input-group">
+          <label for="itemImage"><b>Image</b></label>
+          <input type="file" id="itemImage" accept="image/*" />
+        </div>
+        <div class="input-group">
+          <label for="itemName"><b>Name</b></label>
+          <select id="itemName">
+            <option value="">Select Name</option>
+          </select>
+          <span class="error-message" id="nameError"></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="input-group">
+          <label for="itemCategory"><b>Category</b></label>
+          <select id="itemCategory">
+            <option value="">Select Category</option>
+          </select>
+          <span class="error-message" id="categoryError"></span>
+        </div>
+        <div class="input-group full-width">
+          <label for="itemDescription"><b>Description</b></label>
+          <textarea
+            id="itemDescription"
+            placeholder="Enter Description"
+            required
+          ></textarea>
+          <span class="error-message" id="descriptionError"></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="input-group">
+          <label for="itemQuantity"><b>Quantity</b></label>
+          <input
+            type="number"
+            id="itemQuantity"
+            placeholder="Enter Quantity"
+            required
+          />
+          <span class="error-message" id="quantityError"></span>
+        </div>
+        <div class="input-group">
+          <label for="itemStore"><b>Branch</b></label>
+          <select id="itemStore">
+            <option value="">Select Branch</option>
+          </select>
+          <span class="error-message" id="storeError"></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="input-group">
+          <label for="itemCost"><b>Cost Price</b></label>
+          <input
+            type="number"
+            id="itemCost"
+            placeholder="Enter Cost Price"
+            required
+          />
+          <span class="error-message" id="costPriceError"></span>
+        </div>
+        <div class="input-group">
+          <label for="itemSelling"><b>Selling Price</b></label>
+          <input
+            type="number"
+            id="itemSelling"
+            placeholder="Enter Selling Price"
+            required
+          />
+          <span class="error-message" id="sellingPriceError"></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="input-group">
+          <label for="itemMFG"><b>MFG Date</b></label>
+          <input type="date" id="itemMFG" required />
+          <span class="error-message" id="MFG-Error"></span>
+        </div>
+        <div class="input-group">
+          <label for="itemExpiry"><b>Expiry Date</b></label>
+          <input type="date" id="itemExpiry" required />
+          <span class="error-message" id="expiryError"></span>
+        </div>
+      </div>
+
+      <div class="form-buttons">
+        <button type="submit" class="btn">Add</button>
+        <button type="button" class="btn cancel" onclick="closeForm()">
+          Close
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table fooditem-detail-table">
+      <thead style="border-bottom: 2px solid #333 !important">
+        <tr>
+          <th>ID</th>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Description</th>
+          <th>Quantity</th>
+          <th>Branch</th>
+          <th>Selling Price</th>
+          <th>Cost Price</th>
+          <th>MFG Date</th>
+          <th>Expiry Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="foodTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script src="{% static 'js/inventory_scripts.js' %}"></script>

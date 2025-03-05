@@ -1,0 +1,123 @@
+
+
+* {
+    font-family: "Nunito", sans-serif;
+}
+
+/* food item text search and add item button */
+.food-item-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px;
+    width: 100%;
+}
+
+.add-fooditems-button {
+    background-color:#4E598C;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0px 3px auto 30px;
+}
+
+.btn-icon {
+    display: none;
+}
+
+.search-container {
+    display: flex;
+    gap: 8px;
+    position: relative;
+    margin-left: auto;
+}
+.search-btn {
+    background-color: #F9C784;
+    color: black;
+    border: none;
+    padding: 7px;
+    height: 40px;
+    width: 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.search-btn i {
+    font-size: 15px;
+}
+.table-responsive {
+    overflow-x: auto;
+    margin-top: 10px;
+}
+
+.full-width {
+    width: 100%;
+}
+.search-input {
+    padding: 3px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    transition: 0.3s;
+    display: block;
+    width: 250;
+}
+@media (max-width: 768px) {
+    .food-item-title {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .add-fooditems-button {
+        padding: 6px;
+    }
+
+    .btn-text {
+        display: none;
+    }
+
+    .btn-icon {
+        display: inline-block;
+        font-size: 18px;
+        height: 28px;
+        border-radius: 2px;
+        width: 28px;
+    }
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .stores-detail-table {
+        font-size: 14px;
+    }
+
+    .form-group {
+        flex-direction: column; /* Stack input fields */
+        gap: 10px;
+    }
+
+    .input-group {
+        width: 100%; /* Inputs take full width */
+    }
+
+    .search-input {
+        display: none;
+        width: 0;
+        transition: width 0.3s ease-in-out;
+    }
+
+    .search-container.active .search-input {
+        display: block;
+        width: 180px;
+    }
+
+}
+

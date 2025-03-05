@@ -1,0 +1,20 @@
+{% load static %}
+{% block title %}
+<title>Profile</title>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/settings/profile_style.css' %}">
+{% endblock %}
+
+<div class="container">
+    <div id="default-content">
+        <!-- Profile Picture Wrapper -->
+        <div class="profile-pic-container">
+            <img id="profileImage" src="{% static 'images/default-profile.jpg' %}" alt="Profile Picture" class="profile-pic">
+        </div>
+        
+        <h2>Welcome Admin!<br>This is Your Account Settings</h2>
+        <p>Select an option from the sidebar.</p>
+    </div>
+</div>

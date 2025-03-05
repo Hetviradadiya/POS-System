@@ -1,0 +1,100 @@
+{% load static %}
+{% block title %}
+<title>Food-Items</title>
+{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/dashboard_style.css' %}">
+{% endblock %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.16.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/billboard.js/1.10.1/billboard.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/billboard.js/1.10.1/billboard.min.css">
+
+<div class="dashboard-container">
+    <div class="row title-row">
+        <h2>DASHBOARD</h2>
+    </div>
+    <div class="row graph-row">
+        <div class="col-6">
+            <div class="sales-box">
+                <a href="{% url 'adminside:reports' %}" class="btn-report">View Report</a>
+                <div class="sales-container">
+                    <p class="sales-title">Daily Sales</p>
+                    <p class="sales-value">2,568</p>
+                    <p class="sales-percentage">↑ 2.1% vs last week</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="stat-card-income">
+                <p class="sales-title">Total Income</p>
+                <div class="donut-chart-container">
+                    <div id="donut-chart"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="row"></div>
+                <div class="col-md-5" style="width: 77.666667%;">
+                    <div class="stat-card1">
+                        <div class="stat-icon stat-icon-green">
+                            <i class="fas fa-users fa-lg" style="color: green;"></i>
+                        </div>
+                        <p class="stat-title">New Customers</p>
+                        <p class="stat-percentage positive">+32.40%</p>
+                        <p class="stat-value">21,375</p>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-green" style="width: 85%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-5" style="width: 77.666667%;">
+                    <div class="stat-card1 mt-2">
+                        <div class="stat-icon">
+                            <i class="fas fa-box fa-lg" style="color: #FF8C42;"></i>
+                        </div>
+                        <p class="stat-title">Total Orders</p>
+                        <p class="stat-percentage negative">-2.3%</p>
+                        <p class="stat-value">21,375</p>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 70%;"></div>
+                        </div>
+                    </div>
+                </div>        
+            </div>
+
+
+        </div>
+    </div>
+    <div class="row detail-row">
+        <div class="col-md-6">
+            <div class="da-box">
+                <p class="sales-title">Trending Dishes</p>
+                <select id="trendingDishesDropdown" class="dropdown">
+                    <option value="today">Today</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="da-box best-employee-container">
+                <p class="sales-title">Best Employee</p>
+                <select id="bestEmployeeDropdown" class="dropdown">
+                    <option value="today">Today</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                </select>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/dashboard_scripts.js' %}"></script>

@@ -1,0 +1,484 @@
+.row {
+  align-items: center;
+  max-width: fit-content;
+}
+
+.dashboard-container {
+    margin-left: 10px;
+}
+
+.title-row {
+    margin-top: 24px;
+}
+
+.graph-row {
+    margin-top: 10px;
+    width: 1290px;
+}
+
+.sales-box {
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    text-align: left;
+    width: 580px;
+    height: 347px;
+}
+
+.btn-report {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #4E598C;
+    color: white;
+    border-radius: 20px;
+    padding: 7px 15px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.sales-container {
+    display: flex;
+    flex-direction: column;
+    /* Aligns items vertically */
+    gap: 3px;
+    /* Small space between elements */
+}
+
+.sales-title {
+    margin: 0px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.sales-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #FF8C42;
+    margin-bottom: 2px;
+    /* Reduce space below */
+}
+
+.sales-percentage {
+    color: #4E598C;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: -5px;
+    /*Ensure no extra space above */
+}
+
+.chart-container {
+    width: 100%;
+    height: 200px;
+    /* Adjust height as needed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+canvas {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.graph-card {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.metric {
+    font-size: 26px;
+    font-weight: bold;
+    color: #6c5ce7;
+}
+
+.green-text {
+    color: green;
+    font-size: 14px;
+}
+
+.red-text {
+    color: red;
+    font-size: 14px;
+}
+
+.stat-card-income {
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    position: relative;
+    width: 100%;
+    height: 347px;
+}
+
+.donut-chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+
+#donut-chart {
+    width: 250px;
+    height: 250px;
+}
+
+h21 {
+    text-align: center;
+    font-family: "Verdana", sans-serif;
+    font-size: 40px;
+}
+
+.stat-card1 {
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    position: relative;
+    width: 100%;
+    height: 169px;
+}
+
+
+.stat-icon {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: rgba(255, 165, 0, 0.2);
+    padding: 8px;
+    border-radius: 50%;
+}
+
+.stat-icon-green {
+    background-color: rgba(0, 200, 83, 0.2);
+}
+
+.stat-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.stat-percentage {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.stat-percentage.negative {
+    color: #FF8C42;
+}
+
+.stat-percentage.positive {
+    color: green;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.progress {
+    height: 4px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+.col {
+  /* flex: 1 1 calc(25% - 20px);
+  max-width: calc(25% - 20px); */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  width: 200px;
+  display: block;
+}
+
+.stat-card1 {
+  background: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  position: relative;
+  width: 200px;
+  min-height: 169px;
+}
+
+.order-id {
+  position: absolute;
+  right: 15px;
+  color: #4e598c;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.order-container {
+  margin-left: 10px;
+}
+
+.title-row {
+  margin-top: 24px;
+}
+
+.table-title {
+  margin: 0px;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.order-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* Button Styles */
+.btn-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn-pay,
+.btn-print,
+.btn-edit {
+  background-color: #4e598c;
+  color: white;
+  border-radius: 20px;
+  padding: 8px 15px;
+  text-decoration: none;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-print i,
+.btn-edit i {
+  font-size: 16px;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.status {
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.dine-in {
+  color: green;
+}
+
+.to-go {
+  color: red;
+}
+
+.time {
+  color: gray;
+}
+
+.progress-bar {
+    background-color: orange;
+}
+
+.progress-bar-green {
+    background-color: green;
+}
+
+.detail-row {
+    margin-top: 40px;
+    margin-left: 1px;
+}
+
+.da-box {
+    width: 585px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.best-employee-container{
+    margin-left: -7px;
+}
+
+.sales-title {
+    margin: 0px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.dropdown {
+    float: right;
+    padding: 5px;
+    font-size: 14px;
+}
+
+@media (max-width: 1246px) and (min-width: 1218px) {
+    .best-employee-container{
+        margin-left: 147px;
+    } 
+}
+@media (max-width:1217px) and (min-width: 1192px) {
+    .best-employee-container{
+        margin-left: 152px;
+    }
+}
+
+@media (max-width:1191px) and (min-width:1120px){
+    .best-employee-container{
+        margin-left: 188px;
+    }
+}
+
+@media (max-width:1119px)and (min-width:1098px){
+    .best-employee-container{
+        margin-left: 200px;
+    }
+}
+
+@media (max-width:1097px) and (min-width:1058px){
+    .best-employee-container{
+        margin-left: 218px;
+    }
+}
+
+@media (max-width:1057px) and (min-width:1024px){
+    .best-employee-container{
+        margin-left: 232px;
+    }
+}
+
+
+@media (max-width: 1024px) {
+
+    .graph-row {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .stat-card-income {
+        width: 500px;
+    }
+
+    .stat-card1 {
+        width: 500px !important;
+        height: auto !important;
+    }
+
+
+    .donut-chart-container {
+
+        height: auto;
+    }
+
+    .detail-row {
+        margin-top: 10px;
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .best-employee-container{
+        margin-left: 0px;
+    }
+
+  .col {
+    flex: 1 1 calc(50% - 20px);
+    max-width: calc(50% - 20px);
+  }
+}
+
+@media (max-width: 768px) {
+  .col {
+    flex: 1 1 calc(100% - 20px);
+    max-width: calc(100% - 20px);
+  }
+}
+
+@media (max-width: 1024px) {
+  .graph-row {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .stat-card-income {
+    width: 500px;
+  }
+}
+
+
+/* Edit Box */
+.edit-box {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  z-index: 1000;
+  width: 300px;
+}
+
+.edit-box input {
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.edit-box button {
+  background-color: #4e598c;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}

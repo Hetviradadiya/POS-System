@@ -1,0 +1,41 @@
+{% load static %}
+{% block title %}
+<title>Food-Items</title>
+{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/fooditem_style.css' %}">
+{% endblock %}
+
+<div class="food-items-page">
+  <div class="food-item-title mt-4">
+    <h3>FOOD ITEMS</h3>
+
+    <div class="search-container">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search by category or name">
+      <button class="search-btn" onclick="toggleSearch()">
+        <i class="fa fa-search"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table fooditem-detail-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Image</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Description</th>
+          <th>Price</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="foodTableBody">
+        
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="{% static 'js/fooditem_scripts.js' %}"></script>

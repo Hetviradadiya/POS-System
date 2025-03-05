@@ -1,0 +1,343 @@
+* {
+    font-family: "Nunito", sans-serif;
+}
+
+/* food item text search and add item button */
+.food-item-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px;
+    width: 100%;
+}
+
+.add-fooditems-button {
+    background-color:#4E598C;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0px 3px auto 30px;
+}
+
+.btn-icon {
+    display: none;
+}
+
+.search-container {
+    display: flex;
+    gap: 8px;
+    position: relative;
+    margin-left: auto;
+}
+
+.search-input {
+    padding: 3px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    transition: 0.3s;
+    display: block;
+    width: 250;
+}
+
+.search-btn {
+    background-color: #F9C784;
+    color: black;
+    border: none;
+    padding: 7px;
+    height: 40px;
+    width: 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.search-btn i {
+    font-size: 15px;
+}
+
+
+
+/* table */
+.table-responsive {
+    overflow-x: auto;
+    margin-top: 10px;
+}
+
+.fooditem-detail-table {
+    background-color: #f9f9f9;
+    font-size: 16px;
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+
+.fooditem-detail-table th, 
+.fooditem-detail-table td {
+    padding: 15px 20px; /* Increase padding for more spacing */
+    text-align: left;
+    text-wrap: nowrap;
+    
+}
+
+.fooditem-detail-table th {
+    border-bottom: 2px solid #333 !important;
+    font-size: 18px; /* Increase font size if needed */
+}
+
+.fooditem-detail-table td {
+    border-bottom: 1px solid #ddd;
+    font-size: 16px;
+}
+
+.fooditem-detail-table th:first-child,
+.fooditem-detail-table td:first-child {
+    border-left: none;
+}
+
+.fooditem-detail-table th:last-child,
+.fooditem-detail-table td:last-child {
+    border-right: none;
+}
+
+.update-btn,
+.delete-btn {
+    height: 40px;
+    width: 40px;
+    background-color: #F9C784;
+    color: black;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+
+/* when form popup then background overlay */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 1000;
+}
+
+.error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 2px;
+    display: block;
+}
+
+
+/* form that shows on clicking on add food item button */
+.form-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    display: none;
+    width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.form-container {
+    width: 100%;
+    padding: 10px;
+    background-color: white;
+}
+
+
+.input-group {
+    width: 48%;
+    display: flex;
+    flex-direction: column;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.form-container input {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.form-container input:focus {
+    background-color: #fff;
+    border-color: #5e6790;
+    outline: none;
+    box-shadow: 0 0 5px #5e6790;
+}
+
+.form-container .btn {
+    background-color: #4E598C;
+    color: white;
+    padding: 12px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 5px;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+.btn.cancel {
+    background: #4E598C;
+    color: white;
+}
+
+.btn {
+    background: green;
+    color: white;
+}
+
+
+
+
+@media (max-width: 480px) {
+    .form-buttons {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 600px) {
+    .form-popup {
+        width: 90%; /* Make it take most of the screen width */
+        max-width: 400px; /* Prevent it from getting too large */
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+
+
+@media (max-width: 768px) {
+    .food-item-title {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .add-fooditems-button {
+        padding: 6px;
+    }
+
+    .btn-text {
+        display: none;
+    }
+
+    .btn-icon {
+        display: inline-block;
+        font-size: 18px;
+        height: 28px;
+        border-radius: 2px;
+        width: 28px;
+    }
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .fooditem-detail-table {
+        font-size: 14px;
+    }
+
+    .search-input {
+        display: none;
+        width: 0;
+        transition: width 0.3s ease-in-out;
+    }
+
+    .search-container.active .search-input {
+        display: block;
+        width: 180px;
+    }
+
+}
+
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 25px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 25px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #FF8C42;
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}

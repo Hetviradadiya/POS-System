@@ -1,0 +1,119 @@
+{% load static %} {% block title %}
+<title>Chains</title>
+{% endblock %} {% block css %}
+<link rel="stylesheet" href="{% static 'css/branches_style.css' %}" />
+{% endblock %}
+
+<div class="food-items-page">
+  <div class="food-item-title mt-4">
+    <h3>BRANCHES</h3>
+
+    <div class="search-container">
+      <input
+        type="text"
+        id="searchInput"
+        class="search-input"
+        placeholder="Search by store or manager"
+      />
+      <button class="search-btn" onclick="toggleSearch()">
+        <i class="fa fa-search"></i>
+      </button>
+    </div>
+
+    <button
+      class="open-button add-fooditems-button rounded-3"
+      onclick="openForm(false)"
+    >
+      <span class="btn-text">
+        <i class="fa-solid fa-plus plus-icon"></i> Add Branch
+      </span>
+      <span class="btn-icon"><i class="fa-solid fa-plus plus-icon"></i></span>
+    </button>
+  </div>
+
+  <div class="overlay" id="overlay" onclick="closeForm()"></div>
+  <div class="form-popup" id="myForm">
+    <form id="storeForm" class="form-container">
+      <h1 class="mb-3">Add Branch</h1>
+
+      <div class="form-group">
+        <div class="input-group">
+          <label for="StoreLocation"><b>Location</b></label>
+          <input
+            type="text"
+            id="location"
+            placeholder="Enter location"
+            required
+          />
+        </div>
+        <div class="input-group">
+          <label for="storeArea">Area</label>
+          <input
+            type="text"
+            name="Null"
+            id="storeArea"
+            placeholder="Enter area name"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="input-group">
+          <label for="storeManager">Manager ID </label>
+          <input
+            type="text"
+            name="Null"
+            id="managerID"
+            placeholder="Manager name"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="StoreLocation"><b>Phone No.</b></label>
+          <input
+            type="tel"
+            id="PhoneNo"
+            placeholder="Enter Phone No."
+            required
+          />
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="input-group">
+          <label for="storeManager">Status </label>
+          <select id="status">
+            <option value="">Status</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-buttons">
+        <button type="submit" class="btn">Add</button>
+        <button type="button" class="btn cancel" onclick="closeForm()">
+          Close
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table stores-detail-table">
+      <thead style="border-bottom: 2px solid #333 !important">
+        <tr>
+          <th>ID</th>
+          <th>Location</th>
+          <th>Area</th>
+          <th>Manager ID</th>
+          <th>Phone No.</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="storeTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script src="{% static 'js/branches_scripts.js' %}"></script>
