@@ -1,14 +1,48 @@
-
 from django.db import models , connection
 from phonenumber_field.modelfields import PhoneNumberField
+from django.contrib.auth.hashers import make_password
+from .models import*
 
 class Branch(models.Model):
-    id=models.AutoField(primary_key=True)
-    location=models.CharField(max_length=50)
-    area=models.CharField(max_length=50)
-    manager_id=models.IntegerField(null=False)
-    phone_no=PhoneNumberField()
-    status=models.CharField(max_length=10)
+    branch_id = models.AutoField(primary_key=True)
+    branch_name = models.CharField(max_length=50)
+    branch_location = models.CharField(max_length=50)
+    branch_area = models.CharField(max_length=50)
+    branch_phone_no = PhoneNumberField()
+    branch_status = models.CharField(max_length=10)
+
+    def get_manager(self):
+        # Return the assigned manager's name or 'None' if no manager is assigned.
+        manager = self.staff_members.filter(staff_role="Manager").first()
+        return manager.staff_fullname if manager else "None"
+
+    def __str__(self):
+        return f"{self.branch_id} ({self.branch_name})"
+
+class Staff(models.Model):
+
+    STAFF_ROLE_CHOICES = [
+        ('admin', 'Admin'),
+        ('manager', 'Manager'),
+        ('staff', 'Staff'),
+    ]
+    staff_id = models.AutoField(primary_key=True)
+    staff_username = models.CharField(max_length=50, unique=True)
+    staff_fullname = models.CharField(max_length=100)
+    staff_email = models.EmailField(max_length=50, unique=True)
+    staff_password = models.CharField(max_length=128)
+    staff_phone = PhoneNumberField(null=True, blank=True)
+    staff_img = models.ImageField(upload_to='staff_images/', null=True, blank=True)
+    staff_role = models.CharField(max_length=50, choices=STAFF_ROLE_CHOICES)
+    branch = models.ForeignKey(Branch, on_delete=models.SET_NULL, null=True, blank=True, db_column="branch_id", related_name="staff_members")
+
+    def save(self, *args, **kwargs):
+        if not self.staff_password.startswith("pbkdf2_sha256$"):
+            self.staff_password = make_password(self.staff_password)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.staff_fullname} ({self.staff_role})"
 
 class Purchase(models.Model):
     food_item_id=models.AutoField(primary_key=True)
@@ -80,13 +114,13 @@ class Table(models.Model):
 
 
 class Sales_reports(models.Model):
-  product_id = models.IntegerField(primary_key=True)
+  product_id = models.AutoField(primary_key=True)
   product_name = models.CharField(max_length=50)
   categories= models.CharField(max_length=50)
   quantities= models.IntegerField()
   
 class Supplier(models.Model):
-  supplier_id = models.IntegerField(primary_key=True)
+  supplier_id = models.AutoField(primary_key=True)
   supplier_name = models.CharField(max_length=50)
   company_name = models.CharField(max_length=50)
   supplier_email=models.EmailField(max_length=254)
@@ -95,26 +129,14 @@ class Supplier(models.Model):
   branch=models.CharField(max_length=50) 
 
 class Categories(models.Model):
-  categories_id = models.IntegerField(primary_key=True)
+  categories_id = models.AutoField(primary_key=True)
   categories_name = models.CharField(max_length=50)
   status= models.CharField(max_length=20)
 
 class Customer(models.Model):
-  customer_id = models.IntegerField(primary_key=True) 
+  customer_id = models.AutoField(primary_key=True) 
   customer_firstname = models.CharField(max_length=50)
   customer_lastname = models.CharField(max_length=50)
   customer_email=models.EmailField(max_length=20,blank=True)
   customer_phone=PhoneNumberField()
   gender=models.CharField(max_length=50)
-
-class Staff(models.Model):
-  staff_id = models.IntegerField(primary_key=True) 
-  staff_username = models.CharField(max_length=50)
-  staff_firstname = models.CharField(max_length=50)
-  staff_lastname = models.CharField(max_length=50)
-  staff_email=models.EmailField(max_length=50)
-  staff_phone=PhoneNumberField()
-  staff_img=models.ImageField(blank=True)
-  staff_role=models.CharField(max_length=50)
-  branch=models.CharField(max_length=50)
-

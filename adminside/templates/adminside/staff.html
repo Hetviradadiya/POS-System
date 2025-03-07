@@ -38,16 +38,6 @@
 
       <div class="form-group">
         <div class="input-group">
-          <label for="fullName"><b>FullName</b></label>
-          <input
-            type="text"
-            id="fullName"
-            placeholder="Enter Full Name"
-            required
-          />
-        </div>
-
-        <div class="input-group">
           <label for="userName"><b>UserName</b></label>
           <input
             type="text"
@@ -56,11 +46,26 @@
             required
           />
         </div>
+        <div class="input-group">
+          <label for="fullName"><b>FullName</b></label>
+          <input
+            type="text"
+            id="fullName"
+            placeholder="Enter Full Name"
+            required
+          />
+        </div>
       </div>
 
-      <div class="input-group">
-        <label for="staffImage"><b>Image</b></label>
-        <input type="file" id="staffImage" accept="image/*" />
+      <div class="form-group">
+        <div class="input-group">
+          <label for="staffImage"><b>Image</b></label>
+          <input type="file" id="staffImage" accept="image/*" />
+        </div>
+        <div class="input-group">
+          <label for="phoneNo"><b>PhoneNo</b></label>
+          <input type="tel" id="phoneNo" placeholder="Enter PhoneNo" required />
+        </div>
       </div>
 
       <div class="input-group">
@@ -123,6 +128,7 @@
           <th>UserName</th>
           <th>E-mail</th>
           <th>Password</th>
+          <th>PhoneNo</th>
           <th>StaffRole</th>
           <th>Branch</th>
           <th>Action</th>

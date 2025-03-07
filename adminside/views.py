@@ -1,11 +1,33 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CustomPasswordChangeForm
-from adminside.models import Table
+from adminside.models import*
 from rest_framework.decorators import api_view
 from django.db import connection
+from django.contrib import messages
+from adminside.models import*
+from adminside.forms import*
 
 
 def home(request):
+    staff_id = request.session.get("staff_id")  # Get session data
+    print(f"Checking session: {staff_id}")
+
+    if not staff_id:
+        print("No session found, redirecting to login...")
+        return redirect("login")  # Redirect if no session found
+
+    try:
+        staff_user = Staff.objects.get(staff_id=staff_id)
+        print(f"User accessing admin panel: {staff_user.staff_username}, Role: {staff_user.staff_role}")
+
+        if staff_user.staff_role.lower() != "admin":
+            print("User is not an admin, redirecting to login...")
+            return redirect("login")  # Redirect non-admin users
+    except Staff.DoesNotExist:
+        print("Staff ID not found in database, redirecting to login...")
+        return redirect("login")
+
+    print("Rendering admin dashboard...")
     return redirect('adminside:dashboard')
 
 def render_page(request, template, data=None):
@@ -39,6 +61,46 @@ def customer(request):
     return render_page(request, 'adminside/customer.html')
 
 def staff(request):
+    if request.method == "POST":
+        staff_fullname = request.POST.get("fullName")
+        staff_username = request.POST.get("userName")
+        staff_email = request.POST.get("email")
+        staff_password = request.POST.get("password")
+        staff_role = request.POST.get("staffRole")
+        branch_name = request.POST.get("branches")
+        staff_image = request.FILES.get("staffImage")  # Handle image upload
+
+        # Validate required fields
+        if not all([staff_fullname, staff_username, staff_email, staff_password, staff_role, branch_name]):
+            messages.error(request, "All fields are required.")
+            return redirect("adminside:staff")
+
+        # Check if username already exists
+        if Staff.objects.filter(staff_username=staff_username).exists():
+            messages.error(request, "Username already taken. Please choose another.")
+            print("Username already taken. Please choose another.")
+            return redirect("adminside:staff")
+
+        # Save staff to database
+        staff_member = Staff(
+            staff_fullname=staff_fullname,
+            staff_username=staff_username,
+            staff_email=staff_email,
+            staff_password=make_password(staff_password),  # Hash password
+            staff_role=staff_role,
+            branch=branch,
+            staff_img=staff_image  # Save uploaded image
+        )
+        staff_member.save()
+
+        messages.success(request, "Staff member added successfully!")
+        print("Staff member added successfully!")
+        return redirect("adminside:staff")  # Redirect to prevent duplicate form submissions
+
+    # Fetch existing staff list
+    staff_list = Staff.objects.all()
+
+    # return render(request, "adminside/staff.html", {"staff_list": staff_list})
     return render_page(request, 'adminside/staff.html')
 
 def reports(request):
@@ -73,11 +135,7 @@ def profile(request):
     return render_settings_page(request,"adminside/settings/profile.html")
 
 def logout_view(request):
-    sales_data = [
-    {"invoice_no": "101", "full_name": "John Doe", "phone": "9876543210", "email": "john.doe@example.com", "total": "450", "paid": "200", "balance": "250", "date": "01/15"},
-    
-    ]
-    return render_page(request, 'adminside/logout.html',data=sales_data)
+    return redirect('accounts:loginaccount')
 
 
 

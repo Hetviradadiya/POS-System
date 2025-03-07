@@ -1,8 +1,25 @@
 from django import forms
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import User
-# from .models import Profile
 import re
+from adminside.models import*
+from django.contrib.auth.hashers import make_password
+
+class StaffForm(forms.ModelForm):
+    class Meta:
+        model = Staff
+        fields = [
+            "staff_fullname", "staff_username", "staff_email",
+            "staff_password", "staff_phone", "staff_img", "staff_role", "branch"
+        ]
+
+    def save(self, commit=True):
+        staff = super().save(commit=False)
+        staff.staff_password = make_password(self.cleaned_data["staff_password"])  # Hash password
+        if commit:
+            staff.save()
+        return staff
+
 
 class CustomPasswordChangeForm(PasswordChangeForm):
     old_password = forms.CharField(
@@ -54,3 +71,4 @@ class CustomPasswordChangeForm(PasswordChangeForm):
 
         return cleaned_data
     
+

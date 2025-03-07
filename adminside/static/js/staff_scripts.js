@@ -133,6 +133,7 @@ function addStaff() {
         <td>${userName}</td>
         <td>${email}</td>
         <td>${password}</td>
+        <td>${phoneNo}</td>
         <td>${staffRole}</td>
         <td>${branch}</td>
         <td class="action-buttons">
@@ -155,8 +156,9 @@ function updateRow(button) {
   document.getElementById("userName").value = columns[3].innerText;
   document.getElementById("email").value = columns[4].innerText;
   document.getElementById("password").value = columns[5].innerText;
-  document.getElementById("staffRole").value = columns[6].innerText;
-  document.getElementById("branches").value = columns[7].innerText;
+  document.getElementById("phoneNo").value = columns[6].innerText;
+  document.getElementById("staffRole").value = columns[7].innerText;
+  document.getElementById("branches").value = columns[8].innerText;
 
   let image = document.getElementById("staffImage");
   if (image) {

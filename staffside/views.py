@@ -3,7 +3,25 @@ from django.http import HttpResponse
 from .forms import CustomPasswordChangeForm
 
 def home(request):
-    # return HttpResponse("<h1>hello</h1>")
+    staff_id = request.session.get("staff_id")  # Get session data
+    print(f"Checking session: {staff_id}")
+
+    if not staff_id:
+        print("No session found, redirecting to login...")
+        return redirect("login")  # Redirect if no session found
+
+    try:
+        staff_user = Staff.objects.get(staff_id=staff_id)
+        print(f"User accessing admin panel: {staff_user.staff_username}, Role: {staff_user.staff_role}")
+
+        if staff_user.staff_role.lower() != "admin":
+            print("User is not an admin, redirecting to login...")
+            return redirect("login")  # Redirect non-admin users
+    except Staff.DoesNotExist:
+        print("Staff ID not found in database, redirecting to login...")
+        return redirect("login")
+
+    print("Rendering staff pos...")
     return redirect('staffside:pos')
 
 def render_page(request, template, data=None):
@@ -53,5 +71,5 @@ def profile(request):
     return render_settings_page(request,"staffside/settings/profile.html")
 
 def logout_view(request):
-    return render_page(request, 'staffside/logout.html')
+    return redirect('accounts:loginaccount')
 
