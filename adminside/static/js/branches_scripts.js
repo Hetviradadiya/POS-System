@@ -1,269 +1,4 @@
-// Toggle search input on small devices
-// function toggleSearch() {
-//     let searchContainer = document.querySelector(".search-container");
-//     let searchInput = document.querySelector(".search-input");
-
-//     searchContainer.classList.toggle("active");
-//     if (searchContainer.classList.contains("active")) {
-//       searchInput.focus();
-//     }
-//   }
-
-//   // Search function
-//   document.getElementById("searchInput").addEventListener("keyup", function () {
-//     let filter = this.value.toLowerCase();
-//     let rows = document.querySelectorAll("#storeTableBody tr");
-
-//     rows.forEach(function (row) {
-//       let store = row.cells[1].textContent.toLowerCase();
-//       let manager = row.cells[2].textContent.toLowerCase();
-
-//       if (store.includes(filter) || manager.includes(filter)) {
-//         row.style.display = "";
-//       } else {
-//         row.style.display = "none";
-//       }
-//     });
-//   });
-
-//  let ID = 1;
-
-// document.addEventListener("DOMContentLoaded", function () {
-//   document.getElementById("storeForm").addEventListener("submit", function (event) {
-//     event.preventDefault();
-//     addstore();
-//   });
-//   populateStaticDropdowns();
-// });
-
-// function populateStaticDropdowns() {
-//   let statuss = ["Open","Close"];
-//   let statusDropdown = document.getElementById("status");
-//   statuss.forEach(status => {
-//     let option = document.createElement("option");
-//     option.value = status;
-//     option.textContent = status;
-//     statusDropdown.appendChild(option);
-//   });
-
-// }
-
-// function addstore() {
-//   let location = document.getElementById("location").value;
-//   let area = document.getElementById("storeArea").value;
-//   let manager = document.getElementById("managerID").value;
-//   let Phone_no = document.getElementById("PhoneNo").value;
-//   let Status = document.getElementById("status").value;
-//   if (  !location || !area || !manager  || !Phone_no || !Status)
-//     {
-//     alert("Please fill in all required fields.");
-//     return;
-//   }
-//   let newRow = document.createElement("tr");
-//   newRow.innerHTML = `
-//         <td>${ID}</td>
-//         <td>${location}</td>
-//         <td>${area}</td>
-//         <td>${manager}</td>
-//         <td>${Phone_no}</td>
-//         <td>${Status}</td>
-//         <td class="action-buttons">
-//             <button class="update-btn" onclick="updateRow(this)"><i class="fas fa-edit"></i></button>
-//             <button class="delete-btn" onclick="deleteRow(this)"><i class="fas fa-trash"></i></button>
-//         </td>
-//     `;
-//   document.getElementById("storeTableBody").appendChild(newRow);
-//   ID++;
-//   document.getElementById("storeForm").reset();
-//   closeForm();
-// }
-
-// // Update store item
-// function updateRow(button) {
-//   let row = button.closest("tr");
-//   let columns = row.getElementsByTagName("td");
-//   document.getElementById("location").value = columns[1].innerText;
-//   document.getElementById("storeArea").value = columns[2].innerText;
-//   document.getElementById("managerID").value = columns[3].innerText;
-//   document.getElementById("PhoneNo").value = columns[4].innerText;
-//   document.getElementById("status").value = columns[5].innerText;
-
-//   openForm();
-//   row.remove();
-// }
-
-// // Delete food item
-// function deleteRow(button) {
-//   button.closest("tr").remove();
-// }
-
-// // Open popup form
-// function openForm() {
-//   document.getElementById("overlay").style.display = "block";
-//   document.getElementById("myForm").style.display = "block";
-//   document.body.classList.add("popup-open");
-// }
-
-// // Close popup form
-// function closeForm() {
-//   document.getElementById("overlay").style.display = "none";
-//   document.getElementById("myForm").style.display = "none";
-//   document.body.classList.remove("popup-open");
-// }
-
-// New Code
-
-// let ID = 1;
-// let updateIndex = null; // Track the row index to update
-
-// document.addEventListener("DOMContentLoaded", function () {
-//   document.getElementById("storeForm").addEventListener("submit", function (event) {
-//     event.preventDefault();
-//     if (validateForm()){
-//         if (updateIndex !== null) {
-//           saveUpdatedStore();
-//         } else {
-//           addstore();
-//         }
-//       }
-//   });
-//   populateStaticDropdowns();
-// });
-
-// function populateStaticDropdowns() {
-//   let statuss = ["Open", "Close"];
-//   let statusDropdown = document.getElementById("status");
-//   statuss.forEach(status => {
-//     let option = document.createElement("option");
-//     option.value = status;
-//     option.textContent = status;
-//     statusDropdown.appendChild(option);
-//   });
-// }
-
-// function addstore() {
-//   let location = document.getElementById("location").value;
-//   let area = document.getElementById("storeArea").value;
-//   let manager = document.getElementById("managerID").value;
-//   let Phone_no = document.getElementById("PhoneNo").value;
-//   let Status = document.getElementById("status").value;
-
-//   if (!location || !area || !manager || !Phone_no || !Status) {
-//     alert("Please fill in all required fields.");
-//     return;
-//   }
-
-//   let newRow = document.createElement("tr");
-//   newRow.innerHTML = `
-//         <td>${ID}</td>
-//         <td>${location}</td>
-//         <td>${area}</td>
-//         <td>${manager}</td>
-//         <td>${Phone_no}</td>
-//         <td>${Status}</td>
-//         <td class="action-buttons">
-//             <button class="update-btn" onclick="updateRow(this)"><i class="fas fa-edit"></i></button>
-//             <button class="delete-btn" onclick="deleteRow(this)"><i class="fas fa-trash"></i></button>
-//         </td>
-//     `;
-
-//   document.getElementById("storeTableBody").appendChild(newRow);
-//   ID++;
-//   document.getElementById("storeForm").reset();
-//   closeForm();
-// }
-
-// function updateRow(button) {
-//   let row = button.closest("tr");
-//   let columns = row.getElementsByTagName("td");
-
-//   document.getElementById("location").value = columns[1].textContent;
-//   document.getElementById("storeArea").value = columns[2].textContent;
-//   document.getElementById("managerID").value = columns[3].textContent;
-//   document.getElementById("PhoneNo").value = columns[4].textContent;
-//   document.getElementById("status").value = columns[5].textContent;
-
-//   updateIndex = row; // Store the reference to the row instead of removing it
-
-//   openForm();
-// }
-
-// function validateForm(){
-//   let phoneno = document.getElementById("PhoneNo").value.trim();
-//   let phoneNoRegex = /^(?:\+91[-\s]?)?[6-9]\d{9}$/;
-
-//   removeError(phoneno);
-
-//   let isValid = true;
-
-//   if (!phoneNoRegex.test(phoneno)) {
-//     alert(
-
-//       "Invalid Phone Format.Phone number must be 10 digits & start with 6-9 (e.g., 9876543210)"
-//     );
-//     isValid = false;
-//   }
-//   return isValid;
-// }
-
-// function saveUpdatedStore() {
-//   if (updateIndex!== null) {
-//     let location = document.getElementById("location").value;
-//     let area = document.getElementById("storeArea").value;
-//     let manager = document.getElementById("managerID").value;
-//     let Phone_no = document.getElementById("PhoneNo").value;
-//     let Status = document.getElementById("status").value;
-
-//     updateIndex.cells[1].textContent = location;
-//     updateIndex.cells[2].textContent = area;
-//     updateIndex.cells[3].textContent = manager;
-//     updateIndex.cells[4].textContent = Phone_no;
-//     updateIndex.cells[5].textContent = Status;
-
-//     updateIndex = null;
-//     document.getElementById("storeForm").reset();
-//     closeForm();
-//   }
-// }
-
-// function deleteRow(button) {
-//   button.closest("tr").remove();
-// }
-
-// function showError(input, message) {
-//   let errorSpan = document.createElement("span");
-//   errorSpan.classList.add("error-message");
-//   errorSpan.style.color = "red";
-//   errorSpan.style.fontSize = "12px";
-//   errorSpan.innerText = message;
-//   input.parentNode.appendChild(errorSpan);
-// }
-
-// // Function to remove previous error messages
-// function removeError(input) {
-//   let error = input.parentNode.querySelector(".error-message");
-//   if (error) {
-//     error.remove();
-//   }
-// }
-
-// function openForm() {
-//   document.getElementById("overlay").style.display = "block";
-//   document.getElementById("myForm").style.display = "block";
-//   document.body.classList.add("popup-open");
-// }
-
-// function closeForm() {
-//   document.getElementById("overlay").style.display = "none";
-//   document.getElementById("myForm").style.display = "none";
-//   document.body.classList.remove("popup-open");
-
-//   updateIndex = null; // Reset update index when closing the form
-// }
-
-// Another new code
-
-// Toggle search input on small devices
+// search button
 function toggleSearch() {
   let searchContainer = document.querySelector(".search-container");
   let searchInput = document.querySelector(".search-input");
@@ -274,196 +9,187 @@ function toggleSearch() {
   }
 }
 
-// Search function
+//search function
 document.getElementById("searchInput").addEventListener("keyup", function () {
-  let filter = this.value.toLowerCase();
-  let rows = document.querySelectorAll("#storeTableBody tr");
+  let filter = this.value.toLowerCase().trim();
+  let rows = document.querySelectorAll("#branchTableBody tr");
+  let matchFound = false;
 
   rows.forEach(function (row) {
-    let store = row.cells[1].textContent.toLowerCase();
-    let manager = row.cells[2].textContent.toLowerCase();
+    if (row.id === "noDataRow") return;
 
-    if (store.includes(filter) || manager.includes(filter)) {
+    let branch = row.cells[1].textContent.toLowerCase();
+    let area = row.cells[3].textContent.toLowerCase();
+
+    if (branch.includes(filter) || area.includes(filter)) {
       row.style.display = "";
+      matchFound = true;
     } else {
       row.style.display = "none";
     }
   });
-});
 
-let ID = 1;
-let updateIndex = null; // Stores the row reference for update
+  let tableBody = document.getElementById("branchTableBody");
+  let noData = document.getElementById("noDataRow");
 
-document.addEventListener("DOMContentLoaded", function () {
-  document
-    .getElementById("storeForm")
-    .addEventListener("submit", function (event) {
-      event.preventDefault();
-      if (validateForm()) {
-        if (updateIndex !== null) {
-          saveUpdatedBranch(); // Update existing row
-        } else {
-          addBranch(); // Add new row
-        }
-      }
+  if (filter && !matchFound) {
+    if (!noData) {
+      noData = document.createElement("tr");
+      noData.id = "noDataRow";
+      noData.innerHTML = `<td colspan="8" style="text-align: center;">No data found</td>`; //add no datafound row
+      tableBody.appendChild(noData);
+    }
+  } else {
+    if (noData) {
+      noData.remove();
+    }
+  }
+
+  // if search bar is empty, show all rows again
+  if (filter === "") {
+    rows.forEach(function (row) {
+      row.style.display = "";
     });
-
-  populateStaticDropdowns();
+    if (noData) {
+      noData.remove();
+    }
+  }
 });
 
-function populateStaticDropdowns() {
-  let statuss = ["Open", "Close"];
-  let statusDropdown = document.getElementById("status");
-  statuss.forEach((status) => {
-    let option = document.createElement("option");
-    option.value = status;
-    option.textContent = status;
-    statusDropdown.appendChild(option);
-  });
-}
-
-function validateForm() {
-  let phoneNo = document.getElementById("PhoneNo");
-  let status = document.getElementById("status");
-
-  let phoneNoValue = phoneNo.value.trim();
-  let statusValue = status.value.trim();
-
-  let phoneNoRegex = /^(?:\+91[-\s]?)?[6-9]\d{9}$/;
-
-  removeError(phoneNo);
-  removeError(status);
-  clearErrors();
-
-  let isValid = true;
-
-  if (!phoneNoRegex.test(phoneNoValue)) {
-    showError(
-      phoneNo,
-      "Invalid Phone Format. Phone number must be 10 digits & start with 6-9 (e.g., 9876543210)"
-    );
-    isValid = false;
-  }
-
-  if (!statusValue) {
-    showError(status, "Status is require");
-    isValid = false;
-  }
-
-  return isValid;
-}
-
-function showError(input, message) {
-  let errorSpan = document.createElement("span");
-  errorSpan.classList.add("error-message");
-  errorSpan.style.color = "red";
-  errorSpan.style.fontSize = "12px";
-  errorSpan.innerText = message;
-  input.parentNode.appendChild(errorSpan);
-}
-
-function removeError(input) {
-  let error = input.parentNode.querySelector(".error-message");
-  if (error) {
-    error.remove();
-  }
-}
-
-function addBranch() {
-  let location = document.getElementById("location").value.trim();
-  let area = document.getElementById("storeArea").value.trim();
-  let manager = document.getElementById("managerID").value.trim();
-  let phoneNo = document.getElementById("PhoneNo").value.trim();
-  let status = document.getElementById("status").value;
-
-  let newRow = document.createElement("tr");
-  newRow.innerHTML = `
-        <td>${ID}</td>
-        <td>${location}</td>
-        <td>${area}</td>
-        <td>${manager}</td>
-        <td>${phoneNo}</td>
-        <td>${status}</td>
-        <td class="action-buttons">
-            <button class="update-btn" onclick="updateRow(this)"><i class="fas fa-edit"></i></button>
-            <button class="delete-btn" onclick="deleteRow(this)"><i class="fas fa-trash"></i></button>
-        </td>
-    `;
-
-  document.getElementById("storeTableBody").appendChild(newRow);
-  ID++;
-  document.getElementById("storeForm").reset();
-  closeForm();
-}
-
-function clearErrors() {
-  document.querySelectorAll(".error-message").forEach((el) => {
-    el.textContent = "";
-  });
-}
-
-function updateRow(button) {
-  let row = button.closest("tr");
-  let columns = row.getElementsByTagName("td");
-
-  document.getElementById("location").value = columns[1].textContent;
-  document.getElementById("storeArea").value = columns[2].textContent;
-  document.getElementById("managerID").value = columns[3].textContent;
-  document.getElementById("PhoneNo").value = columns[4].textContent;
-  document.getElementById("status").value = columns[5].textContent;
-
-  updateIndex = row; // Store reference to the row for updating
-  openForm(true);
-}
-
-function saveUpdatedBranch() {
-  if (updateIndex) {
-    let location = document.getElementById("location").value;
-    let area = document.getElementById("storeArea").value;
-    let manager = document.getElementById("managerID").value;
-    let phoneNo = document.getElementById("PhoneNo").value;
-    let status = document.getElementById("status").value;
-
-    updateIndex.cells[1].textContent = location;
-    updateIndex.cells[2].textContent = area;
-    updateIndex.cells[3].textContent = manager;
-    updateIndex.cells[4].textContent = phoneNo;
-    updateIndex.cells[5].textContent = status;
-
-    updateIndex = null; // Reset after update
-    document.getElementById("storeForm").reset();
-    closeForm();
-  }
-}
-
-function deleteRow(button) {
-  button.closest("tr").remove();
-}
-
-// function openForm() {
-//   document.getElementById("overlay").style.display = "block";
-//   document.getElementById("myForm").style.display = "block";
-//   document.body.classList.add("popup-open");
-// }
+// open form
 function openForm(isUpdate = false) {
   document.getElementById("overlay").style.display = "block";
   document.getElementById("myForm").style.display = "block";
   document.body.classList.add("popup-open");
 
   if (!isUpdate) {
-    resetForm(); // Clears the form ONLY when adding a new chain
-    updateIndex = null; // Clear any previous update reference
+    resetForm(); // Clears form
+    document.querySelector(".form-container h1").innerText = "Add Branch";
+    document.querySelector(".form-buttons button[type='submit']").innerText =
+      "Add Branch";
   }
 }
+
+// Close form
 function closeForm() {
   document.getElementById("overlay").style.display = "none";
   document.getElementById("myForm").style.display = "none";
   document.body.classList.remove("popup-open");
 
-  resetForm();
-  updateIndex = null; // Reset update index when closing the form
+  resetForm(); // Reset form
+  clearErrors(); // Clear validation errors
 }
 
+// reset form
 function resetForm() {
-  document.getElementById("storeForm").reset(); // Resets all input fields
+  document.getElementById("branchId").value = "";
+  document.getElementById("branchName").value = "";
+  document.getElementById("manager").value = "";
+  document.getElementById("branchArea").value = "";
+  document.getElementById("branchLocation").value = "";
+  document.getElementById("phoneNo").value = "";
+  document.getElementById("branchStatus").value = "";
 }
+
+//Clear validation errors
+function clearErrors() {
+  document
+    .querySelectorAll(".error")
+    .forEach((el) => el.classList.remove("error"));
+  document.querySelectorAll(".error-message").forEach((el) => el.remove()); // Remove error messages
+}
+
+function editBranch(
+  branchId,
+  branchName,
+  branchLocation,
+  branchArea,
+  phoneNo,
+  branchStatus,
+  manager
+) {
+  document.getElementById("branchId").value = branchId;
+  document.getElementById("branchName").value = branchName;
+  document.getElementById("manager").value = manager || "";
+  document.getElementById("branchArea").value = branchArea;
+  document.getElementById("branchLocation").value = branchLocation;
+  document.getElementById("phoneNo").value = phoneNo;
+
+  let statusSelect = document.getElementById("branchStatus");
+  if (branchStatus === "Active" || branchStatus === "Inactive") {
+    statusSelect.value = branchStatus;
+  } else {
+    statusSelect.value = "";
+  }
+
+  document.querySelector(".form-container h1").innerText = "Update Branch";
+  document.querySelector(".form-buttons button[type='submit']").innerText =
+    "Update Branch";
+
+  openForm(true); // Open form for update
+}
+
+//form validation
+document
+  .getElementById("branchForm")
+  .addEventListener("submit", function (event) {
+    let isValid = true;
+
+    function showError(fieldId, message) {
+      const field = document.getElementById(fieldId);
+      let errorSpan = field.nextElementSibling;
+
+      if (!errorSpan || !errorSpan.classList.contains("error-message")) {
+        errorSpan = document.createElement("span");
+        errorSpan.classList.add("error-message");
+        field.parentNode.appendChild(errorSpan);
+      }
+
+      field.classList.add("error");
+      errorSpan.textContent = message;
+      errorSpan.style.color = "red";
+    }
+
+    clearErrors(); // Clear errors
+
+    const branchName = document.getElementById("branchName").value.trim();
+    if (!branchName) {
+      showError("branchName", "Branch name is required!");
+      isValid = false;
+    }
+
+    const branchLocation = document
+      .getElementById("branchLocation")
+      .value.trim();
+    if (!branchLocation) {
+      showError("branchLocation", "Branch location is required!");
+      isValid = false;
+    }
+
+    const branchArea = document.getElementById("branchArea").value.trim();
+    if (!branchArea) {
+      showError("branchArea", "Branch area is required!");
+      isValid = false;
+    }
+
+    const phoneNo = document.getElementById("phoneNo").value.trim();
+    const phoneRegex =
+      /^\+(1\d{10}|91\d{10}|44\d{9,10}|81\d{9,11}|49\d{10,11}|33\d{9}|61\d{9}|86\d{10,11})$/;
+
+    if (!phoneRegex.test(phoneNo)) {
+      showError("phoneNo", "Enter a valid phone number (e.g., +919876543210).");
+      isValid = false;
+    }
+
+    const branchStatus = document.getElementById("branchStatus").value;
+    if (!branchStatus) {
+      showError("branchStatus", "Branch status is required!");
+      isValid = false;
+    }
+
+    if (!isValid) {
+      event.preventDefault(); // Prevent form submission if validation fails
+      document.getElementById("overlay").style.display = "block"; // Keep the form open
+      document.getElementById("myForm").style.display = "block";
+    }
+  });

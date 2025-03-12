@@ -7,6 +7,36 @@
 {% endblock %}
 
 <div class="food-items-page">
+    {% if messages %}
+    <div id="toastContainer">
+        {% for message in messages %}
+            <div class="custom-alert alert alert-{{ message.tags }}">
+                <i class="fas fa-check-circle"></i>
+                <strong>{{ message.tags|title }}!</strong> {{ message }}
+                <button type="button" class="close" onclick="closeAlert(this)">
+                    &times;
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(() => {
+                document.querySelectorAll(".custom-alert").forEach(alert => {
+                    alert.classList.add("fade-out");
+                    setTimeout(() => alert.remove(), 500);
+                });
+            }, 5000);
+        });
+
+        function closeAlert(button) {
+            let alert = button.parentElement;
+            alert.classList.add("fade-out");
+            setTimeout(() => alert.remove(), 500);
+        }
+    </script>
+  {% endif %}
   <div class="food-item-title mt-4">
     <h3>PURCHASE</h3>
 

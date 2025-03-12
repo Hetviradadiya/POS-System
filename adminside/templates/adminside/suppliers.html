@@ -6,8 +6,38 @@
 <link rel="stylesheet" href="{% static 'css/supplier_style.css' %}">
 {% endblock %}
 
-<div class="food-items-page">
-    <div class="food-item-title mt-4">
+<div class="supplier-page">
+    {% if messages %}
+        <div id="toastContainer">
+            {% for message in messages %}
+                <div class="custom-alert alert alert-{{ message.tags }}">
+                    <i class="fas fa-check-circle"></i>
+                    <strong>{{ message.tags|title }}!</strong> {{ message }}
+                    <button type="button" class="close" onclick="closeAlert(this)">
+                        &times;
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                setTimeout(() => {
+                    document.querySelectorAll(".custom-alert").forEach(alert => {
+                        alert.classList.add("fade-out");
+                        setTimeout(() => alert.remove(), 500);
+                    });
+                }, 5000);
+            });
+
+            function closeAlert(button) {
+                let alert = button.parentElement;
+                alert.classList.add("fade-out");
+                setTimeout(() => alert.remove(), 500);
+            }
+        </script>
+    {% endif %}
+    <div class="supplier-title mt-4">
         <h3>SUPPLIER</h3>
 
         <div class="search-container">
@@ -17,7 +47,7 @@
             </button>
         </div>
 
-        <button class="open-button add-fooditems-button rounded-3" onclick="openForm()">
+        <button class="open-button add-supplier-button rounded-3" onclick="openForm()">
             <span class="btn-text">
                 <i class="fa-solid fa-plus plus-icon"></i> Add Supplier
             </span>
@@ -27,45 +57,43 @@
 
     <div class="overlay" id="overlay" onclick="closeForm()"></div>
     <div class="form-popup" id="myForm">
-        <form id="supplierForm" class="form-container">
+        <form id="supplierForm" class="form-container" method="post">
+            {%csrf_token%}
             <h1 class="mb-3">Add Supplier</h1>
+
+            <input type="hidden" id="supplierId" name="supplier_id" value="{{ supplier.supplier_id|default:'' }}"/>
 
             <div class="input-group">
                 <label for="supplierName"><b>Name</b></label>
-                <input type="text" id="supplierName" placeholder="Enter Supplier Name">
-                <span class="error-message" id="nameError"></span>
+                <input type="text" id="supplierName" name="supplier_name" value="{{ form.supplier_name.value }}" placeholder="Enter Supplier Name">
+
             </div>
+
+            <div class="form-buttons">
             <div class="input-group">
-                <label for="companyName"><b>Company Name</b></label>
-                <input type="text" id="companyName" placeholder="Enter Company Name">
-                <span class="error-message" id="companyError"></span>
+                <label for="supplierEmail"><b>Email</b></label>
+                <input type="email" id="supplierEmail" name="supplier_email" value="{{ form.supplier_email.value }}" placeholder="Enter Email">
+
             </div>
 
             <div class="input-group">
-                <label for="supplierEmail"><b>Email</b></label>
-                <input type="email" id="supplierEmail" placeholder="Enter Email">
-                <span class="error-message" id="emailError"></span>
+                <label for="supplierPhoneNo"><b>Phone</b></label>
+                <input type="tel" id="supplierPhoneNo" name="supplier_phone_no" value="{{ form.supplier_phone_no.value }}" placeholder="Enter Phone Number">
+            </div>
+            </div>
+
+            <div class="input-group">
+                <label for="companyName"><b>Company Name</b></label>
+                <input type="text" id="companyName" name="company_name" value="{{ form.company_name.value }}" placeholder="Enter Company Name">
+
             </div>
 
             <div class="input-group">
                 <label for="supplierAddress"><b>Address</b></label>
-                <textarea id="supplierAddress" placeholder="Enter Address"></textarea>
-                <span class="error-message" id="addressError"></span>
+                <textarea id="supplierAddress" name="address" value="{{ form.address.value }}" placeholder="Enter Address"></textarea>
+
             </div>
 
-            <div class="input-group">
-                <label for="supplierPhone"><b>Phone</b></label>
-                <input type="text" id="supplierPhone" placeholder="Enter Phone Number">
-                <span class="error-message" id="phoneError"></span>
-            </div>
-
-            <div class="input-group">
-                <label for="supplierStore"><b>Store</b></label>
-                <select id="supplierStore">
-                    <option value="">Select Store</option>
-                </select>
-                <span class="error-message" id="storeError"></span>
-            </div>
             
             <div class="form-buttons">
                 <button type="submit" class="btn">Add</button>
@@ -76,28 +104,61 @@
 </div>
 
 <div class="table-responsive">
-    <table class="table fooditem-detail-table">
-        <thead>
+    <table class="table supplier-detail-table">
+        <thead style="border-bottom: 2px solid #333 !important">
             <tr>
                 <th>ID</th>
                 <th>Name</th>
-                <th>Company Name</th>
                 <th>Email</th>
+                <th>PhoneNo</th>
+                <th>Company Name</th>
                 <th>Address</th>
-                <th>Phone</th>
-                <th>Store</th>
                 <th>Action</th>
             </tr>
         </thead>
-        <tbody id="supplierTableBody"></tbody>
+        <tbody id="supplierTableBody">
+        {% if suppliers %}
+            {% for supplier in suppliers %}
+            <tr>
+                <td>{{ supplier.supplier_id }}</td>
+                <td>{{ supplier.supplier_name}}</td>
+                <td>{{ supplier.supplier_email}}</td>
+                <td>{{ supplier.supplier_phone_no}}</td>
+                <td>{{ supplier.company_name }}</td>
+                <td>{{ supplier.address }}</td>
+                <td class="action-buttons">
+            <button
+                class="update-btn"
+                onclick="editsupplier('{{ supplier.supplier_id }}','{{ supplier.supplier_name}}','{{ supplier.supplier_email}}','{{ supplier.supplier_phone_no}}','{{ supplier.company_name }}','{{ supplier.address }}')"
+            >
+                <i class="fas fa-edit"></i>
+            </button>
+            <form
+                method="post"
+                action="{% url 'adminside:delete_supplier' supplier.supplier_id %}"
+                style="display: inline"
+                onsubmit="return confirmDelete(event)"
+            >
+                {% csrf_token %}
+                <button type="submit" class="delete-btn">
+                <i class="fas fa-trash"></i>
+                </button>
+            </form>
+            </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="8" style="text-align: center;">No suppliers found. Click 'Add Supplier' to add one!</td>
+            </tr>
+        {% endif %}
+        </tbody>
     </table>
 </div>
 </div>
 
-<script>
-    function addSupplier() {
-        console.log("addSupplier function called!");
-    }
-</script>
+
+<!-- Include SweetAlert2 (Must be added in the <head> or before </body>) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script src="{% static 'js/supplier_scripts.js' %}"></script>

@@ -1,6 +1,7 @@
 from django.db import models , connection
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import check_password
 from .models import*
 
 class Branch(models.Model):
@@ -8,16 +9,68 @@ class Branch(models.Model):
     branch_name = models.CharField(max_length=50)
     branch_location = models.CharField(max_length=50)
     branch_area = models.CharField(max_length=50)
-    branch_phone_no = PhoneNumberField()
+    branch_phone_no = PhoneNumberField(blank=True, null=True, error_messages={'invalid': "Enter a valid phone number (e.g., +919876543210)."})
     branch_status = models.CharField(max_length=10)
-
+    branch_manager = models.CharField(max_length=100, blank=True, null=True)  # branch manager's name
+    
     def get_manager(self):
-        # Return the assigned manager's name or 'None' if no manager is assigned.
-        manager = self.staff_members.filter(staff_role="Manager").first()
+    # """Return the assigned manager's name or 'None' if no manager is assigned."""
+        manager = self.staff_members.filter(staff_role__iexact="manager").first()  # Case-insensitive check
         return manager.staff_fullname if manager else "None"
 
     def __str__(self):
         return f"{self.branch_id} ({self.branch_name})"
+    
+class Supplier(models.Model):
+    supplier_id = models.AutoField(primary_key=True)
+    supplier_name = models.CharField(max_length=50)
+    supplier_email = models.EmailField(max_length=254)
+    supplier_phone_no = PhoneNumberField(blank=True, null=True, error_messages={'invalid': "Enter a valid phone number (e.g., +919876543210)."})
+    company_name = models.CharField(max_length=50)
+    address = models.CharField(max_length=250)
+
+    def __str__(self):
+        return f"{self.supplier_name} - {self.company_name}"
+
+class Categories(models.Model):
+    categories_id = models.AutoField(primary_key=True)
+    categories_name = models.CharField(max_length=50)
+    status = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.categories_name
+    
+class Purchase(models.Model):
+    purchase_id = models.AutoField(primary_key=True)
+    food_item = models.CharField(max_length=50)
+    cost_price = models.IntegerField()
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, db_column="supplier_id",null=True, blank=True)
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, db_column="branch_id",null=True, blank=True)
+    purchased_date = models.DateField()
+    payment_status = models.CharField(max_length=10)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        # Check if the food item already exists in inventory
+        inventory_item, created = Inventory.objects.get_or_create(
+            food_item=self,
+            defaults={
+                "category": None,  # Set category later if needed
+                "quantity": 0,
+                "branch": self.supplier.branch,
+                "cost_price": self.cost_price,
+            }
+        )
+
+        if not created:
+            inventory_item.quantity += 1  # Update quantity if already exists
+            inventory_item.save()
+
+    def __str__(self):
+        return f"{self.food_item} - {self.supplier.supplier_name}"
+
+    
 
 class Staff(models.Model):
 
@@ -31,7 +84,7 @@ class Staff(models.Model):
     staff_fullname = models.CharField(max_length=100)
     staff_email = models.EmailField(max_length=50, unique=True)
     staff_password = models.CharField(max_length=128)
-    staff_phone = PhoneNumberField(null=True, blank=True)
+    staff_phone_no = PhoneNumberField(blank=True, null=True, error_messages={'invalid': "Enter a valid phone number (e.g., +919876543210)."})
     staff_img = models.ImageField(upload_to='staff_images/', null=True, blank=True)
     staff_role = models.CharField(max_length=50, choices=STAFF_ROLE_CHOICES)
     branch = models.ForeignKey(Branch, on_delete=models.SET_NULL, null=True, blank=True, db_column="branch_id", related_name="staff_members")
@@ -41,29 +94,34 @@ class Staff(models.Model):
             self.staff_password = make_password(self.staff_password)
         super().save(*args, **kwargs)
 
+    def set_password(self, raw_password):
+        self.staff_password = make_password(raw_password)
+        self.save()
+
+    def check_password(self, raw_password):
+    # """Verifies the password with the hashed version."""
+        return check_password(raw_password, self.staff_password)
+
     def __str__(self):
         return f"{self.staff_fullname} ({self.staff_role})"
 
-class Purchase(models.Model):
-    food_item_id=models.AutoField(primary_key=True)
-    food_item=models.CharField(max_length=50)
-    cost_price=models.IntegerField(null=False)
-    supplier_id=models.IntegerField(null=False)
-    purchased_date=models.DateField()
-    payment_status=models.CharField(max_length=10)
 
 class Inventory(models.Model):
-    food_item_id=models.AutoField(primary_key=True)
-    image=models.ImageField(blank=True)
-    food_item_name=models.CharField(max_length=20)
-    category=models.CharField(max_length=20)
-    description=models.TextField(max_length=100)
-    quantity=models.IntegerField(null=True)
-    branch=models.CharField(max_length=20)
-    sell_price=models.IntegerField(null=False)
-    cost_price=models.IntegerField(null=False)
-    mfg_date=models.DateField()
-    exp_date=models.DateField()
+    inventory_id = models.AutoField(primary_key=True)
+    food_item = models.ForeignKey(Purchase, on_delete=models.SET_NULL, null=True, blank=True, db_column="food_item_id")
+    category = models.ForeignKey(Categories, on_delete=models.CASCADE, db_column="categories_id")
+    description = models.TextField(max_length=100, null=True, blank=True)
+    quantity = models.IntegerField(null=True, blank=True)
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, db_column="branch_id")
+    image = models.ImageField(upload_to='inventory_images/', blank=True)
+    sell_price = models.IntegerField(null=True, blank=True)
+    cost_price = models.IntegerField(null=True, blank=True)
+    mfg_date = models.DateField(null=True, blank=True)
+    exp_date = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.food_item.food_item if self.food_item else 'No Food Item'} - {self.category.category_name}"
+
 
 
 class Table(models.Model):
@@ -112,31 +170,28 @@ class Table(models.Model):
     def __str__(self):
         return f"Table {self.table_id} - {self.status}"
 
-
-class Sales_reports(models.Model):
-  product_id = models.AutoField(primary_key=True)
-  product_name = models.CharField(max_length=50)
-  categories= models.CharField(max_length=50)
-  quantities= models.IntegerField()
   
-class Supplier(models.Model):
-  supplier_id = models.AutoField(primary_key=True)
-  supplier_name = models.CharField(max_length=50)
-  company_name = models.CharField(max_length=50)
-  supplier_email=models.EmailField(max_length=254)
-  supplier_phone=PhoneNumberField()
-  address= models.CharField(max_length=250)
-  branch=models.CharField(max_length=50) 
-
-class Categories(models.Model):
-  categories_id = models.AutoField(primary_key=True)
-  categories_name = models.CharField(max_length=50)
-  status= models.CharField(max_length=20)
 
 class Customer(models.Model):
   customer_id = models.AutoField(primary_key=True) 
   customer_firstname = models.CharField(max_length=50)
-  customer_lastname = models.CharField(max_length=50)
-  customer_email=models.EmailField(max_length=20,blank=True)
-  customer_phone=PhoneNumberField()
+  customer_lastname = models.CharField(max_length=50,blank=True, null=True)
+  customer_address = models.CharField(max_length=255,blank=True, null=True)
+  customer_email=models.EmailField(max_length=50,unique=True)
+  customer_phone_no=PhoneNumberField(blank=True, null=True, error_messages={'invalid': "Enter a valid phone number (e.g., +919876543210)."})
   gender=models.CharField(max_length=50)
+
+
+class SalesReport(models.Model):
+    sales_id = models.AutoField(primary_key=True)
+    product = models.ForeignKey(Inventory, on_delete=models.CASCADE, db_column="inventory_id")  # Link to Inventory
+    category = models.ForeignKey(Categories, on_delete=models.CASCADE, db_column="categories_id")
+    quantity_sold = models.IntegerField()
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, db_column="branch_id")
+    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, db_column="supplier_id", null=True, blank=True)
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, db_column="customer_id", null=True, blank=True)
+    staff = models.ForeignKey(Staff, on_delete=models.SET_NULL, db_column="staff_id", null=True, blank=True)
+    sale_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.product.food_item_name} - {self.quantity_sold} sold at {self.branch.branch_name}"

@@ -4,13 +4,88 @@ from django.contrib.auth.models import User
 import re
 from adminside.models import*
 from django.contrib.auth.hashers import make_password
+from phonenumber_field.phonenumber import PhoneNumber
+
+class BranchForm(forms.ModelForm):
+    class Meta:
+        model = Branch
+        fields = ["branch_name", "branch_location", "branch_area", "branch_phone_no", "branch_status"]
+
+
+    def clean_branch_phone_no(self):
+        phone_no = self.cleaned_data.get("branch_phone_no")
+
+        if isinstance(phone_no, PhoneNumber):  #it's a PhoneNumber object
+            phone_no = str(phone_no)  # Convert to string
+
+        # Validate format:
+        pattern = r"^\+(1\d{10}|91\d{10}|44\d{9,10}|81\d{9,11}|49\d{10,11}|33\d{9}|61\d{9}|86\d{10,11})$"
+
+        if not re.match(pattern, phone_no):
+            raise forms.ValidationError("Enter a valid phone number (e.g., +919876543210).")
+
+        return phone_no
+    
+class SupplierForm(forms.ModelForm):
+    class Meta:
+        model = Supplier
+        fields = ["supplier_name", "supplier_email", "supplier_phone_no", "company_name", "address"]
+
+    def clean_supplier_email(self):
+        email = self.cleaned_data.get("supplier_email")
+        email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+
+        if not re.match(email_pattern, email):
+            raise forms.ValidationError("Enter a valid email address (e.g., supplier@example.com).")
+        return email
+    
+    def clean_supplier_phone_no(self):
+        phone_no = self.cleaned_data.get("supplier_phone_no")
+
+        if isinstance(phone_no, PhoneNumber):  #it's a PhoneNumber object
+            phone_no = str(phone_no)  # Convert to string
+
+        # Validate format:
+        pattern = r"^\+(1\d{10}|91\d{10}|44\d{9,10}|81\d{9,11}|49\d{10,11}|33\d{9}|61\d{9}|86\d{10,11})$"
+
+        if not re.match(pattern, phone_no):
+            raise forms.ValidationError("Enter a valid phone number (e.g., +919876543210).")
+
+        return phone_no
+
+class CustomerForm(forms.ModelForm):
+    class Meta:
+        model = Customer
+        fields = ["customer_firstname", "customer_email", "customer_phone_no"]
+
+    def clean_customer_email(self):
+        email = self.cleaned_data.get("customer_email")
+        email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+
+        if not re.match(email_pattern, email):
+            raise forms.ValidationError("Enter a valid email address (e.g., customer@example.com).")
+        return email
+    
+    def clean_customer_phone_no(self):
+        phone_no = self.cleaned_data.get("customer_phone_no")
+
+        if isinstance(phone_no, PhoneNumber):  #it's a PhoneNumber object
+            phone_no = str(phone_no)  # Convert to string
+
+        # Validate format:
+        pattern = r"^\+(1\d{10}|91\d{10}|44\d{9,10}|81\d{9,11}|49\d{10,11}|33\d{9}|61\d{9}|86\d{10,11})$"
+
+        if not re.match(pattern, phone_no):
+            raise forms.ValidationError("Enter a valid phone number (e.g., +919876543210).")
+
+        return phone_no
 
 class StaffForm(forms.ModelForm):
     class Meta:
         model = Staff
         fields = [
             "staff_fullname", "staff_username", "staff_email",
-            "staff_password", "staff_phone", "staff_img", "staff_role", "branch"
+            "staff_password", "staff_phone_no", "staff_img", "staff_role", "branch"
         ]
 
     def save(self, commit=True):
@@ -19,6 +94,28 @@ class StaffForm(forms.ModelForm):
         if commit:
             staff.save()
         return staff
+    
+    def clean_staff_email(self):
+        email = self.cleaned_data.get("staff_email")
+        email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+
+        if not re.match(email_pattern, email):
+            raise forms.ValidationError("Enter a valid email address (e.g., staff24@example.com).")
+        return email
+    
+    def clean_staff_phone_no(self):
+        phone_no = self.cleaned_data.get("staff_phone_no")
+
+        if isinstance(phone_no, PhoneNumber):  #it's a PhoneNumber object
+            phone_no = str(phone_no)  # Convert to string
+
+        # Validate format:
+        pattern = r"^\+(1\d{10}|91\d{10}|44\d{9,10}|81\d{9,11}|49\d{10,11}|33\d{9}|61\d{9}|86\d{10,11})$"
+
+        if not re.match(pattern, phone_no):
+            raise forms.ValidationError("Enter a valid phone number (e.g., +919876543210).")
+
+        return phone_no
 
 
 class CustomPasswordChangeForm(PasswordChangeForm):

@@ -4,8 +4,16 @@
 :root {
   --color: #5e6790;
 }
+
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+  display: block;
+}
+
 /* food item text search and add item button */
-.food-item-title {
+.branch-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -13,7 +21,7 @@
   width: 100%;
 }
 
-.add-fooditems-button {
+.add-branch-button {
   background-color: #4e598c;
   color: white;
   padding: 8px 12px;
@@ -68,7 +76,7 @@
   margin-top: 10px;
 }
 
-.fooditem-detail-table {
+.branch-detail-table {
   background-color: #f9f9f9;
   font-size: 16px;
   width: 100%;
@@ -76,29 +84,29 @@
   min-width: 600px;
 }
 
-.fooditem-detail-table th,
-.fooditem-detail-table td {
+.branch-detail-table th,
+.branch-detail-table td {
   padding: 15px 20px; /* Increase padding for more spacing */
   text-align: left;
   border-bottom: 1px solid #ddd;
   text-wrap: nowrap;
 }
 
-.fooditem-detail-table th {
+.branch-detail-table th {
   font-size: 18px; /* Increase font size if needed */
 }
 
-.fooditem-detail-table td {
+.branch-detail-table td {
   font-size: 16px;
 }
 
-.fooditem-detail-table th:first-child,
-.fooditem-detail-table td:first-child {
+.branch-detail-table th:first-child,
+.branch-detail-table td:first-child {
   border-left: none;
 }
 
-.fooditem-detail-table th:last-child,
-.fooditem-detail-table td:last-child {
+.branch-detail-table th:last-child,
+.branch-detail-table td:last-child {
   border-right: none;
 }
 
@@ -267,13 +275,13 @@
 }
 
 @media (max-width: 768px) {
-  .food-item-title {
+  .branch-title {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
   }
 
-  .add-fooditems-button {
+  .add-branch-button {
     padding: 6px;
   }
 
@@ -294,7 +302,7 @@
     overflow-x: auto;
   }
 
-  .stores-detail-table {
+  .branch-detail-table {
     font-size: 14px;
   }
 
@@ -317,4 +325,47 @@
     display: block;
     width: 180px;
   }
+}
+
+#toastContainer {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.custom-alert {
+  background-color: #d4edda;
+  color: #155724;
+  border-left: 5px solid #28a745;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: Arial, sans-serif;
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+}
+
+.custom-alert i {
+  font-size: 20px;
+  color: #28a745;
+}
+
+.custom-alert .close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #155724;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.fade-out {
+  opacity: 0;
+  transform: translateX(100%);
 }

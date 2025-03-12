@@ -1,11 +1,41 @@
 {% load static %} {% block title %}
-<title>Chains</title>
+<title>Branches</title>
 {% endblock %} {% block css %}
 <link rel="stylesheet" href="{% static 'css/branches_style.css' %}" />
 {% endblock %}
 
-<div class="food-items-page">
-  <div class="food-item-title mt-4">
+<div class="branch-page">
+  {% if messages %}
+    <div id="toastContainer">
+        {% for message in messages %}
+            <div class="custom-alert alert alert-{{ message.tags }}">
+                <i class="fas fa-check-circle"></i>
+                <strong>{{ message.tags|title }}!</strong> {{ message }}
+                <button type="button" class="close" onclick="closeAlert(this)">
+                    &times;
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(() => {
+                document.querySelectorAll(".custom-alert").forEach(alert => {
+                    alert.classList.add("fade-out");
+                    setTimeout(() => alert.remove(), 500);
+                });
+            }, 5000);
+        });
+
+        function closeAlert(button) {
+            let alert = button.parentElement;
+            alert.classList.add("fade-out");
+            setTimeout(() => alert.remove(), 500);
+        }
+    </script>
+  {% endif %}
+  <div class="branch-title mt-4">
     <h3>BRANCHES</h3>
 
     <div class="search-container">
@@ -13,7 +43,7 @@
         type="text"
         id="searchInput"
         class="search-input"
-        placeholder="Search by branch or manager"
+        placeholder="Search by Name or Area"
       />
       <button class="search-btn" onclick="toggleSearch()">
         <i class="fa fa-search"></i>
@@ -21,7 +51,7 @@
     </div>
 
     <button
-      class="open-button add-fooditems-button rounded-3"
+      class="open-button add-branch-button rounded-3"
       onclick="openForm(false)"
     >
       <span class="btn-text">
@@ -33,27 +63,30 @@
 
   <div class="overlay" id="overlay" onclick="closeForm()"></div>
   <div class="form-popup" id="myForm">
-    <form id="branchForm" class="form-container">
-      <h1 class="mb-3">Add Branch</h1>
+    <form id="branchForm" class="form-container" method="post">
+      {%csrf_token%}
+      <h1 class="mb-3"></h1>
+
+      <input type="hidden" id="branchId" name="branch_id" value="{{ branch.branch_id|default:'' }}"/>
 
       <div class="form-group">
         <div class="input-group">
           <label for="branchName"><b>Name</b></label>
           <input
             type="text"
+            name="branch_name"
             id="branchName"
-            placeholder="Enter location"
-            required
+            placeholder="Enter BranchName"
+            value="{{ form.branch_name.value }}"
           />
         </div>
         <div class="input-group">
-          <label for="managerID"><b>Manager ID</b> </label>
+          <label for="manager"><b>Manager Name</b> </label>
           <input
-            type="number"
-            name="Null"
-            id="managerID"
-            placeholder="Manager ID"
-            required
+            type="text"
+            name="manager"
+            id="manager"
+            placeholder="Manager Name"
           />
         </div>
       </div>
@@ -62,43 +95,49 @@
         <label for="branchArea"><b>Area</b></label>
         <input
           type="text"
-          name="Null"
+          name="branch_area"
           id="branchArea"
           placeholder="Enter area name"
-          required
+          value="{{ form.branch_area.value }}"
         />
+
       </div>
       <div class="input-group full-width my-2">
         <label for="branchLocation"><b>Location</b></label>
         <input
           type="text"
+          name="branch_location"
           id="branchLocation"
           placeholder="Enter location"
-          required
+          value="{{ form.branch_location.value }}"
         />
+
       </div>
 
       <div class="form-group">
         <div class="input-group">
           <label for="phoneNo"><b>PhoneNo</b></label>
           <input
-            type="text"
-            name="Null"
+            type="tel"
+            name="branch_phone_no"
             id="phoneNo"
             placeholder="Enter phoneNo"
-            required
+            value="{{ form.branch_phone_no.value }}"
           />
+
         </div>
         <div class="input-group">
           <label for="branchStatus"><b>Status</b> </label>
-          <select id="branchStatus">
+          <select id="branchStatus" name="branch_status">
             <option value="">Status</option>
+            <option value="Active" {% if branch_data.branch_status == "Active" %}selected{% endif %}>Active</option>
+            <option value="Inactive" {% if branch_data.branch_status == "Inactive" %}selected{% endif %}>Inactive</option>
           </select>
         </div>
       </div>
 
-      <div class="form-buttons">
-        <button type="submit" class="btn">Add</button>
+      <div class="form-buttons" id="yourButtonID">
+        <button type="submit" class="btn"></button>
         <button type="button" class="btn cancel" onclick="closeForm()">
           Close
         </button>
@@ -107,21 +146,88 @@
   </div>
 
   <div class="table-responsive">
-    <table class="table stores-detail-table">
+    <table class="table branch-detail-table">
       <thead style="border-bottom: 2px solid #333 !important">
         <tr>
           <th>ID</th>
+          <th>Name</th>
           <th>Location</th>
           <th>Area</th>
-          <th>Manager ID</th>
+          <th>Manager Name</th>
           <th>Phone No.</th>
           <th>Status</th>
           <th>Action</th>
         </tr>
       </thead>
-      <tbody id="branchTableBody"></tbody>
+      <tbody id="branchTableBody">
+        {% if branches %}
+          {% for branch in branches %}
+          <tr>
+            <td>{{ branch.branch_id }}</td>
+            <td>{{ branch.branch_name}}</td>
+            <td>{{ branch.branch_location }}</td>
+            <td>{{ branch.branch_area }}</td>
+            <td>{{ branch.get_manager }}</td>
+            <td>{{ branch.branch_phone_no }}</td>
+            <td>{{ branch.branch_status }}</td>
+            <td class="action-buttons">
+              <button
+                class="update-btn"
+                onclick="editBranch('{{branch.branch_id}}','{{ branch.branch_name}}','{{ branch.branch_location }}','{{ branch.branch_area }}','{{ branch.branch_phone_no }}','{{ branch.branch_status }}','{{ branch.get_manager }}')"
+              >
+                <i class="fas fa-edit"></i>
+              </button>
+              <form
+                method="post"
+                action="{% url 'adminside:delete_branch' branch.branch_id %}"
+                style="display: inline"
+                onsubmit="return confirmDelete(event)"
+              >
+                {% csrf_token %}
+                <button type="submit" class="delete-btn">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+          <td colspan="8" style="text-align: center;">No branches found. Click 'Add Branch' to create one!</td>
+          </tr>
+        {% endif %}
+      </tbody>
     </table>
   </div>
 </div>
+
+<script>
+
+  function confirmDelete() {
+    return confirm("Are you sure you want to delete this category? This action cannot be undone.");
+}
+  function confirmDelete(event) {
+    event.preventDefault(); // Stop form from submitting immediately
+
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to undo this action!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        event.target.submit(); // Submit form if confirmed
+      }
+    });
+
+    return false; // Prevent default form submission
+  }
+</script>
+
+<!-- Include SweetAlert2 (Must be added in the <head> or before </body>) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script src="{% static 'js/branches_scripts.js' %}"></script>
