@@ -5,35 +5,35 @@
 {% endblock %}
 
 <div class="food-items-page">
-    {% if messages %}
-    <div id="toastContainer">
-        {% for message in messages %}
-            <div class="custom-alert alert alert-{{ message.tags }}">
-                <i class="fas fa-check-circle"></i>
-                <strong>{{ message.tags|title }}!</strong> {{ message }}
-                <button type="button" class="close" onclick="closeAlert(this)">
-                    &times;
-                </button>
-            </div>
-        {% endfor %}
+  {% if messages %}
+  <div id="toastContainer">
+    {% for message in messages %}
+    <div class="custom-alert alert alert-{{ message.tags }}">
+      <i class="fas fa-check-circle"></i>
+      <strong>{{ message.tags|title }}!</strong> {{ message }}
+      <button type="button" class="close" onclick="closeAlert(this)">
+        &times;
+      </button>
     </div>
+    {% endfor %}
+  </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            setTimeout(() => {
-                document.querySelectorAll(".custom-alert").forEach(alert => {
-                    alert.classList.add("fade-out");
-                    setTimeout(() => alert.remove(), 500);
-                });
-            }, 5000);
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      setTimeout(() => {
+        document.querySelectorAll(".custom-alert").forEach((alert) => {
+          alert.classList.add("fade-out");
+          setTimeout(() => alert.remove(), 500);
         });
+      }, 5000);
+    });
 
-        function closeAlert(button) {
-            let alert = button.parentElement;
-            alert.classList.add("fade-out");
-            setTimeout(() => alert.remove(), 500);
-        }
-    </script>
+    function closeAlert(button) {
+      let alert = button.parentElement;
+      alert.classList.add("fade-out");
+      setTimeout(() => alert.remove(), 500);
+    }
+  </script>
   {% endif %}
   <div class="food-item-title mt-4">
     <h3>INVENTORY</h3>
@@ -59,99 +59,162 @@
       </span>
       <span class="btn-icon"><i class="fa-solid fa-plus plus-icon"></i></span>
     </button>
+    <!-- Button to Show CSV Upload -->
+    <button class="open-button add-csv-button rounded-3" onclick="openCsvUpload(event)">
+      <span class="btn-text">
+        <i class="fa-solid fa-file-csv"></i> Add CSV File
+      </span>
+    </button>
   </div>
 
+    <!-- CSV Upload Form (Initially Hidden) -->
+  <div class="overlay" id="csvOverlay" onclick="closeCsvUpload()"></div>
+  <div class="form-popup" id="csvForm" style="display: none;">
+    <form id="csvUploadForm" class="form-container" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <h1 class="mb-3">Upload CSV File</h1>
+      <div class="form-group">
+        <div class="input-group">
+          <label for="csvFile"><b>Select CSV File</b></label>
+          <input type="file" id="csvFile" name="csv_file" accept=".csv" />
+        </div>
+      </div>
+      <div class="form-buttons">
+        <button type="submit" class="btn">Add</button>
+        <button type="button" class="btn cancel" onclick="closeCsvUpload()">Close</button>
+      </div>
+    </form>
+  </div>
   <div class="overlay" id="overlay" onclick="closeForm()"></div>
   <div class="form-popup" id="myForm">
-    <form id="foodItemForm" class="form-container">
+    <form
+      id="foodItemForm"
+      class="form-container"
+      method="post"
+      enctype="multipart/form-data"
+    >
+      {%csrf_token%}
       <h1 class="mb-3">Add Food Item</h1>
+      
+      <input
+        type="hidden"
+        id="inventoryId"
+        name="inventory_id"
+        value="{{ inventory.inventory_id|default:'' }}"
+      />
 
       <div class="form-group">
         <div class="input-group">
           <label for="itemImage"><b>Image</b></label>
-          <input type="file" id="itemImage" accept="image/*" />
+          <input
+            type="file"
+            id="itemImage"
+            name="image"
+            value="{{ form.image.value|default:'' }}"
+            accept="image/*"
+          />
         </div>
         <div class="input-group">
-          <label for="itemName"><b>Name</b></label>
-          <select id="itemName">
-            <option value="">Select Name</option>
+          <label for="foodItem"><b>Name</b></label>
+          <select id="foodItem" name="food_item">
+            <option value="" disabled selected hidden>Select Name</option>
+            {% for purchase in purchase_list %}
+            <option value="{{ purchase.purchase_id }}">
+              {{ purchase.food_item }}
+            </option>
+            {% endfor %}
           </select>
-          <span class="error-message" id="nameError"></span>
         </div>
       </div>
 
       <div class="form-group">
         <div class="input-group">
-          <label for="itemCategory"><b>Category</b></label>
-          <select id="itemCategory">
-            <option value="">Select Category</option>
+          <label for="category"><b>Category</b></label>
+          <select id="category" name="category">
+            <option value="" disabled selected hidden>Select Category</option>
+            {% for category in categories %}
+            <option value="{{ category.categories_id }}">
+              {{ category.categories_name }}
+            </option>
+            {% endfor %}
           </select>
-          <span class="error-message" id="categoryError"></span>
         </div>
         <div class="input-group full-width">
           <label for="itemDescription"><b>Description</b></label>
           <textarea
             id="itemDescription"
+            name="description"
+            value="{{ form.description.value|default:'' }}"
             placeholder="Enter Description"
-            required
           ></textarea>
-          <span class="error-message" id="descriptionError"></span>
         </div>
       </div>
 
       <div class="form-group">
         <div class="input-group">
-          <label for="itemQuantity"><b>Quantity</b></label>
+          <label for="quantity"><b>Quantity</b></label>
           <input
             type="number"
-            id="itemQuantity"
+            id="quantity"
+            name="quantity"
+            value="{{ form.quantity.value|default:'' }}"
             placeholder="Enter Quantity"
-            required
           />
-          <span class="error-message" id="quantityError"></span>
         </div>
         <div class="input-group">
-          <label for="itemStore"><b>Branch</b></label>
-          <select id="itemStore">
-            <option value="">Select Branch</option>
+          <label for="branch"><b>Branch</b></label>
+          <select id="branch" name="branch">
+            <option value="" disabled selected hidden>Choose Branch</option>
+            {% for branch in branches %}
+            <option value="{{ branch.branch_id }}">
+              {{ branch.branch_id }}-{{ branch.branch_name }}
+            </option>
+            {% endfor %}
           </select>
-          <span class="error-message" id="storeError"></span>
         </div>
       </div>
 
       <div class="form-group">
         <div class="input-group">
-          <label for="itemCost"><b>Cost Price</b></label>
+          <label for="costPrice"><b>Cost Price</b></label>
           <input
             type="number"
-            id="itemCost"
+            id="costPrice"
+            name="cost_price"
+            value="{{ form.cost_price.value|default:'' }}"
             placeholder="Enter Cost Price"
-            required
           />
-          <span class="error-message" id="costPriceError"></span>
         </div>
         <div class="input-group">
-          <label for="itemSelling"><b>Selling Price</b></label>
+          <label for="sellPrice"><b>Selling Price</b></label>
           <input
             type="number"
-            id="itemSelling"
+            id="sellPrice"
+            name="sell_price"
+            value="{{ form.sell_price.value|default:'' }}"
             placeholder="Enter Selling Price"
-            required
           />
-          <span class="error-message" id="sellingPriceError"></span>
         </div>
       </div>
 
       <div class="form-group">
         <div class="input-group">
-          <label for="itemMFG"><b>MFG Date</b></label>
-          <input type="date" id="itemMFG" required />
-          <span class="error-message" id="MFG-Error"></span>
+          <label for="mfgDate"><b>MFG Date</b></label>
+          <input
+            type="date"
+            id="mfgDate"
+            name="mfg_date"
+            value="{{ form.mfg_date.value|default:'' }}"
+          />
         </div>
         <div class="input-group">
-          <label for="itemExpiry"><b>Expiry Date</b></label>
-          <input type="date" id="itemExpiry" required />
-          <span class="error-message" id="expiryError"></span>
+          <label for="expDate"><b>Expiry Date</b></label>
+          <input
+            type="date"
+            id="expDate"
+            name="exp_date"
+            value="{{ form.exp_date.value|default:'' }}"
+          />
         </div>
       </div>
 
@@ -182,9 +245,64 @@
           <th>Action</th>
         </tr>
       </thead>
-      <tbody id="foodTableBody"></tbody>
+      <tbody id="foodTableBody">
+        {% if food_items %} {% for food_item in food_items %}
+        <tr>
+          <td>{{ food_item.inventory_id }}</td>
+          <td>
+            {% if food_item.image %}
+            <img
+              src="{{ food_item.image.url }}"
+              alt="Food Image"
+              width="50"
+              height="50"
+              style="object-fit: cover"
+            />
+            {% else %} No Image {% endif %}
+          </td>
+          <td>{{ food_item.food_item}}</td>
+          <td>{{ food_item.category}}</td>
+          <td>{{ food_item.description}}</td>
+          <td>{{ food_item.quantity}}</td>
+          <td>{{ food_item.branch}}</td>
+          <td>{{ food_item.cost_price}}</td>
+          <td>{{ food_item.sell_price}}</td>
+          <td>{{ food_item.mfg_date}}</td>
+          <td>{{ food_item.exp_date }}</td>
+          <td class="action-buttons">
+            <button
+              class="update-btn"
+              onclick="editfooditem('{{ food_item.inventory_id }}','{{ food_item.image}}','{{food_item.food_item}}','{{ food_item.category}}','{{ food_item.description}}','{{ food_item.quantity}}',
+                '{{ food_item.branch}}','{{ food_item.cost_price}}','{{ food_item.sell_price}}','{{ food_item.mfg_date}}','{{ food_item.exp_date }}')"
+            >
+              <i class="fas fa-edit"></i>
+            </button>
+            <form
+              method="post"
+              action="{% url 'adminside:delete_fooditem' food_item.inventory_id %}"
+              style="display: inline"
+              onsubmit="return confirmDelete(event)"
+            >
+              {% csrf_token %}
+              <button type="submit" class="delete-btn">
+                <i class="fas fa-trash"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %} {% else %}
+        <tr>
+          <td colspan="12" style="text-align: center">
+            No FoodItem found. Click 'Add Food Item' to add one!
+          </td>
+        </tr>
+        {% endif %}
+      </tbody>
     </table>
   </div>
 </div>
+
+<!-- Include SweetAlert2 (Must be added in the <head> or before </body>) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script src="{% static 'js/inventory_scripts.js' %}"></script>

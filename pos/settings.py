@@ -90,7 +90,22 @@ DATABASES = {
     }
 }
 
-SESSION_ENGINE = "django.contrib.sessions.backends.db"
+# SESSION_ENGINE = "django.contrib.sessions.backends.db"  
+# SESSION_COOKIE_AGE = 86400  # 1 day
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Auto expire session on close
+# SESSION_COOKIE_HTTPONLY = True  # Prevents JavaScript from accessing session
+# SESSION_COOKIE_SECURE = False  # Set to True if using HTTPS
+# SESSION_COOKIE_SAMESITE = "Lax"  # Prevents cross-site session sharing
+
+SESSION_COOKIE_NAME = "pos_session_id"  # Unique session cookie name
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"  # Store in DB
+SESSION_SAVE_EVERY_REQUEST = True  # Save session on every request
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Don't clear session on close
+SESSION_COOKIE_SECURE = False  # Set to True if using HTTPS
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to cookies
+SESSION_COOKIE_SAMESITE = "Lax"  # Prevent CSRF issues
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -129,6 +144,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'adminside/static/'),os.path.join(BASE_DIR, 'staffside/static/')]
 STATIC_ROOT = BASE_DIR / "staticfiles" 
+
+
+MEDIA_URL = '/media/'
+# MEDIAFILES_DIRS = [os.path.join(BASE_DIR, 'adminside/media/'),]
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

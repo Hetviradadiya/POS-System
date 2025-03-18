@@ -35,7 +35,7 @@ class InventoryAdmin(admin.ModelAdmin):
 admin.site.register(Inventory, InventoryAdmin)
 
 class PurchaseAdmin(admin.ModelAdmin):
-  list_display = ("purchase_id", "food_item", "cost_price","supplier","branch","purchased_date","payment_status")
+  list_display = ("purchase_id", "food_item","quantity", "cost_price","branch","supplier","purchased_date","payment_status")
   
 admin.site.register(Purchase, PurchaseAdmin)
 

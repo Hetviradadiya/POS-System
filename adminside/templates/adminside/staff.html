@@ -63,7 +63,7 @@
 
   <div class="overlay" id="overlay"></div>
   <div class="form-popup" id="myForm">
-    <form id="staffForm" class="form-container" method="post">
+    <form id="staffForm" class="form-container" method="post" enctype="multipart/form-data">
       {%csrf_token%}
       <h1 class="mb-3">Add Staff</h1>
 
@@ -104,7 +104,6 @@
             type="file"
             id="staffImage"
             name="staff_img"
-            value="{{ form.staff_img.value|default:'' }}"
             accept="image/*"
           />
         </div>
@@ -139,7 +138,6 @@
           name="staff_password"
           value="{{ form.staff_password.value|default:'' }}"
           placeholder="Generate password"
-          required
         />
       </div>
 
@@ -148,9 +146,10 @@
           <label for="staffRole"><b>StaffRole</b></label>
           <select id="staffRole" name="staff_role">
             <option value="" disabled selected hidden>Choose staff role</option>
-            <option value="Manager"{% if staff_data.staff_role == "Manager" %}selected{% endif %}>Manager</option>
-            <option value="Waiter" {% if staff_data.staff_role == "Waiter" %}selected{% endif %}>Waiter</option>
-            <option value="Chef" {% if staff_data.staff_role == "Chef" %}selected{% endif %}>Chef</option>
+            <option value="manager"{% if staff_data.staff_role == "manager" %}selected{% endif %}>Manager</option>
+            <option value="waiter" {% if staff_data.staff_role == "waiter" %}selected{% endif %}>Waiter</option>
+            <option value="staff" {% if staff_data.staff_role == "staff" %}selected{% endif %}>Staff</option>
+            <option value="chef" {% if staff_data.staff_role == "chef" %}selected{% endif %}>Chef</option>
           </select>
         </div>
         <div class="input-group">
@@ -201,7 +200,15 @@
         {% for staff in staff_list %}
         <tr>
           <td>{{ staff.staff_id }}</td>
-          <td>{{ staff.staff_img }}</td>
+          <td>{% if staff.staff_img %}
+          <img
+              src="{{ staff.staff_img.url }}"
+              alt="Food Image"
+              width="50"
+              height="50"
+              style="object-fit: cover"
+            />
+            {% else %} No Image {% endif %}</td>
           <td>{{ staff.staff_username }}</td>
           <td>{{ staff.staff_fullname }}</td>
           <td>{{ staff.staff_email }}</td>
@@ -239,5 +246,8 @@
     </table>
   </div>
 </div>
+
+<!-- Include SweetAlert2 (Must be added in the <head> or before </body>) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script src="{% static 'js/staff_scripts.js' %}"></script>

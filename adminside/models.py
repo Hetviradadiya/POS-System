@@ -19,7 +19,7 @@ class Branch(models.Model):
         return manager.staff_fullname if manager else "None"
 
     def __str__(self):
-        return f"{self.branch_id} ({self.branch_name})"
+        return f"{self.branch_id} - {self.branch_name}"
     
 class Supplier(models.Model):
     supplier_id = models.AutoField(primary_key=True)
@@ -30,7 +30,7 @@ class Supplier(models.Model):
     address = models.CharField(max_length=250)
 
     def __str__(self):
-        return f"{self.supplier_name} - {self.company_name}"
+        return f"{self.supplier_id} - {self.supplier_name}"
 
 class Categories(models.Model):
     categories_id = models.AutoField(primary_key=True)
@@ -38,56 +38,53 @@ class Categories(models.Model):
     status = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.categories_name
+        return f"{self.categories_id} - {self.categories_name}"
     
 class Purchase(models.Model):
     purchase_id = models.AutoField(primary_key=True)
     food_item = models.CharField(max_length=50)
-    cost_price = models.IntegerField()
+    quantity = models.IntegerField(null=True, blank=True)
+    cost_price = models.IntegerField(null=True, blank=True)
     supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, db_column="supplier_id",null=True, blank=True)
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, db_column="branch_id",null=True, blank=True)
     purchased_date = models.DateField()
     payment_status = models.CharField(max_length=10)
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)
 
-        # Check if the food item already exists in inventory
-        inventory_item, created = Inventory.objects.get_or_create(
-            food_item=self,
-            defaults={
-                "category": None,  # Set category later if needed
-                "quantity": 0,
-                "branch": self.supplier.branch,
-                "cost_price": self.cost_price,
-            }
-        )
+    #     # Check if the food item already exists in inventory
+    #     inventory_item, created = Inventory.objects.get_or_create(
+    #         food_item=self,
+    #         defaults={
+    #             "category": None,  # Set category later if needed
+    #             "quantity": 0,
+    #             "branch": self.supplier.branch,
+    #             "cost_price": self.cost_price,
+    #         }
+    #     )
 
-        if not created:
-            inventory_item.quantity += 1  # Update quantity if already exists
-            inventory_item.save()
+    #     if not created:
+    #         inventory_item.quantity += 1  # Update quantity if already exists
+    #         inventory_item.save()
 
     def __str__(self):
-        return f"{self.food_item} - {self.supplier.supplier_name}"
+        return f"{self.purchase_id} - {self.food_item}"
 
     
 
 class Staff(models.Model):
 
-    STAFF_ROLE_CHOICES = [
-        ('admin', 'Admin'),
-        ('manager', 'Manager'),
-        ('staff', 'Staff'),
-    ]
     staff_id = models.AutoField(primary_key=True)
     staff_username = models.CharField(max_length=50, unique=True)
     staff_fullname = models.CharField(max_length=100)
     staff_email = models.EmailField(max_length=50, unique=True)
     staff_password = models.CharField(max_length=128)
     staff_phone_no = PhoneNumberField(blank=True, null=True, error_messages={'invalid': "Enter a valid phone number (e.g., +919876543210)."})
-    staff_img = models.ImageField(upload_to='staff_images/', null=True, blank=True)
-    staff_role = models.CharField(max_length=50, choices=STAFF_ROLE_CHOICES)
+    staff_img = models.ImageField(upload_to='staff_images/', default='staff_images/default-profile.jpg', null=True, blank=True)
+    staff_role = models.CharField(max_length=50)
     branch = models.ForeignKey(Branch, on_delete=models.SET_NULL, null=True, blank=True, db_column="branch_id", related_name="staff_members")
+    session_keys = models.JSONField(default=list)  # Store multiple session keys
 
     def save(self, *args, **kwargs):
         if not self.staff_password.startswith("pbkdf2_sha256$"):
@@ -103,17 +100,17 @@ class Staff(models.Model):
         return check_password(raw_password, self.staff_password)
 
     def __str__(self):
-        return f"{self.staff_fullname} ({self.staff_role})"
+        return f"{self.staff_fullname}-{self.staff_role}"
 
 
 class Inventory(models.Model):
     inventory_id = models.AutoField(primary_key=True)
+    image = models.ImageField(upload_to='food_images/', blank=True, null= True)
     food_item = models.ForeignKey(Purchase, on_delete=models.SET_NULL, null=True, blank=True, db_column="food_item_id")
     category = models.ForeignKey(Categories, on_delete=models.CASCADE, db_column="categories_id")
     description = models.TextField(max_length=100, null=True, blank=True)
     quantity = models.IntegerField(null=True, blank=True)
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, db_column="branch_id")
-    image = models.ImageField(upload_to='inventory_images/', blank=True)
     sell_price = models.IntegerField(null=True, blank=True)
     cost_price = models.IntegerField(null=True, blank=True)
     mfg_date = models.DateField(null=True, blank=True)

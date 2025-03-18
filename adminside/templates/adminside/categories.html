@@ -5,7 +5,38 @@
 {% endblock %}
 
 <div class="category-page">
+      {% if messages %}
+    <div id="toastContainer">
+        {% for message in messages %}
+            <div class="custom-alert alert alert-{{ message.tags }}">
+                <i class="fas fa-check-circle"></i>
+                <strong>{{ message.tags|title }}!</strong> {{ message }}
+                <button type="button" class="close" onclick="closeAlert(this)">
+                    &times;
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(() => {
+                document.querySelectorAll(".custom-alert").forEach(alert => {
+                    alert.classList.add("fade-out");
+                    setTimeout(() => alert.remove(), 500);
+                });
+            }, 5000);
+        });
+
+        function closeAlert(button) {
+            let alert = button.parentElement;
+            alert.classList.add("fade-out");
+            setTimeout(() => alert.remove(), 500);
+        }
+    </script>
+  {% endif %}
   <div class="category-title mt-4">
+
     <h3>CATEGORY</h3>
 
     <div class="search-container">
@@ -80,6 +111,7 @@
         </tr>
       </thead>
       <tbody id="categoryBody">
+        {% if categories %}
         {% for category in categories %}
         <tr>
           <td>{{ category.categories_id }}</td>
@@ -120,6 +152,11 @@
           </td>
         </tr>
         {% endfor %}
+        {% else %}
+          <tr>
+          <td colspan="8" style="text-align: center;">No category found. Click 'Add Category' to create one!</td>
+          </tr>
+        {% endif %}
       </tbody>
     </table>
   </div>

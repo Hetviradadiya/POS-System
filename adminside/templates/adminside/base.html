@@ -34,15 +34,14 @@
       rel="stylesheet"
     />
 
-    <link rel="icon" href="data:,">
-
+    <link rel="icon" href="data:," />
   </head>
   <body>
     <div class="top-navbar">
       <div class="user-info">
         <!-- <span>{{ request.user.username }}</span> -->
         <span class="notification"><i class="fa-solid fa-bell"></i></span>
-        <span>Date<br />Username</span>
+        <span>{{ request.session.staff_username }}<br />{{ today_date }}</span>
         <i class="fa fa-user"></i>
       </div>
     </div>

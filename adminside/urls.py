@@ -1,6 +1,8 @@
 from django.urls import path
 from django.http import HttpResponse
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 app_name = "adminside"
 
@@ -18,12 +20,15 @@ urlpatterns = [
     path("suppliers/delete/<int:supplier_id>/", views.delete_supplier, name="delete_supplier"),
 
     path('purchase/', views.purchase, name='purchase'),
+    path("purchase/delete/<int:purchase_id>/", views.delete_purchase, name="delete_purchase"),
 
     path('categories/', views.categories, name='categories'),
-    path("categories/update/<int:category_id>/", views.update_category, name="update_category"),
+    # path("categories/update/<int:category_id>/", views.update_category, name="update_category"),
     path("categories/delete/<int:category_id>/", views.delete_category, name="delete_category"),
 
     path('inventory/', views.inventory, name='inventory'),
+    path("inventory/delete/<int:inventory_id>/", views.delete_fooditem, name="delete_fooditem"),
+        
     path('fooditems/', views.fooditems, name='fooditems'),
     path('tables/', views.tables, name='tables'),
 
@@ -42,4 +47,4 @@ urlpatterns = [
 
 
     path('favicon.ico', empty_favicon),  # Handle favicon request
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

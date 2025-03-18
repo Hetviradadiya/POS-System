@@ -52,6 +52,16 @@ class SupplierForm(forms.ModelForm):
             raise forms.ValidationError("Enter a valid phone number (e.g., +919876543210).")
 
         return phone_no
+    
+class PurchaseForm(forms.ModelForm):
+    class Meta:
+        model = Purchase
+        fields = ["food_item", "quantity", "cost_price", "branch", "supplier", "purchased_date", "payment_status"]
+
+class InventoryForm(forms.ModelForm):
+    class Meta:
+        model = Inventory
+        fields = ["image", "food_item", "category", "description", "quantity", "branch", "cost_price", "sell_price", "mfg_date", "exp_date"]
 
 class CustomerForm(forms.ModelForm):
     class Meta:
@@ -87,13 +97,6 @@ class StaffForm(forms.ModelForm):
             "staff_fullname", "staff_username", "staff_email",
             "staff_password", "staff_phone_no", "staff_img", "staff_role", "branch"
         ]
-
-    def save(self, commit=True):
-        staff = super().save(commit=False)
-        staff.staff_password = make_password(self.cleaned_data["staff_password"])  # Hash password
-        if commit:
-            staff.save()
-        return staff
     
     def clean_staff_email(self):
         email = self.cleaned_data.get("staff_email")
@@ -116,6 +119,13 @@ class StaffForm(forms.ModelForm):
             raise forms.ValidationError("Enter a valid phone number (e.g., +919876543210).")
 
         return phone_no
+    
+    def save(self, commit=True):
+        staff = super().save(commit=False)
+        staff.staff_password = make_password(self.cleaned_data["staff_password"])  # Hash password
+        if commit:
+            staff.save()
+        return staff
 
 
 class CustomPasswordChangeForm(PasswordChangeForm):

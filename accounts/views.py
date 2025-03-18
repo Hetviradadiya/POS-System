@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
-from django.core.mail import send_mail
+# from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
@@ -21,9 +21,18 @@ def loginaccount(request):
                 staff_user = Staff.objects.get(staff_username=username)
                 print(f"User found: {staff_user.staff_role}")
 
-                if check_password(password, staff_user.staff_password):  
+                if check_password(password, staff_user.staff_password): 
+
+                    logout(request)
+                    request.session.flush()  # Clears any previous session 
+                    session_key = request.session.session_key
+                    
                     request.session["staff_id"] = staff_user.staff_id  
+                    request.session["staff_username"] = staff_user.staff_username  
+                    request.session["staff_role"] = staff_user.staff_role 
                     request.session.modified = True  
+                    
+                    request.session.save()
                     
                     if staff_user.staff_role.lower() in ["admin", "manager"]:
                         print("Redirecting to admin dashboard")
