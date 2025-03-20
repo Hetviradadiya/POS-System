@@ -102,7 +102,19 @@ function clearErrors() {
 function extractId(value) {
   return value.split(" - ")[0]; // Extracts ID part before " - "
 }
+function formatDate(dateString) {
+  if (!dateString) return ""; // Handle empty date values
 
+  let date = new Date(dateString);
+  if (isNaN(date)) return ""; // Handle invalid date
+
+  // Extract YYYY-MM-DD manually to avoid timezone issues
+  let year = date.getFullYear();
+  let month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+  let day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
 function editpurchase(
   purchaseId,
   food_item,
@@ -117,31 +129,29 @@ function editpurchase(
   document.getElementById("foodItem").value = food_item;
   document.getElementById("quantity").value = quantity;
   document.getElementById("costPrice").value = cost_price;
-  document.getElementById("purchaseDate").value = purchased_date;
+  document.getElementById("purchaseDate").value = formatDate(purchased_date);
 
+  // Extract only the numeric ID
+  let branchId = extractId(branch);
+  let supplierId = extractId(supplier);
 
- // Extract only the numeric ID
- let branchId = extractId(branch);
- let supplierId = extractId(supplier);
+  // Select the correct branch
+  let branchSelect = document.getElementById("branch");
+  for (let option of branchSelect.options) {
+    if (option.value == branchId) {
+      option.selected = true;
+      break;
+    }
+  }
 
-
- // Select the correct branch
- let branchSelect = document.getElementById("branch");
- for (let option of branchSelect.options) {
-   if (option.value == branchId) {
-     option.selected = true;
-     break;
-   }
- }
-
- // Select the correct supplier
- let supplierSelect = document.getElementById("supplier");
- for (let option of supplierSelect.options) {
-   if (option.value == supplierId) {
-     option.selected = true;
-     break;
-   }
- }
+  // Select the correct supplier
+  let supplierSelect = document.getElementById("supplier");
+  for (let option of supplierSelect.options) {
+    if (option.value == supplierId) {
+      option.selected = true;
+      break;
+    }
+  }
 
   let statusSelect = document.getElementById("paymentStatus");
   if (payment_status === "Done" || payment_status === "Remain") {

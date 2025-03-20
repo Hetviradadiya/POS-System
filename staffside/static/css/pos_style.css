@@ -3,18 +3,35 @@
 }
 
 .category-link{
-  text-decoration: none; 
-  color: black; 
-  font-size: 18px;
-  font-weight: normalx;
+    background: none;
+    border: none;
+    color: black; /* Link color */
+    text-decoration: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 0 2px; /* Keeps margin between buttons small */
+    display: inline-block;
+    font-size: 18px;
+    font-weight: normalx;
 }
 
+.category-link:hover,
 .category-link.active{
+    /* text-decoration: underline; */
     color: #4E598C;
     font-weight: bold;
     border-bottom: 2px solid #4E598C;
     font-weight: bold;
 }
+
+#product-container .col-md-6 {
+  display: none; /* Hide all products by default */
+}
+
+#product-container .col-md-6.show {
+  display: flex !important; /* Show matching products */
+}
+
 
 .selected-size {
     background-color: #f9c784 !important;

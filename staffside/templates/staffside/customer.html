@@ -5,6 +5,36 @@
 {% endblock %}
 
 <div class="customer-page">
+    {% if messages %}
+    <div id="toastContainer">
+        {% for message in messages %}
+            <div class="custom-alert alert alert-{{ message.tags }}">
+                <i class="fas fa-check-circle"></i>
+                <strong>{{ message.tags|title }}!</strong> {{ message }}
+                <button type="button" class="close" onclick="closeAlert(this)">
+                    &times;
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(() => {
+                document.querySelectorAll(".custom-alert").forEach(alert => {
+                    alert.classList.add("fade-out");
+                    setTimeout(() => alert.remove(), 500);
+                });
+            }, 5000);
+        });
+
+        function closeAlert(button) {
+            let alert = button.parentElement;
+            alert.classList.add("fade-out");
+            setTimeout(() => alert.remove(), 500);
+        }
+    </script>
+  {% endif %}
   <div class="customer-title mt-4">
     <h3>CUSTOMER</h3>
 
@@ -33,55 +63,62 @@
 
   <div class="overlay" id="overlay"></div>
   <div class="form-popup" id="myForm">
-    <form id="customerForm" class="form-container">
+    <form id="customerForm" class="form-container" method="post">
+      {%csrf_token%}
       <h1 class="mb-3">Add Customer</h1>
 
+      <input type="hidden" id="customerId" name="customer_id" value="{{ customer.customer_id|default:'' }}"/>
       <div class="form-group">
         <div class="input-group">
-          <label for="firstName"><b>FirstName</b></label>
+          <label for="customerFirstName"><b>FirstName</b></label>
           <input
             type="text"
-            id="firstName"
+            id="customerFirstName"
+            name="customer_firstname" 
+            value="{{ form.customer_firstname.value|default:'' }}"
             placeholder="Enter FirstName"
-            required
           />
         </div>
         <div class="input-group">
-          <label for="lastName"><b>LastName</b></label>
+          <label for="customerLastName"><b>LastName</b></label>
           <input
             type="text"
-            id="lastName"
+            id="customerLastName"
+            name="customer_lastname" 
+            value="{{ request.POST.customerLastName }}"
             placeholder="Enter LastName"
-            required
           />
         </div>
       </div>
 
       <div class="form-group full-width mb-4">
-        <label for="address"><b>Address</b></label>
-        <input type="text" id="address" placeholder="Enter Address" required />
+        <label for="customerAddress"><b>Address</b></label>
+        <input type="text" id="customerAddress" name="customer_address" 
+            value="{{ request.POST.customerAddress }}" placeholder="Enter Address"  />
       </div>
       <div class="input-group">
-        <label for="phoneNo"><b>PhoneNo</b></label>
+        <label for="customerEmail"><b>E-mail</b></label>
+        <input type="email" id="customerEmail" name="customer_email" 
+        value="{{ form.customer_email.value|default:'' }}" placeholder="Enter email" />
+      </div>
+      <div class="input-group">
+        <label for="customerPhoneNo"><b>PhoneNo</b></label>
         <input
-          type="number"
-          id="phoneNo"
+          type="tel"
+          id="customerPhoneNo"
+          name="customer_phone_no" 
+          value="{{ form.customer_phone_no.value|default:'' }}"
           placeholder="Enter Phone Number"
-          required
         />
-      </div>
-      <div class="input-group">
-        <label for="email"><b>E-mail</b></label>
-        <input type="email" id="email" placeholder="Enter email" required />
       </div>
 
       <div class="input-group">
         <label for="gender"><b>Gender</b></label>
-        <select id="gender">
+        <select id="gender" name="gender">
           <option value="" disabled selected hidden>Choose Gender</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-          <option value="Other">Other</option>
+          <option value="Male" {% if customer_data.gender == "Male" %}selected{% endif %}>Male</option>
+          <option value="Female" {% if customer_data.gender == "Female" %}selected{% endif %}>Female</option>
+          <option value="Other" {% if customer_data.gender == "Other" %}selected{% endif %}>Other</option>
         </select>
       </div>
 
@@ -96,21 +133,62 @@
 
   <div class="table-responsive">
     <table class="table customer-detail-table">
-      <thead>
+      <thead style="border-bottom: 2px solid #333 !important">
         <tr>
           <th>ID</th>
           <th>FirstName</th>
           <th>LastName</th>
           <th>Address</th>
-          <th>PhoneNo</th>
           <th>Email</th>
+          <th>PhoneNo</th>
           <th>Gender</th>
           <th>Action</th>
         </tr>
       </thead>
-      <tbody id="customerBody"></tbody>
+      <tbody id="customerTableBody">
+
+        {% if customers %}
+            {% for customer in customers %}
+            <tr>
+                <td>{{ customer.customer_id }}</td>
+                <td>{{ customer.customer_firstname|default:"-"}}</td>
+                <td>{{ customer.customer_lastname|default:"-"}}</td>
+                <td>{{ customer.customer_address|default:"-"}}</td>
+                <td>{{ customer.customer_email|default:"-"}}</td>
+                <td>{{ customer.customer_phone_no|default:"-" }}</td>
+                <td>{{ customer.gender|default:"-" }}</td>
+                <td class="action-buttons">
+            <button
+                class="update-btn"
+                onclick="editcustomer('{{ customer.customer_id }}','{{ customer.customer_firstname}}','{{ customer.customer_lastname}}','{{ customer.customer_address}}','{{ customer.customer_phone_no }}','{{ customer.customer_email}}','{{ customer.gender}}')"
+            >
+                <i class="fas fa-edit"></i>
+            </button>
+            <form
+                method="post"
+                action="{% url 'adminside:delete_customer' customer.customer_id %}"
+                style="display: inline"
+                onsubmit="return confirmDelete(event)"
+            >
+                {% csrf_token %}
+                <button type="submit" class="delete-btn">
+                <i class="fas fa-trash"></i>
+                </button>
+            </form>
+            </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="8" style="text-align: center;">No customer found. Click 'Add customer' to add one!</td>
+            </tr>
+        {% endif %}
+      </tbody>
     </table>
   </div>
 </div>
 
+
+<!-- Include SweetAlert2 (Must be added in the <head> or before </body>) -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{% static 'js/customer_scripts.js' %}"></script>

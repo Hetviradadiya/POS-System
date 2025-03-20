@@ -81,13 +81,22 @@ function closeForm() {
 
 // reset form
 function resetForm() {
-  document.getElementById("customerId").value = "";
-  document.getElementById("customerFirstName").value = "";
-  document.getElementById("customeLastName").value = "";
-  document.getElementById("customerAddress").value = "";
-  document.getElementById("customerEmail").value = "";
-  document.getElementById("customerPhoneNo").value = "";
-  document.getElementById("gender").value = "";
+
+    let customerId = document.getElementById("customerId");
+    let firstName = document.getElementById("customerFirstName");
+    let lastName = document.getElementById("customerLastName");
+    let address = document.getElementById("customerAddress");
+    let email = document.getElementById("customerEmail");
+    let phoneNo = document.getElementById("customerPhoneNo");
+    let gender = document.getElementById("gender");
+
+    if (customerId) customerId.value = "";
+    if (firstName) firstName.value = "";
+    if (lastName) lastName.value = "";
+    if (address) address.value = "";
+    if (email) email.value = "";
+    if (phoneNo) phoneNo.value = "";
+    if (gender) gender.value = "";
 }
 
 //Clear validation errors

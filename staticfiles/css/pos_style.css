@@ -9,6 +9,7 @@
   font-weight: normalx;
 }
 
+.category-link:hover,
 .category-link.active{
     color: #4E598C;
     font-weight: bold;

@@ -10,7 +10,7 @@ from adminside.models import*
 from adminside.forms import*
 import os
 import csv
-
+# import codecs
 
 def home(request):
     staff_id = request.session.get("staff_id")  # Get session data
@@ -18,7 +18,7 @@ def home(request):
 
     if not staff_id:
         print("No session found, redirecting to login...")
-        return redirect("login")  # Redirect if no session found
+        return redirect("accounts:loginaccount")  # Redirect if no session found
 
     try:
         staff_user = Staff.objects.get(staff_id=staff_id)
@@ -26,10 +26,10 @@ def home(request):
 
         if staff_user.staff_role.lower() != "admin":
             print("User is not an admin, redirecting to login...")
-            return redirect("login")  # Redirect non-admin users
+            return redirect("accounts:loginaccount")  # Redirect non-admin users
     except Staff.DoesNotExist:
         print("Staff ID not found in database, redirecting to login...")
-        return redirect("login")
+        return redirect("accounts:loginaccount")
 
     print("Rendering admin dashboard...")
     return redirect('adminside:dashboard')
@@ -339,7 +339,7 @@ def inventory(request):
         # **CSV Upload Handling**
         if csv_file:
             try:
-                decoded_file = csv_file.read().decode("utf-8").splitlines()
+                decoded_file = csv_file.read().decode("utf-8-sig").splitlines()
                 reader = csv.reader(decoded_file)
                 header = next(reader)  # Skip the header row
                 print("CSV Header:", header)  
@@ -379,10 +379,11 @@ def inventory(request):
 
                             if os.path.exists(image_path):
                                 with open(image_path, "rb") as img_file:
-                                    inventory.image.save(image_name, File(img_file))  # Assign image properly
+                                    inventory.image.save(image_name, File(img_file))  # Assign image
                             else:
                                 print(f"Image {image_name} not found at {image_path}")
-
+                                messages.error(request, f"Image {image_name} not found at {image_path}, skipping row.")
+                                continue 
                             inventory_form.save()
 
                         else:
@@ -554,10 +555,10 @@ def customer(request):
 
 def delete_customer(request, customer_id):
     try:
-        customer = get_object_or_404(Supplier, pk=customer_id)
+        customer = get_object_or_404(Customer, pk=customer_id)
 
-        customer.delete()  # delete supplier
-        return redirect("adminside:customer")  # Redirect to supplier
+        customer.delete()  # delete customer
+        return redirect("adminside:customer")  # Redirect to customer
     except Exception as e:
         return HttpResponseServerError(f"Error deleting customer: {e}")
     
@@ -572,6 +573,7 @@ def staff(request):
             staff = get_object_or_404(Staff, pk=staff_id)
             form = StaffForm(request.POST, request.FILES, instance=staff)  # Attach instance to show Pre-fill form with existing data and update branch
         else:  # Creating new branch
+            staff = None
             form = StaffForm(request.POST, request.FILES)
 
         context["form"] = form
@@ -580,14 +582,15 @@ def staff(request):
             staff_username = form.cleaned_data.get("staff_username", "").strip()
             staff_fullname = form.cleaned_data.get("staff_fullname", "").strip()
             staff_email = form.cleaned_data.get("staff_email", "").strip()
-            staff_password = make_password(form.cleaned_data.get("staff_password", "").strip())  # Hashing password
+            staff_password = form.cleaned_data.get("staff_password", "").strip()  # Hashing password
+            if staff_password:
+                staff_password = make_password(staff_password)
             staff_phone_no = form.cleaned_data.get("staff_phone_no", "").strip()
             print("Cleaned staff_phone_no:", form.cleaned_data.get("staff_phone_no"))
             staff_role = form.cleaned_data.get("staff_role", "").strip().lower()
             branch = form.cleaned_data.get("branch", "")
             staff_img = request.FILES.get("staff_img")  # Handling image upload
-            if not staff_img:
-                staff_img = "/staff_images/default-profile.jpg"
+            
 
             print(request.POST)
             print(request.POST.get('staff_role')) 
@@ -595,7 +598,9 @@ def staff(request):
                 staff = form.save(commit=False)
                 staff = get_object_or_404(Staff, pk=staff_id)
                 if staff_img:  # Ensure image is uploaded
-                    staff.staff_img = request.FILES['staff_img']
+                    staff.staff_img = request.FILES.get('staff_img')
+                else:
+                    staff.staff_img = "/staff_images/default-profile.jpg"
                 staff.staff_username=staff_username
                 staff.staff_fullname=staff_fullname
                 staff.staff_email=staff_email
@@ -607,6 +612,8 @@ def staff(request):
                 messages.success(request, "Staff updated successfully!")
 
             else:# Create and save staff member
+                if not staff_img:
+                    staff_img = "/staff_images/default-profile.jpg"
                 Staff.objects.create(
                     staff_username=staff_username,
                     staff_fullname=staff_fullname,

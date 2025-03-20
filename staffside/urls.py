@@ -9,7 +9,10 @@ urlpatterns = [
     path('tables/', views.tables, name='tables'),
     path('pos/', views.pos, name='pos'),
     path('sales/', views.sales, name='sales'),
+    
     path('customer/', views.customer, name='customer'),
+    path("customer/delete/<int:customer_id>/", views.delete_customer, name="delete_customer"),
+
     path('settings/', views.staffside_settings_view, name='settings'),
     path('profile/', views.profile, name='profile'),
     path('edit_profile/', views.edit_profile, name='edit_profile'),

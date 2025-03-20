@@ -1,4 +1,4 @@
-// Toggle search input on small devices
+// search button
 function toggleSearch() {
   let searchContainer = document.querySelector(".search-container");
   let searchInput = document.querySelector(".search-input");
@@ -8,197 +8,238 @@ function toggleSearch() {
     searchInput.focus();
   }
 }
-
-// Search function
+//search function
 document.getElementById("searchInput").addEventListener("keyup", function () {
-  let filter = this.value.toLowerCase();
-  let rows = document.querySelectorAll("#customerBody tr");
+  let filter = this.value.toLowerCase().trim();
+  let rows = document.querySelectorAll("#customerTableBody tr");
+  let matchFound = false;
 
   rows.forEach(function (row) {
-    let store = row.cells[1].textContent.toLowerCase();
-    let manager = row.cells[2].textContent.toLowerCase();
+    if (row.id === "noDataRow") return;
 
-    if (store.includes(filter) || manager.includes(filter)) {
+    let firstname = row.cells[1].textContent.toLowerCase();
+    let lastname = row.cells[2].textContent.toLowerCase();
+
+    if (firstname.includes(filter) || lastname.includes(filter)) {
       row.style.display = "";
+      matchFound = true;
     } else {
       row.style.display = "none";
     }
   });
-});
 
-let ID = 1;
-let updateIndex = null; // Customers the row reference for updating
+  let tableBody = document.getElementById("customerTableBody");
+  let noData = document.getElementById("noDataRow");
 
-document.addEventListener("DOMContentLoaded", function () {
-  document
-    .getElementById("customerForm")
-    .addEventListener("submit", function (event) {
-      event.preventDefault();
-      if (validateForm()) {
-        if (updateIndex !== null) {
-          saveUpdatedCustomer(); // Update existing row
-        } else {
-          addCustomer(); // Add new row
-        }
-      }
+  if (filter && !matchFound) {
+    if (!noData) {
+      noData = document.createElement("tr");
+      noData.id = "noDataRow";
+      noData.innerHTML = `<td colspan="8" style="text-align: center;">No data found</td>`; //add no datafound row
+      tableBody.appendChild(noData);
+    }
+  } else {
+    if (noData) {
+      noData.remove();
+    }
+  }
+
+  // if search bar is empty, show all rows again
+  if (filter === "") {
+    rows.forEach(function (row) {
+      row.style.display = "";
     });
+    if (noData) {
+      noData.remove();
+    }
+  }
 });
 
-// Form validation function
-function validateForm() {
-  let email = document.getElementById("email");
-  let phoneNo = document.getElementById("phoneNo");
-  let gender = document.getElementById("gender");
-
-  let emailValue = email.value.trim();
-  let phoneNoValue = phoneNo.value.trim();
-  let genderValue = gender.value.trim();
-
-  // Regular expressions for validation
-  let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Valid email format
-  let phoneNoRegex = /^(?:\+91[-\s]?)?[6-9]\d{9}$/;
-
-  clearErrors();
-  let isValid = true;
-
-  // Email Validation
-  if (!emailRegex.test(emailValue)) {
-    showError(email, "Enter a valid email (e.g., user@example.com)");
-    isValid = false;
-  }
-  // Password Validation
-  if (!phoneNoRegex.test(phoneNoValue)) {
-    showError(
-      phoneNo,
-      "Invalid Phone Format.Phone number must be 10 digits & start with 6-9 (e.g., 9876543210)"
-    );
-    isValid = false;
-  }
-  if (!genderValue) {
-    showError(gender, "Gender selection is required.");
-    isValid = false;
-  }
-  return isValid;
-}
-
-// Function to show error messages below the input field
-function showError(input, message) {
-  let errorSpan = document.createElement("span");
-  errorSpan.classList.add("error-message");
-  errorSpan.style.color = "red";
-  errorSpan.style.fontSize = "12px";
-  errorSpan.innerText = message;
-  input.parentNode.appendChild(errorSpan);
-}
-
-// Function to add a new customer
-function addCustomer() {
-  if (!validateForm()) {
-    return; // STOP adding data if validation fails
-  }
-
-  let firstName = document.getElementById("firstName").value.trim();
-  let lastName = document.getElementById("lastName").value.trim();
-  let address = document.getElementById("address").value.trim();
-  let phoneNo = document.getElementById("phoneNo").value.trim();
-  let email = document.getElementById("email").value.trim();
-  let gender = document.getElementById("gender").value;
-
-  let newRow = document.createElement("tr");
-  newRow.innerHTML = `
-        <td>${ID}</td>
-        <td>${firstName}</td>
-        <td>${lastName}</td>
-        <td>${address}</td>
-        <td>${phoneNo}</td>
-        <td>${email}</td>
-        <td>${gender}</td>
-        <td class="action-buttons">
-            <button class="update-btn" onclick="updateRow(this)"><i class="fas fa-edit"></i></button>
-            <button class="delete-btn" onclick="deleteRow(this)"><i class="fas fa-trash"></i></button>
-        </td>
-    `;
-
-  document.getElementById("customerBody").appendChild(newRow);
-  ID++; // Increment ID
-  document.getElementById("customerForm").reset();
-  closeForm();
-}
-
-// Function to update a row
-function updateRow(button) {
-  let row = button.closest("tr");
-  let columns = row.getElementsByTagName("td");
-
-  document.getElementById("firstName").value = columns[1].textContent;
-  document.getElementById("lastName").value = columns[2].textContent;
-  document.getElementById("address").value = columns[3].textContent;
-  document.getElementById("phoneNo").value = columns[4].textContent;
-  document.getElementById("email").value = columns[5].textContent;
-  document.getElementById("gender").value = columns[6].textContent;
-
-  updateIndex = row; // Customer reference to the row for updating
-  openForm(true);
-}
-
-// Function to save the updated customer details
-function saveUpdatedCustomer() {
-  if (updateIndex) {
-    let firstName = document.getElementById("firstName").value.trim();
-    let lastName = document.getElementById("lastName").value.trim();
-    let address = document.getElementById("address").value.trim();
-    let phoneNo = document.getElementById("phoneNo").value.trim();
-    let email = document.getElementById("email").value.trim();
-    let gender = document.getElementById("gender").value;
-
-    updateIndex.cells[1].textContent = firstName;
-    updateIndex.cells[2].textContent = lastName;
-    updateIndex.cells[3].textContent = address;
-    updateIndex.cells[4].textContent = phoneNo;
-    updateIndex.cells[5].textContent = email;
-    updateIndex.cells[6].textContent = gender;
-
-    updateIndex = null; // Reset after update
-    document.getElementById("customerForm").reset();
-    closeForm();
-  }
-}
-
-// Function to delete a row
-function deleteRow(button) {
-  button.closest("tr").remove();
-}
-
-// Open form modal
+// open form
 function openForm(isUpdate = false) {
   document.getElementById("overlay").style.display = "block";
   document.getElementById("myForm").style.display = "block";
   document.body.classList.add("popup-open");
 
   if (!isUpdate) {
-    resetForm(); // Clears the form when adding a new customer
-    updateIndex = null; // Clear any previous update reference
+    resetForm(); // Clears form
+    document.querySelector(".form-container h1").innerText = "Add Customer";
+    document.querySelector(".form-buttons button[type='submit']").innerText =
+      "Add Customer";
   }
 }
 
-// Close form modal
+// Close form
 function closeForm() {
   document.getElementById("overlay").style.display = "none";
   document.getElementById("myForm").style.display = "none";
   document.body.classList.remove("popup-open");
 
-  resetForm(); // Ensure form resets when closing
-  updateIndex = null; // Reset update index when closing
+  resetForm(); // Reset form
+  clearErrors(); // Clear validation errors
 }
 
-// Function to reset the form
+// reset form
 function resetForm() {
-  document.getElementById("customerForm").reset();
+  document.getElementById("customerId").value = "";
+  document.getElementById("customerFirstName").value = "";
+  document.getElementById("customeLastName").value = "";
+  document.getElementById("customerAddress").value = "";
+  document.getElementById("customerEmail").value = "";
+  document.getElementById("customerPhoneNo").value = "";
+  document.getElementById("gender").value = "";
 }
 
-// Function to clear all error messages
+//Clear validation errors
 function clearErrors() {
-  document.querySelectorAll(".error-message").forEach((el) => {
-    el.textContent = "";
+  document
+    .querySelectorAll(".error")
+    .forEach((el) => el.classList.remove("error"));
+  document.querySelectorAll(".error-message").forEach((el) => el.remove()); // Remove error messages
+}
+
+function editcustomer(
+  customer_id,
+  customer_firstname,
+  customer_lastname,
+  customer_address,
+  customer_phone_no,
+  customer_email,
+  gender
+) {
+  document.getElementById("customerId").value = customer_id;
+  document.getElementById("customerFirstName").value = customer_firstname;
+  document.getElementById("customerLastName").value = customer_lastname;
+  document.getElementById("customerAddress").value = customer_address;
+  document.getElementById("customerPhoneNo").value = customer_phone_no;
+  document.getElementById("customerEmail").value = customer_email;
+  document.getElementById("gender").value = gender;
+
+  document.querySelector(".form-container h1").innerText = "Update Customer";
+  document.querySelector(".form-buttons button[type='submit']").innerText =
+    "Update Customer";
+
+  openForm(true); // Open form for update
+}
+
+//form validation
+document
+  .getElementById("customerForm")
+  .addEventListener("submit", function (event) {
+    let isValid = true;
+
+    function showError(fieldId, message) {
+      const field = document.getElementById(fieldId);
+      let errorSpan = field.nextElementSibling;
+
+      if (!errorSpan || !errorSpan.classList.contains("error-message")) {
+        errorSpan = document.createElement("span");
+        errorSpan.classList.add("error-message");
+        field.parentNode.appendChild(errorSpan);
+      }
+
+      field.classList.add("error");
+      errorSpan.textContent = message;
+      errorSpan.style.color = "red";
+    }
+
+    clearErrors(); // Clear errors
+
+    const customerFirstName = document
+      .getElementById("customerFirstName")
+      .value.trim();
+    if (!customerFirstName) {
+      event.preventDefault();
+      showError("customerFirstName", "Customer name is required!");
+      isValid = false;
+    }
+
+    const customerEmail = document.getElementById("customerEmail").value.trim();
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!customerEmail) {
+      event.preventDefault();
+      showError("customerEmail", "Customer Email is required!");
+      isValid = false;
+    } else if (!emailPattern.test(customerEmail)) {
+      event.preventDefault();
+      showError("customerEmail", "Enter a valid email address!");
+      isValid = false;
+    }
+
+    const customerPhoneNo = document
+      .getElementById("customerPhoneNo")
+      .value.trim();
+    const phoneRegex =
+      /^\+(1\d{10}|91\d{10}|44\d{9,10}|81\d{9,11}|49\d{10,11}|33\d{9}|61\d{9}|86\d{10,11})$/;
+
+    if (!customerPhoneNo) {
+      event.preventDefault();
+      showError("customerPhoneNo", "customer PhoneNo is required!.");
+    } else if (!phoneRegex.test(customerPhoneNo)) {
+      event.preventDefault();
+      showError(
+        "customerPhoneNo",
+        "Enter a valid phone number (e.g., +919876543210)."
+      );
+      isValid = false;
+    }
+    if (!isValid) {
+      event.preventDefault(); // Prevent form submission if validation fails
+      document.getElementById("overlay").style.display = "block"; // Keep the form open
+      document.getElementById("myForm").style.display = "block";
+    }
+
+    // const customerAddress = document.getElementById("customerAddress").value;
+    // if (!customerAddress) {
+    //   showError("customerAddress", "customer Address is required!");
+    //   isValid = false;
+    // }
+
+    // const gender = document.getElementById("gender").value;
+    // if (!gender) {
+    //   showError("gender", "Gender is required!");
+    //   isValid = false;
+    // }
   });
+//message when try to delete row
+function confirmDelete() {
+  return confirm(
+    "Are you sure you want to delete this category? This action cannot be undone."
+  );
+}
+function confirmDelete(event) {
+  event.preventDefault(); // Stop form from submitting immediately
+
+  Swal.fire({
+    title: "Are you sure?",
+    text: "You won't be able to undo this action!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      event.target.submit(); // Submit form if confirmed
+    }
+  });
+
+  return false; // Prevent default form submission
+}
+
+// Auto-hide messages after 3 seconds
+setTimeout(function () {
+  let alerts = document.querySelectorAll(".custom-alert");
+  alerts.forEach((alert) => {
+    alert.style.opacity = "0"; // Smooth fade-out
+    setTimeout(() => alert.remove(), 500); // Remove after fade-out
+  });
+}, 3000);
+
+// Close button function
+function closeAlert(button) {
+  let alert = button.parentElement;
+  alert.style.opacity = "0";
+  setTimeout(() => alert.remove(), 500);
 }

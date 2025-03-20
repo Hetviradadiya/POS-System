@@ -1,6 +1,10 @@
 :root {
   --color: #5e6790;
 }
+.col {
+  flex: 1 0 0%;
+  max-width: 250px;
+}
 
 .table-title {
   display: flex;

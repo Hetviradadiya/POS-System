@@ -117,6 +117,9 @@ function editstaff(
   document.getElementById("staffId").value = staff_id;
   if (staff_img) {
     document.getElementById("staffImage").src = staff_img;
+  } else {
+    document.getElementById("staffImage").src =
+      "/staff_images/default-profile.jpg"; // Default image
   }
   document.getElementById("staffUserName").value = staff_username;
   document.getElementById("staffFullName").value = staff_fullname;

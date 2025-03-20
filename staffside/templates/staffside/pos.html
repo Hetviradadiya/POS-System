@@ -1,48 +1,169 @@
-{% load static %}
-
-{% block css %}
-<link rel="stylesheet" href="{% static 'css/pos_style.css' %}">
+{% load static %} {% block css %}
+<link rel="stylesheet" href="{% static 'css/pos_style.css' %}" />
 {% endblock %}
 
-<div class="container-fluid" style="font-family: Nunito, serif; font-weight: 800">
-    <div class="row">
-        <div class="col-md-9 left-section">
-            <div class="row" id="category-container"></div>
-            <div class="row mt-3" id="product-container"></div>
-        </div>
-        <div class="col-md-3 cart-container p-4">
-            <div class="cart-header d-flex justify-content-between align-items-center">
-                <h3 class="cart-title">Cart</h3>
-                <select id="table-selector" class="form-select w-50">
-                    <option value="" selected disabled>Select Table</option>
-                    <option value="1">Table 1</option>
-                    <option value="2">Table 2</option>
-                    <option value="3">Table 3</option>
-                    <option value="4">Table 4</option>
-                    <option value="5">Table 5</option>
-                </select>
-            </div>
-            
-            <div class="order-options d-flex justify-content-between">
-                <button class="btn btn-light">Delivery</button>
-                <button class="btn btn-light">Dine In</button>
-                <button class="btn btn-light">Take Away</button>
-            </div>
-            <hr>
-            <div id="cart-container" class="cart-items">
-                <p class="text-center">Cart is empty</p>
-            </div>
-            <hr>
-            <div class="cart-summary">
-                <p><strong>Items:</strong> <span id="cart-items-count">0</span></p>
-                <p><strong>Discounts:</strong> <span id="cart-discount">₹0.00</span></p>
-                <p class="total-price"><strong>Total:</strong> <span id="cart-total-price">₹0.00</span></p>
-            </div>
-            <button class="btn btn-primary w-100 place-order-btn">Place an order</button>
-            <button class="btn btn-primary w-100 payment-btn">Payment</button>
-        </div>
+<div
+  class="container-fluid"
+  style="font-family: Nunito, serif; font-weight: 800"
+>
+  <div class="row">
+    <!-- Left Section: Categories & Products -->
 
+    <div class="col-md-9 left-section">
+      <div class="row" id="category-container">
+        <div class="col-auto text-center category-col">
+          <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="category" value="All" />
+            <button
+              type="submit"
+              class="category-link {% if selectedCategory == 'All' %}active{% endif %}"
+            >
+              All
+            </button>
+          </form>
+        </div>
+        {% if categories %} {% for category in categories %}
+        <div class="col-auto text-center category-col">
+          <form method="POST">
+            {% csrf_token %}
+            <input
+              type="hidden"
+              name="category"
+              value="{{ category.categories_name }}"
+            />
+            <button
+              type="submit"
+              class="category-link {% if selectedCategory == category.categories_name %}active{% endif %}"
+            >
+              {{ category.categories_name }}
+            </button>
+          </form>
+        </div>
+        {% endfor %} {% else %}
+        <p>No categories found.</p>
+        {% endif %}
+      </div>
+      <div class="row mt-3" id="product-container">
+        {% if products %} {% for product in products %}
+        <div
+          class="col-md-6 mb-4 d-flex justify-content-center"
+          data-category="{{ product.category.categories_name|lower|default:'' }}"
+        >
+          <div
+            class="card d-flex flex-row align-items-center p-3"
+            style="width: 100%"
+          >
+            <img
+              src="{{ product.image.url }}"
+              class="card-img-left"
+              style="
+                width: 100px;
+                height: 100px;
+                object-fit: cover;
+                border-radius: 10px;
+              "
+            />
+            <div class="card-body d-flex flex-column">
+              <h4 class="card-title">{{ product.food_item.food_item }}</h4>
+              <p class="card-text">₹{{ product.sell_price }}</p>
+
+              <!-- Size Options -->
+              <div class="size-options mb-2">
+                <button
+                  class="btn btn-sm btn-outline-secondary size-btn"
+                  onclick="selectSize('{{ product.inventory_id }}', 'Small')"
+                >
+                  Small
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-secondary size-btn"
+                  onclick="selectSize('{{ product.product_id }}', 'Medium')"
+                >
+                  Medium
+                </button>
+                <button
+                  class="btn btn-sm btn-outline-secondary size-btn"
+                  onclick="selectSize('{{ product.product_id }}', 'Large')"
+                >
+                  Large
+                </button>
+              </div>
+
+              <!-- Quantity Selector -->
+              <div class="d-flex align-items-center">
+                <button
+                  class="btn btn-sm btn-outline-secondary"
+                  onclick="updateQuantity('{{ product.product_id }}', -1)"
+                >
+                  -
+                </button>
+                <span class="mx-2" id="quantity-{{ product.id }}">1</span>
+                <button
+                  class="btn btn-sm btn-outline-secondary"
+                  onclick="updateQuantity('{{ product.product_id }}', 1)"
+                >
+                  +
+                </button>
+              </div>
+
+              <!-- Add to Cart Button -->
+              <button
+                class="btn add-to-cart-button mt-2"
+                id="add-to-cart-{{ product.id }}"
+                onclick="addToCart('{{ product.product_id }}')"
+                style="background-color: #4e598c; color: white"
+              >
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+        {% endfor %} {% else %}
+        <p>No products available for this branch.</p>
+        {% endif %}
+      </div>
     </div>
+
+    <!-- Right Section: Cart & Table Selection -->
+    <div class="col-md-3 cart-container p-4">
+      <div
+        class="cart-header d-flex justify-content-between align-items-center"
+      >
+        <h3 class="cart-title">Cart</h3>
+        <select id="table-selector" class="form-select w-50">
+          <option value="" selected disabled>Select Table</option>
+          <option value="1">Table 1</option>
+          <option value="2">Table 2</option>
+          <option value="3">Table 3</option>
+          <option value="4">Table 4</option>
+          <option value="5">Table 5</option>
+        </select>
+      </div>
+
+      <div class="order-options d-flex justify-content-between">
+        <button class="btn btn-light">Delivery</button>
+        <button class="btn btn-light">Dine In</button>
+        <button class="btn btn-light">Take Away</button>
+      </div>
+      <hr />
+      <div id="cart-container" class="cart-items">
+        <p class="text-center">Cart is empty</p>
+      </div>
+      <hr />
+      <div class="cart-summary">
+        <p><strong>Items:</strong> <span id="cart-items-count">0</span></p>
+        <p><strong>Discounts:</strong> <span id="cart-discount">₹0.00</span></p>
+        <p class="total-price">
+          <strong>Total:</strong> <span id="cart-total-price">₹0.00</span>
+        </p>
+      </div>
+      <button class="btn btn-primary w-100 place-order-btn">
+        Place an order
+      </button>
+      <button class="btn btn-primary w-100 payment-btn">Payment</button>
+    </div>
+  </div>
 </div>
 
 <script src="{% static 'js/pos_scripts.js' %}"></script>

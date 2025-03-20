@@ -1,132 +1,142 @@
-let currentRow = null; 
-let categoryId = 1; 
-
-document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("foodItemForm").addEventListener("submit", function (event) {
-        event.preventDefault();
-        saveCategory();
-    });
-});
-
-
+// search button
 function toggleSearch() {
-    let searchContainer = document.querySelector(".search-container");
-    let searchInput = document.querySelector(".search-input");
-    
-    searchContainer.classList.toggle("active");
-    if (searchContainer.classList.contains("active")) {
-        searchInput.focus();
-    }
+  let searchContainer = document.querySelector(".search-container");
+  let searchInput = document.querySelector(".search-input");
+
+  searchContainer.classList.toggle("active");
+  if (searchContainer.classList.contains("active")) {
+    searchInput.focus();
+  }
 }
 
-// Search function
+//search function
 document.getElementById("searchInput").addEventListener("keyup", function () {
-    let filter = this.value.trim().toLowerCase();
-    let rows = document.querySelectorAll("#foodTableBody tr");
-    
+  let filter = this.value.toLowerCase().trim();
+  let rows = document.querySelectorAll("#categoryBody tr");
+  let matchFound = false;
+
+  rows.forEach(function (row) {
+    if (row.id === "noDataRow") return;
+
+    let name = row.cells[1].textContent.toLowerCase();
+
+    if (name.includes(filter)) {
+      row.style.display = "";
+      matchFound = true;
+    } else {
+      row.style.display = "none";
+    }
+  });
+
+  let tableBody = document.getElementById("categoryBody");
+  let noData = document.getElementById("noDataRow");
+
+  if (filter && !matchFound) {
+    if (!noData) {
+      noData = document.createElement("tr");
+      noData.id = "noDataRow";
+      noData.innerHTML = `<td colspan="8" style="text-align: center;">No data found</td>`; //add no datafound row
+      tableBody.appendChild(noData);
+    }
+  } else {
+    if (noData) {
+      noData.remove();
+    }
+  }
+
+  // if search bar is empty, show all rows again
+  if (filter === "") {
     rows.forEach(function (row) {
-        let itemname = row.cells[1].textContent.trim().toLowerCase();
-        if (itemname.includes(filter)) {
-            row.style.display = "";
-        } else {
-            row.style.display = "none";
-        }
+      row.style.display = "";
     });
+    if (noData) {
+      noData.remove();
+    }
+  }
 });
 
-// Function to add or update a category
-function saveCategory() {
-    let itemName = document.getElementById("itemName").value.trim();
-    let nameError = document.getElementById("nameError");
-    
-    nameError.textContent = "";
-    if (!itemName) {
-        nameError.textContent = "Category name is required.";
-        return;
-    }
-    
-    if (currentRow) {
-        // If updating an existing row
-        currentRow.cells[1].innerText = itemName;
-    } else {
-        // Creating a new row
-        let newRow = document.createElement("tr");
-        newRow.innerHTML = `
-            <td>${categoryId}</td>
-            <td>${itemName}</td>
-            <td>
-                <label class="switch">
-                    <input type="checkbox" onclick="toggleStatus(this)" checked>
-                    <span class="slider round"></span>
-                </label>
-            </td>
-            <td>
-                <button class="update-btn" onclick="updateRow(this)">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="delete-btn" onclick="deleteRow(this)">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        `;
-        
-        document.getElementById("foodTableBody").appendChild(newRow);
-        categoryId++;
-    }
-    
-    document.getElementById("foodItemForm").reset(); 
-    closeForm();
-    currentRow = null;
-}
-
-// Function to toggle category status
-function toggleStatus(checkbox) {
-    if (checkbox.checked) {
-        console.log("Status: ON");
-    } else {
-        console.log("Status: OFF");
-    }
-}
-
-function resetForm() {
-    document.getElementById("foodItemForm").reset(); // Resets all input fields
-}
-
-// Function to handle updating a category
-function updateRow(button) {
-    currentRow = button.closest("tr");
-    let name = currentRow.cells[1].innerText;
-    document.getElementById("itemName").value = name;
-    openForm(true);
-}
-
-// Function to delete a category row
-function deleteRow(button) {
-    button.closest("tr").remove();
-}
-
-// Open form modal
-// function openForm() {
-//     document.getElementById("overlay").style.display = "block";
-//     document.getElementById("myForm").style.display = "block";
-//     document.body.classList.add("popup-open");
-// }
+//open form
 function openForm(isUpdate = false) {
-    document.getElementById("overlay").style.display = "block";
-    document.getElementById("myForm").style.display = "block";
-    document.body.classList.add("popup-open");
-  
-    if (!isUpdate) {
-        resetForm();  // Clears the form ONLY when adding a new chain
-        updateIndex = null; // Clear any previous update reference
-    }
+  document.getElementById("overlay").style.display = "block";
+  document.getElementById("myForm").style.display = "block";
+  document.body.classList.add("popup-open");
+
+  if (!isUpdate) {
+    resetForm(); // Clears the form
+    document.querySelector(".form-container h1").innerText = "Add Category";
+    document.querySelector(".form-buttons button[type='submit']").innerText =
+      "Add Category";
+  }
 }
-// Close form modal
+
+// Close form
 function closeForm() {
-    document.getElementById("overlay").style.display = "none";
-    document.getElementById("myForm").style.display = "none";
-    document.body.classList.remove("popup-open");
-   
-    // Reset currentRow to prevent unintended deletions
-    currentRow = null;
+  document.getElementById("overlay").style.display = "none";
+  document.getElementById("myForm").style.display = "none";
+  document.body.classList.remove("popup-open");
+
+  resetForm(); //  form resets
+  clearErrors();
 }
+
+//reset form
+function resetForm() {
+  document.getElementById("categoryForm").reset(); // Resets all input fields
+}
+
+//Clear validation errors
+function clearErrors() {
+  document
+    .querySelectorAll(".error")
+    .forEach((el) => el.classList.remove("error"));
+  document.querySelectorAll(".error-message").forEach((el) => el.remove()); // Remove error messages
+}
+
+function editCategory(categoryId, categoryName, categoryStatus) {
+  document.getElementById("categoryId").value = categoryId;
+  document.getElementById("categoryName").value = categoryName;
+  document.getElementById("categoryStatus").checked = categoryStatus === "True";
+
+
+  document.querySelector(".form-container h1").innerText = "Update Category";
+  document.querySelector(".form-buttons button[type='submit']").innerText =
+    "Update Category";
+  openForm(true); // Open form
+}
+
+document
+  .getElementById("categoryForm")
+  .addEventListener("submit", function (event) {
+    let isValid = true;
+
+    function showError(fieldId, message) {
+      const field = document.getElementById(fieldId);
+      let errorSpan = field.nextElementSibling;
+
+      if (!errorSpan || !errorSpan.classList.contains("error-message")) {
+        errorSpan = document.createElement("span");
+        errorSpan.classList.add("error-message");
+        field.parentNode.appendChild(errorSpan);
+      }
+
+      field.classList.add("error");
+      errorSpan.textContent = message;
+      errorSpan.style.color = "red";
+    }
+
+    clearErrors(); // Clear errors
+
+    const categoryName = document.getElementById("categoryName").value.trim();
+    if (!categoryName) {
+      showError("categoryName", "Category Name is required!");
+      isValid = false;
+    }
+
+    if (!isValid) {
+      event.preventDefault(); // Prevent form submission if validation fails
+      document.getElementById("overlay").style.display = "block"; // Keep the form open
+      document.getElementById("myForm").style.display = "block";
+    }
+  });
+
+

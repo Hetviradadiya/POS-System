@@ -1,217 +1,235 @@
-// Toggle search input on small devices
+// search button
 function toggleSearch() {
-    let searchContainer = document.querySelector(".search-container");
-    let searchInput = document.querySelector(".search-input");
+  let searchContainer = document.querySelector(".search-container");
+  let searchInput = document.querySelector(".search-input");
 
-    searchContainer.classList.toggle("active");
-    if (searchContainer.classList.contains("active")) {
-        searchInput.focus();
-    }
+  searchContainer.classList.toggle("active");
+  if (searchContainer.classList.contains("active")) {
+    searchInput.focus();
+  }
 }
-
-// Search function
+//search function
 document.getElementById("searchInput").addEventListener("keyup", function () {
-    let filter = this.value.toLowerCase();
-    let rows = document.querySelectorAll("#supplierTableBody tr");
+  let filter = this.value.toLowerCase().trim();
+  let rows = document.querySelectorAll("#supplierTableBody tr");
+  let matchFound = false;
 
+  rows.forEach(function (row) {
+    if (row.id === "noDataRow") return;
+
+    let name = row.cells[1].textContent.toLowerCase();
+    let company = row.cells[4].textContent.toLowerCase();
+
+    if (name.includes(filter) || company.includes(filter)) {
+      row.style.display = "";
+      matchFound = true;
+    } else {
+      row.style.display = "none";
+    }
+  });
+
+  let tableBody = document.getElementById("supplierTableBody");
+  let noData = document.getElementById("noDataRow");
+
+  if (filter && !matchFound) {
+    if (!noData) {
+      noData = document.createElement("tr");
+      noData.id = "noDataRow";
+      noData.innerHTML = `<td colspan="8" style="text-align: center;">No data found</td>`; //add no datafound row
+      tableBody.appendChild(noData);
+    }
+  } else {
+    if (noData) {
+      noData.remove();
+    }
+  }
+
+  // if search bar is empty, show all rows again
+  if (filter === "") {
     rows.forEach(function (row) {
-        let name = row.cells[1].textContent.toLowerCase();
-        let company = row.cells[2].textContent.toLowerCase();
-
-        if (name.includes(filter) || company.includes(filter)) {
-            row.style.display = "";
-        } else {
-            row.style.display = "none";
-        }
+      row.style.display = "";
     });
+    if (noData) {
+      noData.remove();
+    }
+  }
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("supplierForm").addEventListener("submit", function (event) {
-        event.preventDefault();
-        if (updateIndex !== null) {
-            updateSupplier();
-        } else {
-            addSupplier();
-        }
-    });
-
-    populateStoreDropdown();
-});
-
-let supplierID = 1;
-let updateIndex = null;
-
-function addSupplier() {
-    clearErrors();
-    if (!validateForm()) return;
-
-    let name = document.getElementById("supplierName").value.trim();
-    let company = document.getElementById("companyName").value.trim();
-    let email = document.getElementById("supplierEmail").value.trim();
-    let address = document.getElementById("supplierAddress").value.trim();
-    let phone = document.getElementById("supplierPhone").value.trim();
-    let store = document.getElementById("supplierStore").value.trim();
-
-    let tableBody = document.getElementById("supplierTableBody");
-    let newRow = document.createElement("tr");
-    newRow.innerHTML = `
-        <td>${supplierID}</td>
-        <td>${name}</td>
-        <td>${company}</td>
-        <td>${email}</td>
-        <td>${address}</td>
-        <td>${phone}</td>
-        <td>${store}</td>
-        <td>
-            <button class="update-btn"><i class="fas fa-edit"></i></button>          
-            <button class="delete-btn"><i class="fas fa-trash"></i></button>
-        </td>
-    `;
-
-    // ✅ Attach event listener to the "Update" button after adding row
-    let updateBtn = newRow.querySelector(".update-btn");
-    updateBtn.addEventListener("click", function () {
-        editSupplier(this);
-    });
-
-    // ✅ Attach event listener to the "Delete" button
-    let deleteBtn = newRow.querySelector(".delete-btn");
-    deleteBtn.addEventListener("click", function () {
-        deleteSupplier(this);
-    });
-
-    tableBody.appendChild(newRow);
-    supplierID++;
-    document.getElementById("supplierForm").reset();
-    closeForm();
-}
-
-
-function editSupplier(button) {
-    console.log("Edit button clicked!"); // ✅ Check if function runs
-    let row = button.closest("tr");
-
-    if (!row) {
-        console.log("❌ Error: Could not find row!");
-        return;
-    }
-
-    console.log("Row found:", row); // ✅ Check row selection
-
-    updateIndex = row;
-    let cells = row.getElementsByTagName("td");
-
-    console.log("Resetting form...");
-    document.getElementById("supplierForm").reset();
-
-    document.getElementById("supplierName").value = cells[1].textContent.trim();
-    document.getElementById("companyName").value = cells[2].textContent.trim();
-    document.getElementById("supplierEmail").value = cells[3].textContent.trim();
-    document.getElementById("supplierAddress").value = cells[4].textContent.trim();
-    document.getElementById("supplierPhone").value = cells[5].textContent.trim();
-    document.getElementById("supplierStore").value = cells[6].textContent.trim();
-
-    console.log("Form populated with row data.");
-    openForm(true);
-}
-
-
-
-
-function updateSupplier() {
-    if (!validateForm()) return;
-
-    let cells = updateIndex.getElementsByTagName("td");
-    cells[1].textContent = document.getElementById("supplierName").value.trim();
-    cells[2].textContent = document.getElementById("companyName").value.trim();
-    cells[3].textContent = document.getElementById("supplierEmail").value.trim();
-    cells[4].textContent = document.getElementById("supplierAddress").value.trim();
-    cells[5].textContent = document.getElementById("supplierPhone").value.trim();
-    cells[6].textContent = document.getElementById("supplierStore").value.trim();
-
-    updateIndex = null;
-    document.getElementById("supplierForm").reset();
-    closeForm();
-}
-
-function deleteSupplier(button) {
-    button.closest("tr").remove();
-}
-
-function validateForm() {
-    let isValid = true;
-    clearErrors();
-
-    function showError(input, message) {
-        let errorSpan = document.getElementById(input.id + "Error");
-        errorSpan.textContent = message;
-        errorSpan.style.color = "red";
-    }
-
-    let name = document.getElementById("supplierName");
-    let company = document.getElementById("companyName");
-    let email = document.getElementById("supplierEmail");
-    let address = document.getElementById("supplierAddress");
-    let phone = document.getElementById("supplierPhone");
-    let store = document.getElementById("supplierStore");
-
-    if (!name.value.trim()) {
-        showError(name, "Name is required");
-        isValid = false;
-    }
-    if (!company.value.trim()) {
-        showError(company, "Company Name is required");
-        isValid = false;
-    }
-    if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-        showError(email, "Enter a valid email");
-        isValid = false;
-    }
-    if (!address.value.trim()) {
-        showError(address, "Address is required");
-        isValid = false;
-    }
-    if (!phone.value.trim() || !/^[6789]\d{9}$/.test(phone.value)) {
-        showError(phone, "Enter a valid 10-digit phone number starting with 6,7,8,9");
-        isValid = false;
-    }
-    if (!store.value.trim()) {
-        showError(store, "Please select a store");
-        isValid = false;
-    }
-    return isValid;
-}
-
-function clearErrors() {
-    let errorMessages = document.querySelectorAll(".error-message");
-    errorMessages.forEach(error => error.textContent = "");
-}
-
+// open form
 function openForm(isUpdate = false) {
-    document.getElementById("overlay").style.display = "block";
-    document.getElementById("myForm").style.display = "block";
-    document.body.classList.add("popup-open");
-    if (!isUpdate) {
-        document.getElementById("supplierForm").reset();
-        updateIndex = null;
-    }
+  document.getElementById("overlay").style.display = "block";
+  document.getElementById("myForm").style.display = "block";
+  document.body.classList.add("popup-open");
+
+  if (!isUpdate) {
+    resetForm(); // Clears form
+    document.querySelector(".form-container h1").innerText = "Add Supplier";
+    document.querySelector(".form-buttons button[type='submit']").innerText =
+      "Add Supplier";
+  }
 }
 
+// Close form
 function closeForm() {
-    document.getElementById("overlay").style.display = "none";
-    document.getElementById("myForm").style.display = "none";
-    document.body.classList.remove("popup-open");
-    updateIndex = null;
+  document.getElementById("overlay").style.display = "none";
+  document.getElementById("myForm").style.display = "none";
+  document.body.classList.remove("popup-open");
+
+  resetForm(); // Reset form
+  clearErrors(); // Clear validation errors
 }
 
-function populateStoreDropdown() {
-    let stores = ["Store A", "Store B", "Store C"];
-    let dropdown = document.getElementById("supplierStore");
-    stores.forEach(store => {
-        let option = document.createElement("option");
-        option.value = store;
-        option.textContent = store;
-        dropdown.appendChild(option);
-    });
+// reset form
+function resetForm() {
+  document.getElementById("supplierId").value = "";
+  document.getElementById("supplierName").value = "";
+  document.getElementById("supplierEmail").value = "";
+  document.getElementById("supplierPhoneNo").value = "";
+  document.getElementById("companyName").value = "";
+  document.getElementById("supplierAddress").value = "";
+}
+
+//Clear validation errors
+function clearErrors() {
+  document
+    .querySelectorAll(".error")
+    .forEach((el) => el.classList.remove("error"));
+  document.querySelectorAll(".error-message").forEach((el) => el.remove()); // Remove error messages
+}
+
+function editsupplier(
+  supplier_id,
+  supplier_name,
+  supplier_email,
+  supplier_phone_no,
+  company_name,
+  address
+) {
+  document.getElementById("supplierId").value = supplier_id;
+  document.getElementById("supplierName").value = supplier_name;
+  document.getElementById("supplierEmail").value = supplier_email;
+  document.getElementById("supplierPhoneNo").value = supplier_phone_no;
+  document.getElementById("companyName").value = company_name;
+  document.getElementById("supplierAddress").value = address;
+
+  document.querySelector(".form-container h1").innerText = "Update Supplier";
+  document.querySelector(".form-buttons button[type='submit']").innerText =
+    "Update Supplier";
+
+  openForm(true); // Open form for update
+}
+
+//form validation
+document
+  .getElementById("supplierForm")
+  .addEventListener("submit", function (event) {
+    let isValid = true;
+
+    function showError(fieldId, message) {
+      const field = document.getElementById(fieldId);
+      let errorSpan = field.nextElementSibling;
+
+      if (!errorSpan || !errorSpan.classList.contains("error-message")) {
+        errorSpan = document.createElement("span");
+        errorSpan.classList.add("error-message");
+        field.parentNode.appendChild(errorSpan);
+      }
+
+      field.classList.add("error");
+      errorSpan.textContent = message;
+      errorSpan.style.color = "red";
+    }
+
+    clearErrors(); // Clear errors
+
+    const supplierName = document.getElementById("supplierName").value.trim();
+    if (!supplierName) {
+      showError("supplierName", "Supplier name is required!");
+      isValid = false;
+    }
+
+    const supplierEmail = document.getElementById("supplierEmail").value.trim();
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!supplierEmail) {
+      showError("supplierEmail", "Supplier Email is required!");
+      isValid = false;
+    } else if (!emailPattern.test(supplierEmail)) {
+      showError("supplierEmail", "Enter a valid email address!");
+      isValid = false;
+    }
+
+    const supplierPhoneNo = document
+      .getElementById("supplierPhoneNo")
+      .value.trim();
+    const phoneRegex =
+      /^\+(1\d{10}|91\d{10}|44\d{9,10}|81\d{9,11}|49\d{10,11}|33\d{9}|61\d{9}|86\d{10,11})$/;
+
+    if (!supplierPhoneNo) {
+      showError("supplierPhoneNo", "Supplier PhoneNo is required!.");
+    } else if (!phoneRegex.test(supplierPhoneNo)) {
+      showError(
+        "supplierPhoneNo",
+        "Enter a valid phone number (e.g., +919876543210)."
+      );
+      isValid = false;
+    }
+
+    const companyName = document.getElementById("companyName").value;
+    if (!companyName) {
+      showError("companyName", "company Name is required!");
+      isValid = false;
+    }
+    const supplierAddress = document.getElementById("supplierAddress").value;
+    if (!supplierAddress) {
+      showError("supplierAddress", "supplier Address is required!");
+      isValid = false;
+    }
+
+    if (!isValid) {
+      event.preventDefault(); // Prevent form submission if validation fails
+      document.getElementById("overlay").style.display = "block"; // Keep the form open
+      document.getElementById("myForm").style.display = "block";
+    }
+  });
+//message when try to delete row
+function confirmDelete() {
+  return confirm(
+    "Are you sure you want to delete this category? This action cannot be undone."
+  );
+}
+function confirmDelete(event) {
+  event.preventDefault(); // Stop form from submitting immediately
+
+  Swal.fire({
+    title: "Are you sure?",
+    text: "You won't be able to undo this action!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      event.target.submit(); // Submit form if confirmed
+    }
+  });
+
+  return false; // Prevent default form submission
+}
+
+// Auto-hide messages after 3 seconds
+setTimeout(function () {
+  let alerts = document.querySelectorAll(".custom-alert");
+  alerts.forEach((alert) => {
+    alert.style.opacity = "0"; // Smooth fade-out
+    setTimeout(() => alert.remove(), 500); // Remove after fade-out
+  });
+}, 3000);
+
+// Close button function
+function closeAlert(button) {
+  let alert = button.parentElement;
+  alert.style.opacity = "0";
+  setTimeout(() => alert.remove(), 500);
 }

@@ -87,8 +87,14 @@ class Staff(models.Model):
     session_keys = models.JSONField(default=list)  # Store multiple session keys
 
     def save(self, *args, **kwargs):
-        if not self.staff_password.startswith("pbkdf2_sha256$"):
-            self.staff_password = make_password(self.staff_password)
+        if self.pk:  # If updating an existing user
+            existing_staff = Staff.objects.filter(pk=self.pk).first()
+            if existing_staff and existing_staff.staff_password != self.staff_password:
+                self.staff_password = make_password(self.staff_password)
+        else:  # If creating a new user
+            if not self.staff_password.startswith("pbkdf2_sha256$"):
+                self.staff_password = make_password(self.staff_password)
+
         super().save(*args, **kwargs)
 
     def set_password(self, raw_password):
@@ -117,7 +123,7 @@ class Inventory(models.Model):
     exp_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.food_item.food_item if self.food_item else 'No Food Item'} - {self.category.category_name}"
+        return f"{self.food_item.food_item if self.food_item else 'No Food Item'} - {self.category.categories_name}"
 
 
 
