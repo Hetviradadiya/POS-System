@@ -30,6 +30,7 @@ def loginaccount(request):
                     request.session["staff_id"] = staff_user.staff_id  
                     request.session["staff_username"] = staff_user.staff_username  
                     request.session["staff_role"] = staff_user.staff_role 
+                    # request.session["staff_img"] = staff_user.staff_img
                     request.session.modified = True  
                     
                     request.session.save()

@@ -125,8 +125,6 @@ class Inventory(models.Model):
     def __str__(self):
         return f"{self.food_item.food_item if self.food_item else 'No Food Item'} - {self.category.categories_name}"
 
-
-
 class Table(models.Model):
     STATUS_CHOICES = [
         ('vacant', 'Vacant'),
@@ -135,43 +133,91 @@ class Table(models.Model):
     ]
 
     table_id = models.AutoField(primary_key=True)
-    seats = models.IntegerField()
+    table_number = models.CharField(max_length=10, unique=True, blank=True, null=True)  # Store 'T-1', 'T-2'
+    seats = models.IntegerField(null=False)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='vacant')
 
-    def create_tablecart_table(self):
-        """Dynamically create a new table for this specific table_id."""
-        print(f"DEBUG: Table ID before creating table: {self.table_id}")  # Debug print
-
-        if not self.table_id:  # Ensure table_id is set
-            print("ERROR: Table ID is not available. Skipping table creation.")
-            return
-
-        table_name = f"table_{self.table_id}_cart"  # Unique table name
-        with connection.cursor() as cursor:
-            query = f"""
-            CREATE TABLE IF NOT EXISTS {table_name} (
-                cart_id SERIAL PRIMARY KEY,
-                table_id INTEGER REFERENCES adminside_table(table_id) ON DELETE CASCADE,
-                order_item TEXT NOT NULL,
-                size INTEGER DEFAULT 0,
-                quantity INTEGER DEFAULT 0,
-                price DECIMAL(10,2) DEFAULT 0.00
-            )
-            """
-            print(f"Executing SQL Query: {query}")  # Debug print
-            cursor.execute(query)
-
-
-
-
     def save(self, *args, **kwargs):
-        """Override save to create a unique table dynamically."""
+        """Auto-generate table_number if not provided."""
+        if not self.table_number:
+            last_table = Table.objects.order_by("-table_id").first()
+            next_number = 1
+
+        if last_table and last_table.table_number:
+            last_table_number = str(last_table.table_number)  # Ensure it's a string
+            if "-" in last_table_number:  # Prevents AttributeError
+                try:
+                    next_number = int(last_table_number.split("-")[1]) + 1
+                except (IndexError, ValueError):
+                    next_number = 1  # Fallback in case of parsing error
+
+        self.table_number = f"T-{next_number}"
+
+        """Override save to clear cart when status is changed to vacant."""
         super().save(*args, **kwargs)
-        print(f"DEBUG: Table saved with ID {self.table_id}") 
-        self.create_tablecart_table() 
+        # if self.status == 'vacant':
+        #     Cart.objects.filter(table=self).delete()  # Clear cart when table becomes vacant
 
     def __str__(self):
         return f"Table {self.table_id} - {self.status}"
+
+
+class Cart(models.Model):
+    cart_id = models.AutoField(primary_key=True)
+    table = models.ForeignKey(Table, on_delete=models.CASCADE, db_column="table_id")
+    order_item = models.CharField(max_length=255)
+    size = models.CharField(max_length=20, choices=[("Small", "Small"), ("Medium", "Medium"), ("Large", "Large")], default="Medium")
+    quantity = models.IntegerField(default=1)
+    price = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
+
+    def __str__(self):
+        return f"Cart {self.cart_id} - Table {self.table.table_id}"
+
+# class Table(models.Model):
+#     STATUS_CHOICES = [
+#         ('vacant', 'Vacant'),
+#         ('reserved', 'Reserved'),
+#         ('occupied', 'Occupied'),
+#     ]
+
+#     table_id = models.AutoField(primary_key=True)
+#     seats = models.IntegerField()
+#     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='vacant')
+
+#     def create_tablecart_table(self):
+#         """Dynamically create a new table for this specific table_id."""
+#         print(f"DEBUG: Table ID before creating table: {self.table_id}")  # Debug print
+
+#         if not self.table_id:  # Ensure table_id is set
+#             print("ERROR: Table ID is not available. Skipping table creation.")
+#             return
+
+#         table_name = f"table_{self.table_id}_cart"  # Unique table name
+#         with connection.cursor() as cursor:
+#             query = f"""
+#             CREATE TABLE IF NOT EXISTS {table_name} (
+#                 cart_id SERIAL PRIMARY KEY,
+#                 table_id INTEGER REFERENCES adminside_table(table_id) ON DELETE CASCADE,
+#                 order_item TEXT NOT NULL,
+#                 size INTEGER DEFAULT 0,
+#                 quantity INTEGER DEFAULT 0,
+#                 price DECIMAL(10,2) DEFAULT 0.00
+#             )
+#             """
+#             print(f"Executing SQL Query: {query}")  # Debug print
+#             cursor.execute(query)
+
+
+
+
+#     def save(self, *args, **kwargs):
+#         """Override save to create a unique table dynamically."""
+#         super().save(*args, **kwargs)
+#         print(f"DEBUG: Table saved with ID {self.table_id}") 
+#         self.create_tablecart_table() 
+
+#     def __str__(self):
+#         return f"Table {self.table_id} - {self.status}"
 
   
 

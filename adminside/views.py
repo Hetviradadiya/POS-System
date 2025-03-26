@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseServerError
 from .forms import CustomPasswordChangeForm
+from django.contrib.sessions.models import Session
 from django.utils.timezone import now
-from adminside.models import*
 from django.conf import settings
 from django.contrib import messages
 from adminside.models import*
@@ -23,6 +23,12 @@ def home(request):
     try:
         staff_user = Staff.objects.get(staff_id=staff_id)
         print(f"User accessing admin panel: {staff_user.staff_username}, Role: {staff_user.staff_role}")
+
+        # Store staff image in session
+        if staff_user.staff_img:
+            request.session["staff_img"] = f"/media/staff_images/{staff_user.staff_img}"
+        else:
+            request.session["staff_img"] = None
 
         if staff_user.staff_role.lower() != "admin":
             print("User is not an admin, redirecting to login...")
@@ -489,7 +495,25 @@ def fooditems(request):
     return render_page(request, 'adminside/fooditems.html',context)
 
 def tables(request):
-    return render_page(request, 'adminside/tables.html')
+    if request.method == "POST":
+        # print("Form Data:", request.POST) 
+        # table_number = request.POST.get("table_number")
+        seats = request.POST.get("seats")
+        status = "Vacant"  # Default status
+
+        if not seats:  # Ensure seats is not empty
+            # print("not seats selected.")
+            messages.error(request, "Please select a table type before adding.")
+            return redirect("adminside:tables")
+
+        # Save to Database
+        Table.objects.create(seats=seats, status=status)
+        # print("Table added with seats:", seats)
+        # Redirect back to the tables page to refresh the list
+        return redirect("adminside:tables")
+    
+    tables = Table.objects.all()
+    return render_page(request, "adminside/tables.html", {"tables": tables})
 
 def customer(request):
     context = {}

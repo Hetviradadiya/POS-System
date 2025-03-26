@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Invoice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            width: 320px;
+            margin: auto;
+            text-align: center;
+            border: 1px solid #000;
+            padding: 10px;
+        }
+        h2 {
+            margin: 0;
+        }
+        .header {
+            text-align: center;
+            font-size: 14px;
+        }
+        .bill-info {
+            text-align: left;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .table th, .table td {
+            border-bottom: 1px dashed #000;
+            padding: 5px;
+            text-align: left;
+            font-size: 12px;
+        }
+        .total {
+            text-align: right;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .thank-you {
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h2>RAGA BAKERY & RESTAURANT</h2>
+    <div class="header">
+        Kollam, Kerala. <br>
+        PHONE: 94463978797 <br>
+        GSTIN: 32IDNAP1991TZ8 <br>
+        <hr>
+    </div>
+    <h3>Tax Invoice</h3>
+    
+    <div class="bill-info">
+        <strong>Bill No:</strong> INV{{ table_id }} <br>
+        <strong>Date:</strong> {{ now|date:"d-m-Y, h:i A" }} <br>
+        <strong>Customer:</strong> Walk-in <br>
+        <strong>Payment Mode:</strong> Cash <br>
+    </div>
+
+    <table class="table">
+        <tr>
+            <th>Qty</th>
+            <th>Item</th>
+            <th>Rate</th>
+            <th>Amt</th>
+        </tr>
+        {% for item in cart_items %}
+        <tr>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.order_item }}</td>
+            <td>{{ item.price }}</td>
+            <td>{{ item.price|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div class="total">
+        (Tax Incl) Sub Total: {{ total_price|floatformat:2 }} <br>
+        SGST @ 2.50%: {{ gst|floatformat:2 }} <br>
+        CGST @ 2.50%: {{ gst|floatformat:2 }} <br>
+        <hr>
+        <h2>Total: ₹{{ final_total|floatformat:2 }}</h2>
+    </div>
+
+    <div class="thank-you">
+        !!! Thank You !!!
+    </div>
+</body>
+</html>
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Receipt</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .bill-container { width: 60%; margin: auto; border: 1px solid #000; padding: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+        .print-btn { margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="bill-container">
+        <h2>Restaurant Invoice</h2>
+        <p>Table No: {{ table_id }}</p>
+        <table>
+            <tr>
+                <th>Qty</th>
+                <th>Description</th>
+                <th>Amount</th>
+            </tr>
+            {% for item in cart_items %}
+            <tr>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.order_item }}</td>
+                <td>₹{{ item.price }}* {{item.quantity }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <p>Less 10% Discount: ₹{{ discount }}</p>
+        <p>GST @ 7%: ₹{{ gst }}</p>
+        <p><strong>Total: ₹{{ final_total }}</strong></p>
+        <button onclick="window.print()" class="print-btn">Print Bill</button>
+    </div>
+</body>
+</html> -->

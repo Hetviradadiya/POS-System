@@ -1,176 +1,215 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const allTables = document.querySelector("#allTables .d-flex");
-  const vacantTabContent = document.querySelector("#vacant .d-flex");
-  const occupiedTabContent = document.querySelector("#occupied .d-flex");
-  const reservedTabContent = document.querySelector("#reserved .d-flex");
-  const addTableButton = document.querySelector(".add-table-button");
-  const formPopup = document.getElementById("myForm");
-  const overlay = document.getElementById("overlay");
-  const closeButton = document.querySelector(".btn-close");
-  const addTableCards = document.querySelectorAll(".add-table-card");
 
-  if (!addTableButton || !formPopup || !overlay || !allTables) {
-    console.error("Missing elements in DOM");
-    return;
+document
+  .getElementById("tableForm")
+  .addEventListener("submit", function (event) {
+    var selectedSeats = document.getElementById("selectedSeats").value;
+
+    // console.log("Form submitted! Selected seats:", selectedSeats); // Debugging
+
+    if (!selectedSeats) {
+      alert("Please select a table type before adding.");
+      event.preventDefault(); // Stop form submission if no table is selected
+      return;
+    }
+
+    // console.log("Submitting form now...");
+  });
+
+function selectTable(event, seats) {
+  event.preventDefault(); // Prevent accidental form submission
+
+  let formSeatsInput = document.getElementById("selectedSeats");
+  if (formSeatsInput) {
+    formSeatsInput.value = seats;
+    // console.log("Seats set:", seats); // Debugging output
+
+    // Explicitly submit the form after selecting a table
+    document.getElementById("tableForm").submit();
+  } else {
+    // console.error("Hidden form seats input not found!");
   }
+}
 
-  // Open & Close Form Functions
-  function openForm() {
-    formPopup.style.display = "block";
-    overlay.style.display = "block";
-    addTableButton.innerHTML = `<span class="btn-text">
-            <i class="fa-solid fa-xmark plus-icon"></i> Close
-        </span>
-        <span class="btn-icon"><i class="fa-solid fa-xmark plus-icon"></i></span>`;
-  }
+function openForm() {
+  document.getElementById("myForm").style.display = "block";
+  document.getElementById("overlay").style.display = "block";
+}
 
-  function closeForm() {
-    formPopup.style.display = "none";
-    overlay.style.display = "none";
-    addTableButton.innerHTML = `<span class="btn-text">
-            <i class="fa-solid fa-plus plus-icon"></i> Add Table
-        </span>
-        <span class="btn-icon"><i class="fa-solid fa-plus plus-icon"></i></span>`;
-  }
+function closeForm() {
+  document.getElementById("myForm").style.display = "none";
+  document.getElementById("overlay").style.display = "none";
+}
+// document.addEventListener("DOMContentLoaded", function () {
+//   const allTables = document.querySelector("#allTables .d-flex");
+//   const vacantTabContent = document.querySelector("#vacant .d-flex");
+//   const occupiedTabContent = document.querySelector("#occupied .d-flex");
+//   const reservedTabContent = document.querySelector("#reserved .d-flex");
+//   const addTableButton = document.querySelector(".add-table-button");
+//   const formPopup = document.getElementById("myForm");
+//   const overlay = document.getElementById("overlay");
+//   const closeButton = document.querySelector(".btn-close");
+//   const addTableCards = document.querySelectorAll(".add-table-card");
 
-  // Add click event for Add Table button
-  addTableButton.addEventListener("click", function () {
-    if (formPopup.style.display === "block") {
-      closeForm();
-    } else {
-      openForm();
-    }
-  });
+// if (!addTableButton || !formPopup || !overlay || !allTables) {
+//   console.error("Missing elements in DOM");
+//   return;
+// }
+// function openForm() {
+//   formPopup.style.display = "block";
+//   overlay.style.display = "block";
+//   addTableButton.innerHTML = `<span class="btn-text">
+//           <i class="fa-solid fa-xmark plus-icon"></i> Close
+//       </span>
+//       <span class="btn-icon"><i class="fa-solid fa-xmark plus-icon"></i></span>`;
+// }
 
-  // Close form on close button or overlay click
-  closeButton.addEventListener("click", closeForm);
-  overlay.addEventListener("click", closeForm);
-  document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape") {
-      closeForm();
-    }
-  });
+// function closeForm() {
+//   formPopup.style.display = "none";
+//   overlay.style.display = "none";
+//   addTableButton.innerHTML = `<span class="btn-text">
+//           <i class="fa-solid fa-plus plus-icon"></i> Add Table
+//       </span>
+//       <span class="btn-icon"><i class="fa-solid fa-plus plus-icon"></i></span>`;
+// }
 
-  // Function to Add Table
-  function addTableCard(tableCard) {
-    const newTableCard = tableCard.cloneNode(true);
-    newTableCard.classList.remove("add-table-card");
-    newTableCard.classList.add("table-card");
+// Add click event for Add Table button
+//   addTableButton.addEventListener("click", function () {
+//     if (formPopup.style.display === "block") {
+//       closeForm();
+//     } else {
+//       openForm();
+//     }
+//   });
 
-    // Add to "All Tables"
-    allTables.appendChild(newTableCard);
+//   // Close form on close button or overlay click
+//   closeButton.addEventListener("click", closeForm);
+//   overlay.addEventListener("click", closeForm);
+//   document.addEventListener("keydown", function (event) {
+//     if (event.key === "Escape") {
+//       closeForm();
+//     }
+//   });
 
-    // Get Table Status & Add to Correct Tab
-    let status = newTableCard.getAttribute("data-status");
-    if (status === "vacant") {
-      vacantTabContent.appendChild(newTableCard.cloneNode(true));
-    } else if (status === "occupied") {
-      occupiedTabContent.appendChild(newTableCard.cloneNode(true));
-    } else if (status === "reserved") {
-      reservedTabContent.appendChild(newTableCard.cloneNode(true));
-    }
+//   // Function to Add Table
+//   function addTableCard(tableCard) {
+//     const newTableCard = tableCard.cloneNode(true);
+//     newTableCard.classList.remove("add-table-card");
+//     newTableCard.classList.add("table-card");
 
-    // Attach Click Event to Open Modal
-    newTableCard.addEventListener("click", function () {
-      openTableModal(newTableCard);
-    });
-  }
+//     // Add to "All Tables"
+//     allTables.appendChild(newTableCard);
 
-  // Click event for selecting a table card from the form
-  addTableCards.forEach((card) => {
-    card.addEventListener("click", function () {
-      addTableCard(card);
-    });
-  });
+//     // Get Table Status & Add to Correct Tab
+//     let status = newTableCard.getAttribute("data-status");
+//     if (status === "vacant") {
+//       vacantTabContent.appendChild(newTableCard.cloneNode(true));
+//     } else if (status === "occupied") {
+//       occupiedTabContent.appendChild(newTableCard.cloneNode(true));
+//     } else if (status === "reserved") {
+//       reservedTabContent.appendChild(newTableCard.cloneNode(true));
+//     }
 
-  // Function to Open Modal with Table Details
-  function openTableModal(card) {
-    const tableNumber = card.getAttribute("data-table-number");
-    const tableStatus = card.getAttribute("data-status");
-    const numPeople = card.getAttribute("data-num-people");
-    let orderedItems = card.getAttribute("data-ordered-items");
+//     // Attach Click Event to Open Modal
+//     newTableCard.addEventListener("click", function () {
+//       openTableModal(newTableCard);
+//     });
+//   }
 
-    try {
-      orderedItems = JSON.parse(orderedItems);
-    } catch (e) {
-      orderedItems = [];
-    }
+//   // Click event for selecting a table card from the form
+//   addTableCards.forEach((card) => {
+//     card.addEventListener("click", function () {
+//       addTableCard(card);
+//     });
+//   });
 
-    document.getElementById("modalTableNumber").textContent = tableNumber;
-    document.getElementById("modalTableStatus").textContent = tableStatus;
-    document.getElementById("modalNumPeople").textContent = numPeople;
+//   // Function to Open Modal with Table Details
+//   function openTableModal(card) {
+//     const tableNumber = card.getAttribute("data-table-number");
+//     const tableStatus = card.getAttribute("data-status");
+//     const numPeople = card.getAttribute("data-num-people");
+//     let orderedItems = card.getAttribute("data-ordered-items");
 
-    const orderedItemsList = document.getElementById("modalOrderedItems");
-    orderedItemsList.innerHTML = "";
+//     try {
+//       orderedItems = JSON.parse(orderedItems);
+//     } catch (e) {
+//       orderedItems = [];
+//     }
 
-    if (orderedItems.length > 0) {
-      orderedItems.forEach((item) => {
-        const li = document.createElement("li");
-        li.textContent = item;
-        orderedItemsList.appendChild(li);
-      });
-    } else {
-      const li = document.createElement("li");
-      li.textContent = "No orders";
-      orderedItemsList.appendChild(li);
-    }
+//     document.getElementById("modalTableNumber").textContent = tableNumber;
+//     document.getElementById("modalTableStatus").textContent = tableStatus;
+//     document.getElementById("modalNumPeople").textContent = numPeople;
 
-    const tableModal = new bootstrap.Modal(
-      document.getElementById("tableDetailsModal")
-    );
-    tableModal.show();
-  }
+//     const orderedItemsList = document.getElementById("modalOrderedItems");
+//     orderedItemsList.innerHTML = "";
 
-  // Keep added tables when form closes
-  closeButton.addEventListener("click", function () {
-    formPopup.style.display = "none";
-    overlay.style.display = "none";
-  });
+//     if (orderedItems.length > 0) {
+//       orderedItems.forEach((item) => {
+//         const li = document.createElement("li");
+//         li.textContent = item;
+//         orderedItemsList.appendChild(li);
+//       });
+//     } else {
+//       const li = document.createElement("li");
+//       li.textContent = "No orders";
+//       orderedItemsList.appendChild(li);
+//     }
 
-  // Prevent tables from disappearing when closing form
-  overlay.addEventListener("click", function (event) {
-    if (event.target === overlay) {
-      formPopup.style.display = "none";
-      overlay.style.display = "none";
-    }
-  });
+//     const tableModal = new bootstrap.Modal(
+//       document.getElementById("tableDetailsModal")
+//     );
+//     tableModal.show();
+//   }
 
-  // Ensure Tables Stay in Correct Tab When Switching
-  document.querySelectorAll(".nav-link").forEach((tab) => {
-    tab.addEventListener("click", function () {
-      let selectedTab = this.getAttribute("href").substring(1);
+//   // Keep added tables when form closes
+//   closeButton.addEventListener("click", function () {
+//     formPopup.style.display = "none";
+//     overlay.style.display = "none";
+//   });
 
-      // Remove active class from all tabs
-      document
-        .querySelectorAll(".nav-link")
-        .forEach((link) => link.classList.remove("active"));
-      this.classList.add("active");
+//   // Prevent tables from disappearing when closing form
+//   overlay.addEventListener("click", function (event) {
+//     if (event.target === overlay) {
+//       formPopup.style.display = "none";
+//       overlay.style.display = "none";
+//     }
+//   });
 
-      // Hide all tab content
-      document
-        .querySelectorAll(".tab-pane")
-        .forEach((tabContent) => tabContent.classList.remove("show", "active"));
+//   // Ensure Tables Stay in Correct Tab When Switching
+//   document.querySelectorAll(".nav-link").forEach((tab) => {
+//     tab.addEventListener("click", function () {
+//       let selectedTab = this.getAttribute("href").substring(1);
 
-      // Show only the selected tab
-      document.getElementById(selectedTab).classList.add("show", "active");
+//       // Remove active class from all tabs
+//       document
+//         .querySelectorAll(".nav-link")
+//         .forEach((link) => link.classList.remove("active"));
+//       this.classList.add("active");
 
-      // Move tables based on status
-      if (selectedTab === "vacant") {
-        vacantTabContent.innerHTML = "";
-        document.querySelectorAll(".table-card.vacant").forEach((table) => {
-          vacantTabContent.appendChild(table.cloneNode(true));
-        });
-      } else if (selectedTab === "occupied") {
-        occupiedTabContent.innerHTML = "";
-        document.querySelectorAll(".table-card.occupied").forEach((table) => {
-          occupiedTabContent.appendChild(table.cloneNode(true));
-        });
-      } else if (selectedTab === "reserved") {
-        reservedTabContent.innerHTML = "";
-        document.querySelectorAll(".table-card.reserved").forEach((table) => {
-          reservedTabContent.appendChild(table.cloneNode(true));
-        });
-      }
-    });
-  });
-});
+//       // Hide all tab content
+//       document
+//         .querySelectorAll(".tab-pane")
+//         .forEach((tabContent) => tabContent.classList.remove("show", "active"));
+
+//       // Show only the selected tab
+//       document.getElementById(selectedTab).classList.add("show", "active");
+
+//       // Move tables based on status
+//       if (selectedTab === "vacant") {
+//         vacantTabContent.innerHTML = "";
+//         document.querySelectorAll(".table-card.vacant").forEach((table) => {
+//           vacantTabContent.appendChild(table.cloneNode(true));
+//         });
+//       } else if (selectedTab === "occupied") {
+//         occupiedTabContent.innerHTML = "";
+//         document.querySelectorAll(".table-card.occupied").forEach((table) => {
+//           occupiedTabContent.appendChild(table.cloneNode(true));
+//         });
+//       } else if (selectedTab === "reserved") {
+//         reservedTabContent.innerHTML = "";
+//         document.querySelectorAll(".table-card.reserved").forEach((table) => {
+//           reservedTabContent.appendChild(table.cloneNode(true));
+//         });
+//       }
+//     });
+//   });
+// });

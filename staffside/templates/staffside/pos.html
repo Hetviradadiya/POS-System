@@ -6,6 +6,36 @@
   class="container-fluid"
   style="font-family: Nunito, serif; font-weight: 800"
 >
+  <!-- {% if messages %}
+  <div id="toastContainer">
+    {% for message in messages %}
+    <div class="custom-alert alert alert-{{ message.tags }}">
+      <i class="fas fa-check-circle"></i>
+      <strong>{{ message.tags|title }}!</strong> {{ message }}
+      <button type="button" class="close" onclick="closeAlert(this)">
+        &times;
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      setTimeout(() => {
+        document.querySelectorAll(".custom-alert").forEach((alert) => {
+          alert.classList.add("fade-out");
+          setTimeout(() => alert.remove(), 500);
+        });
+      }, 5000);
+    });
+
+    function closeAlert(button) {
+      let alert = button.parentElement;
+      alert.classList.add("fade-out");
+      setTimeout(() => alert.remove(), 500);
+    }
+  </script>
+  {% endif %} -->
   <div class="row">
     <!-- Left Section: Categories & Products -->
 
@@ -72,50 +102,76 @@
               <div class="size-options mb-2">
                 <button
                   class="btn btn-sm btn-outline-secondary size-btn"
-                  onclick="selectSize('{{ product.inventory_id }}', 'Small')"
+                  data-product="{{ product.inventory_id }}"
+                  data-size="Small"
+                  onclick="selectSize(event, '{{ product.inventory_id }}', 'Small')"
                 >
                   Small
                 </button>
                 <button
                   class="btn btn-sm btn-outline-secondary size-btn"
-                  onclick="selectSize('{{ product.product_id }}', 'Medium')"
+                  data-product="{{ product.inventory_id }}"
+                  data-size="Medium"
+                  onclick="selectSize(event, '{{ product.inventory_id }}', 'Medium')"
                 >
                   Medium
                 </button>
                 <button
                   class="btn btn-sm btn-outline-secondary size-btn"
-                  onclick="selectSize('{{ product.product_id }}', 'Large')"
+                  data-product="{{ product.inventory_id }}"
+                  data-size="Large"
+                  onclick="selectSize(event, '{{ product.inventory_id }}', 'Large')"
                 >
                   Large
                 </button>
               </div>
-
-              <!-- Quantity Selector -->
-              <div class="d-flex align-items-center">
-                <button
-                  class="btn btn-sm btn-outline-secondary"
-                  onclick="updateQuantity('{{ product.product_id }}', -1)"
-                >
-                  -
-                </button>
-                <span class="mx-2" id="quantity-{{ product.id }}">1</span>
-                <button
-                  class="btn btn-sm btn-outline-secondary"
-                  onclick="updateQuantity('{{ product.product_id }}', 1)"
-                >
-                  +
-                </button>
-              </div>
+              <input
+                type="hidden"
+                name="size"
+                id="size-{{ product.inventory_id }}"
+              />
 
               <!-- Add to Cart Button -->
-              <button
+              <!-- <button
                 class="btn add-to-cart-button mt-2"
-                id="add-to-cart-{{ product.id }}"
-                onclick="addToCart('{{ product.product_id }}')"
+                onclick="validateCart('{{ product.inventory_id }}')"
                 style="background-color: #4e598c; color: white"
               >
                 Add to Cart
-              </button>
+              </button> -->
+              <form
+                method="POST"
+                action="{% url 'staffside:pos' %}"
+                id="add-to-cart-form-{{ product.inventory_id }}"
+              >
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_to_cart" />
+                <!-- <input type="hidden" name="order_type" id="order_type" /> -->
+                <input type="hidden" name="table_id" value="" />
+                <input
+                  type="hidden"
+                  name="product_id"
+                  value="{{ product.inventory_id }}"
+                />
+                <input
+                  type="hidden"
+                  name="size"
+                  value=""
+                  id="size-{{ product.inventory_id }}"
+                />
+                <input type="hidden" name="quantity" value="1" />
+                <input type="hidden" name="price" value="{{ product.sell_price }}" data-original-price="{{ product.sell_price }}">
+
+                <button
+                  type="submit"
+                  class="btn add-to-cart-button mt-2"
+                  data-product-id="{{ product.inventory_id }}"
+                  onclick="validateCart('{{ product.inventory_id }}')"
+                  style="background-color: #4e598c; color: white"
+                >
+                  Add to Cart
+                </button>
+              </form>
             </div>
           </div>
         </div>
@@ -133,35 +189,103 @@
         <h3 class="cart-title">Cart</h3>
         <select id="table-selector" class="form-select w-50">
           <option value="" selected disabled>Select Table</option>
-          <option value="1">Table 1</option>
-          <option value="2">Table 2</option>
-          <option value="3">Table 3</option>
-          <option value="4">Table 4</option>
-          <option value="5">Table 5</option>
+          {% for table in tables %}
+          <option value="{{ table.table_id }}">
+            Table {{ table.table_number }} (ID: {{ table.table_id }})
+          </option>
+          {% endfor %}
         </select>
       </div>
 
       <div class="order-options d-flex justify-content-between">
-        <button class="btn btn-light">Delivery</button>
-        <button class="btn btn-light">Dine In</button>
-        <button class="btn btn-light">Take Away</button>
+        <button class="btn btn-light" onclick="setOrderType('delivery')">
+          Delivery
+        </button>
+        <button class="btn btn-light" onclick="setOrderType('dinein')">
+          Dine In
+        </button>
+        <button class="btn btn-light" onclick="setOrderType('takeaway')">
+          Take Away
+        </button>
+        <input type="hidden" name="order_type" />
       </div>
-      <hr />
+      <br />
       <div id="cart-container" class="cart-items">
+        {% if cart_items %} {% for item in cart_items %}
+        <div
+          class="cart-item d-flex justify-content-between align-items-center p-2"
+        >
+          <div>
+            <h5>{{ item.order_item }}</h5>
+            <p>Size: {{ item.size }}</p>
+            <p>₹{{ item.price }} x {{ item.quantity }}</p>
+          </div>
+          <!-- Quantity Selector -->
+          <div class="d-flex align-items-center">
+            <button
+              type="submit"
+              class="btn btn-sm btn-outline-secondary"
+              name="change"
+              onclick="updateQuantity('{{ item.cart_id }}', '{{ item.table_id }}', -1)"
+            >
+              -
+            </button>
+            <span class="mx-2" id="quantity-{{ item.cart_id }}"
+              >{{ item.quantity }}</span
+            >
+            <button
+              type="submit"
+              class="btn btn-sm btn-outline-secondary"
+              name="change"
+              onclick="updateQuantity('{{ item.cart_id }}', '{{ item.table_id }}', 1)"
+            >
+              +
+            </button>
+          </div>
+          <form method="POST" action="{% url 'staffside:pos' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="remove_from_cart" />
+            <input type="hidden" name="cart_id" value="{{ item.cart_id }}" />
+            <input type="hidden" name="table_id" value="{{ item.table_id }}" />
+            <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+          </form>
+        </div>
+        {% endfor %} {% else %}
         <p class="text-center">Cart is empty</p>
+        {% endif %}
       </div>
       <hr />
       <div class="cart-summary">
-        <p><strong>Items:</strong> <span id="cart-items-count">0</span></p>
-        <p><strong>Discounts:</strong> <span id="cart-discount">₹0.00</span></p>
+        <p><strong>Items:</strong> <span id="cart-items-count">{{ total_items }}</span></p>
+        <!-- <p><strong>Discounts:</strong> <span id="cart-discount">₹0.00</span></p> -->
         <p class="total-price">
-          <strong>Total:</strong> <span id="cart-total-price">₹0.00</span>
+          <strong>Total:</strong> <span id="cart-total-price">₹{{ total_price }}</span>
         </p>
       </div>
-      <button class="btn btn-primary w-100 place-order-btn">
+      <!-- <button class="btn btn-primary w-100 place-order-btn">
         Place an order
-      </button>
-      <button class="btn btn-primary w-100 payment-btn">Payment</button>
+      </button> -->
+      <form
+        method="POST"
+        action="{% url 'staffside:pos' %}"
+        id="place-order-form"
+      >
+        {% csrf_token %}
+        <input type="hidden" name="action" value="place_order" />
+        <input type="hidden" name="order_type" id="order_type" />
+        <input type="hidden" name="table_id" id="table_id" />
+        <button type="submit" class="btn btn-primary w-100 place-order-btn">
+          Place an Order
+        </button>
+      </form>
+      {% if selected_table %}
+        <a href="{% url 'staffside:bill_page' table_id=selected_table %}" target="_blank">
+            <button class="btn btn-primary w-100 payment-btn">Payment</button>
+        </a>
+      {% else %}
+          <button class="btn btn-secondary w-100 payment-btn"  disabled>Select Table First</button>
+      {% endif %}
+
     </div>
   </div>
 </div>

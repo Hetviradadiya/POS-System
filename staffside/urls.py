@@ -8,6 +8,7 @@ urlpatterns = [
     path('orders/', views.orders, name='orders'),
     path('tables/', views.tables, name='tables'),
     path('pos/', views.pos, name='pos'),
+    path('bill_page/<int:table_id>/',views.bill_page,name='bill_page'),
     path('sales/', views.sales, name='sales'),
     
     path('customer/', views.customer, name='customer'),

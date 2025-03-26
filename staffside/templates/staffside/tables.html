@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="{% static 'css/tables_style.css' %}" />
 {% endblock %}
 
-<div class="table-container mt-4">
+<div class="table-container mt-4 width-full">
   <div class="table-bar rounded px-1">
       <ul class="nav nav-pills" role="tablist">
         <li class="nav-item">
@@ -19,118 +19,100 @@
           <a class="nav-link" data-bs-toggle="pill" href="#occupied">Occupied</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" data-bs-toggle="pill" href="#reserved">Disabled</a>
+          <a class="nav-link" data-bs-toggle="pill" href="#reserved">Reserved</a>
         </li>
       </ul>
   </div>
+</div>
 
-  <div class="tab-content">
+<div class="tab-content">
     <div id="allTables" class="container tab-pane fade show active"><br>
       <div class="d-flex flex-wrap justify-content-center">
-        <!-- Table Card Example with data attributes -->
-        <div class="table-card vacant" 
-             data-table-number="T-1" 
-             data-status="Vacant" 
-             data-num-people="0" 
-             data-ordered-items='[]'>
-          <div class="table-shape">
-              <p class="table-text">T-1</p>
+        {% for table in tables %}
+        {% if table.seats == 4 %}
+          <div class="table-card {{ table.status|lower }}" 
+              data-table-number="{{ table.table_number }}" 
+              data-status="{{ table.status }}" 
+              data-num-people="{{ table.seats }}">
+            <div class="table-shape">
+              <p class="table-text">{{ table.table_number }}</p>
+            </div>
+            <div class="seat top"></div>
+            <div class="seat bottom"></div>
+            <div class="seat left"></div>
+            <div class="seat right"></div>
           </div>
-          <div class="seat top"></div>
-          <div class="seat bottom"></div>
-          <div class="seat left"></div>
-          <div class="seat right"></div>
-        </div>
-        <div class="table-card reserved" 
-             data-table-number="T-2" 
-             data-status="Disabled" 
-             data-num-people="4" 
-             data-ordered-items='["Burger", "Fries", "Coke"]'> 
-          <div class="seat top left"></div>
-          <div class="seat top right"></div>
-          <div class="seat left"></div>
-          <div class="table-shape">
-              <p class="table-text">T-2</p>
+        {% elif table.seats == 6 %}
+          <div class="table-card {{ table.status|lower }}" 
+              data-table-number="{{ table.table_number }}" 
+              data-status="{{ table.status }}" 
+              data-num-people="{{ table.seats }}">
+            <div class="seat top left"></div>
+            <div class="seat top right"></div>
+            <div class="seat left"></div>
+            <div class="table-shape">
+              <p class="table-text">{{ table.table_number }}</p>
+            </div>
+            <div class="seat right"></div>
+            <div class="seat bottom left"></div>
+            <div class="seat bottom right"></div>
           </div>
-          <div class="seat right"></div>
-          <div class="seat bottom left"></div>
-          <div class="seat bottom right"></div>
-        </div>
-        <div class="table-card vacant" 
-             data-table-number="T-3" 
-             data-status="Vacant" 
-             data-num-people="0" 
-             data-ordered-items='[]'>
-          <div class="table-shape">
-              <p class="table-text">T-3</p>
-          </div>
-          <div class="seat top"></div>
-          <div class="seat bottom"></div>
-          <div class="seat left"></div>
-          <div class="seat right"></div>
-        </div>
-        <div class="table-card occupied" 
-             data-table-number="T-4" 
-             data-status="Occupied" 
-             data-num-people="3" 
-             data-ordered-items='["Pasta", "Salad"]'> 
-          <div class="seat top left"></div>
-          <div class="seat top right"></div>
-          <div class="seat left"></div>
-          <div class="table-shape">
-              <p class="table-text">T-4</p>
-          </div>
-          <div class="seat right"></div>
-          <div class="seat bottom left"></div>
-          <div class="seat bottom right"></div>
-        </div>
-        <div class="table-card occupied" 
-             data-table-number="T-5" 
-             data-status="Occupied" 
-             data-num-people="2" 
-             data-ordered-items='["Steak", "Wine"]'> 
-          <div class="table-shape">
-              <p class="table-text">T-5</p>
-          </div>
-          <div class="seat top"></div>
-          <div class="seat bottom"></div>
-          <div class="seat left"></div>
-          <div class="seat right"></div>
-        </div>
-        <div class="table-card vacant" 
-             data-table-number="T-6" 
-             data-status="Vacant" 
-             data-num-people="0" 
-             data-ordered-items='[]'> 
-          <div class="seat top left"></div>
-          <div class="seat top right"></div>
-          <div class="seat left"></div>
-          <div class="table-shape">
-              <p class="table-text">T-6</p>
-          </div>
-          <div class="seat right"></div>
-          <div class="seat bottom left"></div>
-          <div class="seat bottom right"></div>
-        </div>
+      {% endif %}
+      {% endfor %}
       </div>
     </div>
     <div id="vacant" class="container tab-pane fade"><br>
       <div class="d-flex flex-wrap justify-content-center">
+        {% for table in tables %}
+        {% if table.status == "Vacant" %}
+        <div class="table-card vacant" 
+            data-table-number="{{ table.table_number }}" 
+            data-status="{{ table.status }}" 
+            data-num-people="{{ table.seats }}">
+          <div class="table-shape">
+            <p class="table-text">{{ table.table_number }}</p>
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
         <!-- Additional vacant table cards here -->
       </div>
     </div>
     <div id="occupied" class="container tab-pane fade"><br>
       <div class="d-flex flex-wrap justify-content-center">
+        {% for table in tables %}
+        {% if table.status == "Occupied" %}
+        <div class="table-card occupied" 
+            data-table-number="{{ table.table_number }}" 
+            data-status="{{ table.status }}" 
+            data-num-people="{{ table.seats }}">
+          <div class="table-shape">
+            <p class="table-text">{{ table.table_number }}</p>
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
         <!-- Additional occupied table cards here -->
       </div>
     </div>
     <div id="reserved" class="container tab-pane fade"><br>
       <div class="d-flex flex-wrap justify-content-center">
-        <!-- Additional disabled table cards here -->
+        {% for table in tables %}
+        {% if table.status == "Reserved" %}
+        <div class="table-card reserved" 
+            data-table-number="{{ table.table_number }}" 
+            data-status="{{ table.status }}" 
+            data-num-people="{{ table.seats }}">
+          <div class="table-shape">
+            <p class="table-text">{{ table.table_number }}</p>
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
+        <!-- Additional reserved table cards here -->
       </div>
     </div>
   </div>
-</div>
 
 <!-- Modal for Table Details -->
 <div class="modal fade" id="tableDetailsModal" tabindex="-1" aria-labelledby="tableDetailsModalLabel" aria-hidden="true">
@@ -204,134 +186,3 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 
-
-
-
-
-
-
-<!-- <div class="table-container mt-4">
-  <div class="table-bar rounded px-1">
-      <ul class="nav nav-pills" role="tablist">
-    <li class="nav-item">
-      <a class="nav-link active" data-bs-toggle="pill" href="#allTables">All Tables</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" data-bs-toggle="pill" href="#vacant">Vacant</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" data-bs-toggle="pill" href="#occupied">Occupied</a>
-    </li>
-        <li class="nav-item">
-      <a class="nav-link" data-bs-toggle="pill" href="#reserved">Reserved</a>
-    </li>
-  </ul>
-  </div>
-
-  <div class="tab-content">
-    <div id="allTables" class="container tab-pane fad show active"><br>
-        <div class="d-flex flex-wrap justify-content-center">
-            <div class="table-card vacant">
-                <div class="table-shape">
-                    <p class="table-text">T-1</p>
-                </div>
-                <div class="seat top"></div>
-                <div class="seat bottom"></div>
-                <div class="seat left"></div>
-                <div class="seat right"></div>
-            </div>
-            <div class="table-card reserved"> 
-                <div class="seat top left"></div>
-                <div class="seat top right"></div>
-                <div class="seat left"></div>
-                <div class="table-shape">
-                    <p class="table-text">T-2</p>
-                </div>
-                <div class="seat right"></div>
-                <div class="seat bottom left"></div>
-                <div class="seat bottom right"></div>
-            </div>
-            <div class="table-card vacant">
-                 <div class="table-shape">
-                    <p class="table-text">T-3</p>
-                </div>
-                <div class="seat top"></div>
-                <div class="seat bottom"></div>
-                <div class="seat left"></div>
-                <div class="seat right"></div>
-            </div>
-            <div class="table-card occupied"> 
-                <div class="seat top left"></div>
-                <div class="seat top right"></div>
-                <div class="seat left"></div>
-                <div class="table-shape">
-                    <p class="table-text">T-4</p>
-                </div>
-                <div class="seat right"></div>
-                <div class="seat bottom left"></div>
-                <div class="seat bottom right"></div>
-            </div>
-            <div class="table-card occupied"> <div class="table-shape">
-                    <p class="table-text">T-5</p>
-                </div>
-                <div class="seat top"></div>
-                <div class="seat bottom"></div>
-                <div class="seat left"></div>
-                <div class="seat right"></div>
-            </div>
-            <div class="table-card vacant"> 
-                <div class="seat top left"></div>
-                <div class="seat top right"></div>
-                <div class="seat left"></div>
-                <div class="table-shape">
-                    <p class="table-text">T-6</p>
-                </div>
-                <div class="seat right"></div>
-                <div class="seat bottom left"></div>
-                <div class="seat bottom right"></div>
-            </div>
-        </div>
-    </div>
-    <div id="vacant" class="container tab-pane fade"><br>
-        <div class="d-flex flex-wrap justify-content-center">
-        </div>
-    </div>
-    <div id="occupied" class="container tab-pane fade"><br>
-        <div class="d-flex flex-wrap justify-content-center">
-
-        </div>
-    </div>
-    <div id="reserved" class="container tab-pane fade"><br>
-        <div class="d-flex flex-wrap justify-content-center">
-        </div>
-  </div>
-    </div>
-  </div> -->
-
-<!-- </div> -->
-<!-- Modal for Table Details -->
-<!-- <div class="modal fade" id="tableDetailsModal" tabindex="-1" aria-labelledby="tableDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="tableDetailsModalLabel">Table Details</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p><strong>Table:</strong> <span id="modalTableNumber"></span></p>
-          <p><strong>Status:</strong> <span id="modalTableStatus"></span></p>
-          <p><strong>Number of People Seated:</strong> <span id="modalNumPeople"></span></p>
-          <h6>Ordered Items:</h6>
-          <ul id="modalOrderedItems"></ul>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-<script src="{% static 'js/tables_scripts.js' %}"></script>
-
-
- -->
