@@ -9,9 +9,6 @@ from django.contrib import messages
 from adminside.models import*
 from adminside.forms import*
 from staffside.models import Sales
-import os
-import csv
-# import codecs
 
 def home(request):
     staff_id = request.session.get("staff_id")  # Get session data
@@ -43,8 +40,6 @@ def home(request):
     print("Rendering admin dashboard...")
     return redirect('adminside:dashboard')
 
-from django.contrib.sessions.models import Session
-
 def render_page(request, template, data=None):
     data=data or {}
     # Retrieve session key from URL and apply it
@@ -66,72 +61,6 @@ def render_page(request, template, data=None):
 def dashboard(request):
     return render_page(request, 'adminside/dashboard.html')
 
-def categories(request):
-    if request.method == "POST":
-        category_id = request.POST.get("categoryId")  # Get ID 
-        category_name = request.POST.get("categoryName", "").strip()
-        status = request.POST.get("status") == "on"  # Convert checkbox value to Boolean
-
-        if category_id:  # If ID exists, update category
-            category = get_object_or_404(Categories, pk=category_id)
-            category.categories_name = category_name
-            category.status = status
-            category.save()
-        else:  # Create new category
-            if category_name:
-                Categories.objects.create(categories_name=category_name, status=status)
-
-        return redirect("adminside:categories")  
-
-    all_categories = Categories.objects.all()
-    return render_page(request, "adminside/categories.html", {"categories": all_categories})
-
-def delete_category(request, category_id):
-    try:
-        category = get_object_or_404(Categories, pk=category_id)
-
-        # Check if category is linked to any inventory
-        related_inventory = Inventory.objects.filter(category=category).exists()
-        
-        if related_inventory:
-            return HttpResponseServerError("Cannot delete category: Related inventory exists.")
-
-        category.delete()  # delete category
-        return redirect("adminside:categories")  # redirect to category
-    except Exception as e:
-        return HttpResponseServerError(f"Error deleting category: {e}")
-
-def tables(request):
-    if request.method == "POST":
-        # print("Form Data:", request.POST) 
-        # table_number = request.POST.get("table_number")
-        seats = request.POST.get("seats")
-        status = "Vacant"  # Default status
-
-        if not seats:  # Ensure seats is not empty
-            # print("not seats selected.")
-            messages.error(request, "Please select a table type before adding.")
-            return redirect("adminside:tables")
-
-        # Save to Database
-        Table.objects.create(seats=seats, status=status)
-        # print("Table added with seats:", seats)
-        # Redirect back to the tables page to refresh the list
-        return redirect("adminside:tables")
-    tables = Table.objects.all()
-
-    for table in tables:
-        has_orders = Cart.objects.filter(table=table).exists()
-        if has_orders:
-            table.status = "Occupied"
-        elif table.status != "Reserved":
-            table.status = "Vacant"
-
-    context = {
-        "tables": tables,
-    }
-    return render_page(request, 'adminside/tables.html', context)
-
 def reports(request):
     sales_data = Sales.objects.all()
 
@@ -140,14 +69,6 @@ def reports(request):
     }
     return render_page(request, 'adminside/reports.html', context)
 
-
 def logout_view(request):
     logout(request)
     return redirect('accounts:loginaccount')
-
-
-
-
-
-
-

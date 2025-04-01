@@ -11,7 +11,11 @@
     <div id="default-content">
         <!-- Profile Picture Wrapper -->
         <div class="profile-pic-container">
-            <img id="profileImage" src="{% static 'images/default-profile.jpg' %}" alt="Profile Picture" class="profile-pic">
+            {% if request.session.staff_img %}
+            <img id="profileImage" src="{{ request.session.staff_img }}" alt="Profile Picture" class="profile-pic">
+            {% else %}
+            <i class="fa fa-user"></i> <!-- Default icon if no image -->
+            {% endif %}
             
             <button class="edit-icon" data-bs-toggle="modal" data-bs-target="#editProfilePicModal">
                 <i class="fa-solid fa-circle"></i>

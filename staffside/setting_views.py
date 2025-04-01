@@ -1,19 +1,24 @@
 from django.shortcuts import render, redirect
-from .forms import CustomPasswordChangeForm
 from django.contrib import messages
+from adminside.forms import CustomPasswordChangeForm
 from adminside.models import*
 from adminside.forms import*
+from django.utils.timezone import now
 
 
-def adminside_settings_view(request):
-    return redirect('adminside:profile')
+def staffside_settings_view(request):
+    return redirect('staffside:profile')
 
 def render_settings_page(request, template, context=None):
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return render(request, template, context or {})
     context = context or {}
-    context["template"] = template  # Ensures `template` is still passed
-    return render(request, "adminside/settings.html", context)
+    context.update({
+        "template": template,
+        "today_date": now().strftime("%Y-%m-%d"),  # Current date in YYYY-MM-DD format
+        "staff_username": request.session.get("staff_username", "Guest"),
+    })
+    return render(request, "staffside/settings.html", context)
 
 def change_password(request):
     staff_id = request.session.get("staff_id") 
@@ -46,13 +51,11 @@ def change_password(request):
                 print("Password Match:", password_match)
 
                 messages.success(request, "Password updated successfully!")
-                return redirect("adminside:change_password")  # Redirect after password change
+                return redirect("staffside:change_password")  # Redirect after password change
 
     else:
         form = CustomPasswordChangeForm()
-
-    return render_settings_page(request, "adminside/settings/change_password.html", {'form': form})
-
+    return render_settings_page(request, "staffside/settings/change_password.html", {'form': form})
 
 def edit_profile(request):
     staff_id = request.session.get("staff_id") 
@@ -69,8 +72,8 @@ def edit_profile(request):
         # Update session data
         request.session["staff_img"] = staff.staff_img.url # Full path for template use
 
-        return redirect("adminside:edit_profile")  # Redirect after saving
-    return render_settings_page(request,"adminside/settings/edit_profile.html")
+        return redirect("staffside:edit_profile")  # Redirect after saving
+    return render_settings_page(request,"staffside/settings/edit_profile.html")
 
 def profile(request):
-    return render_settings_page(request,"adminside/settings/profile.html")
+    return render_settings_page(request,"staffside/settings/profile.html")

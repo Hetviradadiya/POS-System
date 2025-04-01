@@ -1,6 +1,6 @@
 from django.urls import path
 from django.http import HttpResponse
-from . import views,setting_views
+from . import views,setting_views,tables_views,category_views
 from . import branches_views,suppliers_views,customer_views,staff_views,purchase_views,inventory_views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -23,15 +23,14 @@ urlpatterns = [
     path('purchase/', purchase_views.purchase, name='purchase'),
     path("purchase/delete/<int:purchase_id>/", purchase_views.delete_purchase, name="delete_purchase"),
 
-    path('categories/', views.categories, name='categories'),
-    # path("categories/update/<int:category_id>/", views.update_category, name="update_category"),
-    path("categories/delete/<int:category_id>/", views.delete_category, name="delete_category"),
+    path('categories/', category_views.categories, name='categories'),
+    path("categories/delete/<int:category_id>/", category_views.delete_category, name="delete_category"),
 
     path('inventory/', inventory_views.inventory, name='inventory'),
     path("inventory/delete/<int:inventory_id>/", inventory_views.delete_fooditem, name="delete_fooditem"),
         
     path('fooditems/', inventory_views.fooditems, name='fooditems'),
-    path('tables/', views.tables, name='tables'),
+    path('tables/', tables_views.tables, name='tables'),
 
     path('customer/', customer_views.customer, name='customer'),
     path("customer/delete/<int:customer_id>/", customer_views.delete_customer, name="delete_customer"),

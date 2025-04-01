@@ -11,10 +11,14 @@
     <div id="default-content">
         <!-- Profile Picture Wrapper -->
         <div class="profile-pic-container">
-            <img id="profileImage" src="{% static 'images/default-profile.jpg' %}" alt="Profile Picture" class="profile-pic">
+            {% if request.session.staff_img %}
+            <img src="{{ request.session.staff_img }}" alt="Staff Image" class="staff-img" style="width: 100px; height: 100px; border-radius: 50%; border: 2px solid #ccc;">
+            {% else %}
+            <i class="fa fa-user"></i> <!-- Default icon if no image -->
+            {% endif %}
         </div>
         
-        <h2>Welcome Admin!<br>This is Your Account Settings</h2>
+        <h2>Welcome {{ request.session.staff_username }}!<br>This is Your Account Settings</h2>
         <p>Select an option from the sidebar.</p>
     </div>
 </div>

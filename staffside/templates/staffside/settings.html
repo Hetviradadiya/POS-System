@@ -38,8 +38,12 @@
       <div class="user-info">
         <!-- <span>{{ request.user.username }}</span> -->
         <span class="notification"><i class="fa-solid fa-bell"></i></span>
-        <span>Date<br />Username</span>
-        <i class="fa fa-user"></i>
+        <span>{{ request.session.staff_username }}<br />{{ today_date }}</span>
+        {% if request.session.staff_img %}
+          <img src="{{ request.session.staff_img }}" alt="Staff Image" class="staff-img" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid #ccc;">
+        {% else %}
+          <i class="fa fa-user"></i> <!-- Default icon if no image -->
+        {% endif %}
       </div>
     </div>
 

@@ -5,6 +5,7 @@ import re
 from adminside.models import*
 from django.contrib.auth.hashers import make_password
 from phonenumber_field.phonenumber import PhoneNumber
+from django import forms
 
 class BranchForm(forms.ModelForm):
     class Meta:
@@ -148,54 +149,18 @@ class StaffForm(forms.ModelForm):
         return staff
 
 
-class CustomPasswordChangeForm(PasswordChangeForm):
-    old_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter Old Password'}),
-        label="Old Password"
-    )
-    new_password1 = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter New Password'}),
-        label="New Password"
-    )
-    new_password2 = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm New Password'}),
-        label="Confirm Password"
-    )
-
-    class Meta:
-        model = User
-        fields = ['old_password', 'new_password1', 'new_password2']
-
-    def clean_new_password1(self):
-        password = self.cleaned_data.get("new_password1")
-
-        # Password must be at least 6 characters long
-        if len(password) < 6:
-            raise forms.ValidationError("❌ Password must be at least 6 characters long.")
-
-        # At least one uppercase letter
-        if not any(char.isupper() for char in password):
-            raise forms.ValidationError("❌ Password must contain at least one uppercase letter.")
-
-        # At least one digit
-        if not any(char.isdigit() for char in password):
-            raise forms.ValidationError("❌ Password must contain at least one digit.")
-
-        # At least one special character
-        if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
-            raise forms.ValidationError("❌ Password must contain at least one special character.")
-
-        return password
+class CustomPasswordChangeForm(forms.Form):
+    old_password = forms.CharField(widget=forms.PasswordInput, label="Old Password", required=True)
+    new_password = forms.CharField(widget=forms.PasswordInput, label="New Password", required=True)
+    confirm_password = forms.CharField(widget=forms.PasswordInput, label="Confirm Password", required=True)
 
     def clean(self):
         cleaned_data = super().clean()
-        new_password1 = cleaned_data.get("new_password1")
-        new_password2 = cleaned_data.get("new_password2")
+        new_password = cleaned_data.get("new_password")
+        confirm_password = cleaned_data.get("confirm_password")
 
-        # Check if both passwords match
-        if new_password1 and new_password2 and new_password1 != new_password2:
-            raise forms.ValidationError("❌ New password and Confirm password do not match.")
+        if new_password and confirm_password and new_password != confirm_password:
+            self.add_error("confirm_password", "New password and confirm password do not match.")
 
         return cleaned_data
     
-
