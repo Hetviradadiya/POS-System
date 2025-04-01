@@ -22,6 +22,7 @@ def loginaccount(request):
                 print(f"User found: {staff_user.staff_role}")
 
                 if check_password(password, staff_user.staff_password): 
+                    # login(request, Staff)
 
                     logout(request)
                     request.session.flush()  # Clears any previous session 
@@ -31,6 +32,11 @@ def loginaccount(request):
                     request.session["staff_username"] = staff_user.staff_username  
                     request.session["staff_role"] = staff_user.staff_role 
                     # request.session["staff_img"] = staff_user.staff_img
+                    if staff_user.staff_img:  
+                        request.session["staff_img"] = staff_user.staff_img.url  # Store image URL
+                    else:
+                        request.session["staff_img"] = "/staff_images/default-profile.jpg"  # Default image
+
                     request.session.modified = True  
                     
                     request.session.save()

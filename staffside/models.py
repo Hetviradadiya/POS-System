@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.timezone import now 
-from adminside.models import Table, Cart 
+from adminside.models import Table
 
 class Order(models.Model):
     STATUS_CHOICES = [
@@ -11,11 +11,11 @@ class Order(models.Model):
 
     order_id = models.AutoField(primary_key=True)
     table = models.ForeignKey(Table, on_delete=models.CASCADE)  
-    order_item = models.CharField(max_length=255,null=True)  
+    ordered_items = models.TextField(null=True, blank=True)  
     price = models.DecimalField(max_digits=10, decimal_places=2,default=0.00)
     quantity = models.IntegerField(default=1)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
-    created_at = models.DateTimeField(auto_now_add=True,null=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
         return f"Order {self.order_id} - Table {self.table.table_id} - {self.status}"
@@ -38,6 +38,6 @@ class Sales(models.Model):
     time = models.TimeField(auto_now_add=True) 
 
     def __str__(self):
-        return f"Sale {self.sales_id} - Table {self.table.table_id} - {self.total_amount} ({self.payment_method})"
+        return f"Sale {self.sales_id} - Table {self.table.table_id} - {self.total_amount} ({self.payment_method}) - Order {self.order_list.order_id}"
 
     

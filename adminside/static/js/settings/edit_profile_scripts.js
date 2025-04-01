@@ -1,29 +1,35 @@
 function updateProfilePic() {
-    let input = document.getElementById("profile_pic");
-    let file = input.files[0];
+  let formData = new FormData();
+  let fileInput = document.getElementById("profile_pic");
 
-    if (file) {
-        let reader = new FileReader();
-        reader.onload = function (e) {
-            // Update the profile picture preview
-            document.getElementById("profileImage").src = e.target.result;
+  if (fileInput.files.length === 0) {
+    alert("Please select an image.");
+    return;
+  }
 
-            // Close the modal properly
-            let modalElement = document.getElementById("editProfilePicModal");
-            let modalInstance = bootstrap.Modal.getInstance(modalElement);
+  formData.append("profile_pic", fileInput.files[0]);
 
-            if (modalInstance) {
-                modalInstance.hide();
-            }
+  fetch("/update-profile-pic/", {
+    method: "POST",
+    body: formData,
+    headers: {
+      "X-CSRFToken": getCSRFToken(),
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        document.getElementById("profileImage").src = data.image_url;
+      } else {
+        alert("Failed to update profile picture.");
+      }
+    })
+    .catch((error) => console.error("Error:", error));
+}
 
-            // Remove the modal backdrop manually after hiding
-            setTimeout(() => {
-                document.querySelectorAll(".modal-backdrop").forEach(backdrop => backdrop.remove());
-                document.body.classList.remove("modal-open"); // Remove the Bootstrap modal-open class
-                document.body.style.overflow = "auto"; // Restore scrolling
-            }, 300); // Delay slightly to match modal animation
-        };
-
-        reader.readAsDataURL(file);
-    }
+function getCSRFToken() {
+  return document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("csrftoken="))
+    ?.split("=")[1];
 }

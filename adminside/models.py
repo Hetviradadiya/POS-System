@@ -102,7 +102,9 @@ class Staff(models.Model):
         self.save()
 
     def check_password(self, raw_password):
-    # """Verifies the password with the hashed version."""
+        """Verifies the entered password against the hashed password."""
+        if not self.staff_password:
+            return False  # Prevent errors when password is None
         return check_password(raw_password, self.staff_password)
 
     def __str__(self):
@@ -123,7 +125,7 @@ class Inventory(models.Model):
     exp_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.food_item.food_item if self.food_item else 'No Food Item'} - {self.category.categories_name}"
+        return f"{self.food_item.food_item if self.food_item else 'No Food Item'}"
 
 class Table(models.Model):
     STATUS_CHOICES = [

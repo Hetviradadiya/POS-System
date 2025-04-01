@@ -122,7 +122,27 @@ class StaffForm(forms.ModelForm):
     
     def save(self, commit=True):
         staff = super().save(commit=False)
-        staff.staff_password = make_password(self.cleaned_data["staff_password"])  # Hash password
+
+        # If updating existing staff
+        if staff.pk:
+            try:
+                existing_staff = Staff.objects.get(pk=staff.pk)
+                plain_password = self.cleaned_data["staff_password"]
+
+                # ⚠ Don't rehash if password is already stored correctly
+                if not check_password(plain_password, existing_staff.staff_password):
+                    staff.staff_password = make_password(plain_password)  # Hash new password
+                
+                else:
+                    staff.staff_password = existing_staff.staff_password  # Keep old hash
+                
+            except Staff.DoesNotExist:
+                staff.staff_password = make_password(self.cleaned_data["staff_password"])
+        
+        else:
+            # New staff, always hash password
+            staff.staff_password = make_password(self.cleaned_data["staff_password"])
+
         if commit:
             staff.save()
         return staff

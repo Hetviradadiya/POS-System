@@ -47,12 +47,31 @@
             font-size: 14px;
             font-weight: bold;
         }
+        .button-container {
+            margin-top: 20px;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+            border-radius: 5px;
+        }
+        .back-btn {
+            background-color: #6c757d;
+            color: white;
+        }
+        .print-btn {
+            background-color: #28a745;
+            color: white;
+        }
     </style>
 </head>
 <body>
-    <h2>RAGA BAKERY & RESTAURANT</h2>
+    <h2>RESTAURANT</h2>
     <div class="header">
-        Kollam, Kerala. <br>
+        Krishna, Ahmedabad. <br>
         PHONE: 94463978797 <br>
         GSTIN: 32IDNAP1991TZ8 <br>
         <hr>
@@ -94,46 +113,21 @@
     <div class="thank-you">
         !!! Thank You !!!
     </div>
+
+    <!-- Buttons -->
+    <div class="button-container">
+        <button class="button back-btn" onclick="goBack()">Back to POS</button>
+        <button class="button print-btn" onclick="printBill()">Print</button>
+    </div>
+
+    <script>
+        function goBack() {
+            window.location.href = "{% url 'staffside:pos' %}";  // Update 'pos_page' with your actual POS page URL name
+        }
+
+        function printBill() {
+            window.print();
+        }
+    </script>
 </body>
 </html>
-
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bill Receipt</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        .bill-container { width: 60%; margin: auto; border: 1px solid #000; padding: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #000; padding: 8px; text-align: left; }
-        .print-btn { margin-top: 10px; }
-    </style>
-</head>
-<body>
-    <div class="bill-container">
-        <h2>Restaurant Invoice</h2>
-        <p>Table No: {{ table_id }}</p>
-        <table>
-            <tr>
-                <th>Qty</th>
-                <th>Description</th>
-                <th>Amount</th>
-            </tr>
-            {% for item in cart_items %}
-            <tr>
-                <td>{{ item.quantity }}</td>
-                <td>{{ item.order_item }}</td>
-                <td>₹{{ item.price }}* {{item.quantity }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-        <p>Less 10% Discount: ₹{{ discount }}</p>
-        <p>GST @ 7%: ₹{{ gst }}</p>
-        <p><strong>Total: ₹{{ final_total }}</strong></p>
-        <button onclick="window.print()" class="print-btn">Print Bill</button>
-    </div>
-</body>
-</html> -->

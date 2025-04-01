@@ -1,3 +1,82 @@
+// search button
+function toggleSearch() {
+  let searchContainer = document.querySelector(".search-container");
+  let searchInput = document.querySelector(".search-input");
+
+  searchContainer.classList.toggle("active");
+  if (searchContainer.classList.contains("active")) {
+    searchInput.focus();
+  }
+}
+
+//search function
+document.getElementById("searchInput").addEventListener("keyup", function () {
+  let filter = this.value.toLowerCase().trim();
+  // console.log("Search filter:", filter);
+
+  let productCards = document.querySelectorAll("#product-container .col-md-6");
+  // console.log("Total product cards found:", productCards.length);
+
+  let matchFound = false;
+
+  productCards.forEach(function (card, index) {
+    let foodItemElement = card.querySelector(".card-body .card-title");
+    let foodItemName = foodItemElement
+      ? foodItemElement.textContent.toLowerCase().trim()
+      : "";
+
+    // console.log(`Card ${index + 1}:`, foodItemName);
+
+    if (!foodItemName) {
+      card.style.setProperty("display", "none", "important");
+      return;
+    }
+
+    if (foodItemName.includes(filter)) {
+      card.style.setProperty("display", "block", "important"); // ✅ Force show
+      matchFound = true;
+    } else {
+      card.style.setProperty("display", "none", "important"); // ✅ Force hide
+    }
+
+    // console.log(
+    //   `Card ${index + 1} display style:`,
+    //   getComputedStyle(card).display
+    // );
+  });
+
+  // Handle "No matching food item found"
+  let productContainer = document.getElementById("product-container");
+  let noData = document.getElementById("noDataRow");
+
+  if (filter && !matchFound) {
+    if (!noData) {
+      noData = document.createElement("div");
+      noData.id = "noDataRow";
+      noData.innerHTML = `<p style="text-align: center;">No matching food item found</p>`;
+      productContainer.appendChild(noData);
+    }
+  } else {
+    if (noData) {
+      noData.remove();
+    }
+  }
+
+  // Reset when search is cleared
+  if (filter === "") {
+    productCards.forEach((card) => {
+      card.style.setProperty("display", "block", "important"); // ✅ Reset visibility
+    });
+    if (noData) noData.remove();
+  }
+});
+
+
+
+
+
+
+
 // Store and restore table selection
 document.addEventListener("DOMContentLoaded", function () {
   const tableSelector = document.getElementById("table-selector");
@@ -110,8 +189,6 @@ function validateCart(event, productId) {
   return true;
 }
 
-
-
 function updateQuantity(cartId, tableId, change) {
   let quantityElement = document.getElementById(`quantity-${cartId}`);
   let currentQuantity = parseInt(quantityElement.innerText);
@@ -183,6 +260,20 @@ document.addEventListener("DOMContentLoaded", function () {
       updateCartSummary(price);
     });
   });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  document
+    .getElementById("place-order-form")
+    .addEventListener("submit", function (event) {
+      let tableId = document.getElementById("table_id").value;
+      if (!tableId) {
+        alert("Table is not selected!");
+        event.preventDefault(); // Prevent form submission
+      } else {
+        console.log("Submitting order for table:", tableId);
+      }
+    });
 });
 
 

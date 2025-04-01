@@ -41,29 +41,34 @@
   <table class="table">
     <thead>
         <tr>
-            <th>Product ID</th>
-            <th>Product Name</th>
-            <th>Category</th>
-            <th>Quantity</th>          
+            <th>Sales ID</th>
+            <th>Table</th>
+            <th>Branch</th>
+            <th>Total Amount</th>
+            <th>Payment Method</th>
+            <th>Date</th>
+            <th>Time</th>
         </tr>
     </thead>
     <tbody>
-        {% for i in data %}
+        {% for sale in sales_data %}
         <tr>
-            <td>{{ i.product_id }}</td>
-            <td>{{ i.product_name }}</td>
-            <td>{{ i.calegories }}</td>
-            <td>{{ i.quentity }}</td>
-            
-
+            <td>{{ sale.sales_id }}</td>
+            <td>Table {{ sale.table.table_id }}</td>
+            <td>{{ sale.table.branch.branch_name }}</td>
+            <td>${{ sale.total_amount }}</td>
+            <td>{{ sale.get_payment_method_display }}</td>
+            <td>{{ sale.date }}</td>
+            <td>{{ sale.time }}</td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="9">No is data available</td>
+            <td colspan="7" class="text-center">No sales data available</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+
 </div>
 <script src="{% static 'js/reports_scripts.js' %}"></script>
 

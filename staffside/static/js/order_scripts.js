@@ -1,27 +1,51 @@
-$(document).ready(function () {
-  // Pay button logic
-  $(".btn-pay").click(function () {
-    let customerName = $(this).data("customer");
-    let amount = $(this).data("amount");
-
-    $("#payCustomer").text(customerName);
-    $("#payAmount").text(amount);
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".btn-print").forEach(function (button) {
+    button.addEventListener("click", function () {
+      let tableId = this.getAttribute("data-table-id");
+      if (tableId) {
+        window.location.href = `/staffside/bill_page/${tableId}/`; // Redirect to bill page
+      }
+    });
   });
 });
 
-// Open Edit Box with existing values
-function openEditBox(name, price) {
-  document.getElementById("edit-name").value = name;
-  document.getElementById("edit-price").value = price;
-  document.getElementById("overlay").style.display = "block";
-  document.getElementById("edit-box").style.display = "block";
-}
 
-// Close Edit Box
-function closeEditBox() {
-  document.getElementById("overlay").style.display = "none";
-  document.getElementById("edit-box").style.display = "none";
-}
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".btn-pay").forEach((button) => {
+    button.addEventListener("click", function () {
+      let tableId = this.getAttribute("data-tableid");
+      let amount = this.getAttribute("data-amount");
+      let status = this.getAttribute("data-status");
+      let orderId = this.getAttribute("data-orderid"); // Get order ID
+
+      // Update modal content
+      document.getElementById("payTable").textContent = tableId;
+      document.getElementById("payAmount").textContent = amount;
+      document.getElementById("payStatus").textContent = status;
+
+      // Set order ID in hidden input
+      document.getElementById("orderIdInput").value = orderId;
+
+      // Show the modal
+      let payModal = new bootstrap.Modal(document.getElementById("payModal"));
+      payModal.show();
+    });
+  });
+  // Ensure modal and backdrop are properly removed when closed
+  document
+    .getElementById("payModal")
+    .addEventListener("hidden.bs.modal", function () {
+      document.body.classList.remove("modal-open"); // Remove Bootstrap modal-open class
+      let backdrop = document.querySelector(".modal-backdrop");
+      if (backdrop) {
+        backdrop.remove(); // Remove the modal overlay
+      }
+    });
+});
+
+
+
+
 
 // Save Edit Changes (simulated)
 function saveChanges() {

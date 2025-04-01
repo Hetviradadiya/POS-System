@@ -11,7 +11,13 @@
     <div id="default-content">
         <!-- Profile Picture Wrapper -->
         <div class="profile-pic-container">
-            <img id="profileImage" src="{% static 'images/default-profile.jpg' %}" alt="Profile Picture" class="profile-pic">
+            <!-- <img id="profileImage" src="{% static 'images/default-profile.jpg' %}" alt="Profile Picture" class="profile-pic"> -->
+
+            {% if request.session.staff_img %}
+            <img id="profileImage" src="{{ request.session.staff_img }}" alt="Profile Picture" class="profile-pic">
+            {% else %}
+            <i class="fa fa-user"></i> <!-- Default icon if no image -->
+            {% endif %}
             
             <button class="edit-icon" data-bs-toggle="modal" data-bs-target="#editProfilePicModal">
                 <i class="fa-solid fa-circle"></i>
@@ -29,13 +35,14 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="profilePicForm">
+                <form id="profilePicForm" method="POST" action="{% url 'adminside:edit_profile' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
                     <div class="mb-3">
                         <label for="profile_pic" class="form-label">Choose Profile Picture</label>
                         <input type="file" class="form-control" id="profile_pic" name="profile_pic" accept="image/*">
                     </div>
                     <div class="text-center">
-                        <button type="button" class="btn upload-btn" onclick="updateProfilePic()">Upload</button>
+                        <button type="submit" class="btn upload-btn" onclick="updateProfilePic()">Upload</button>
                     </div>
                 </form>
             </div>

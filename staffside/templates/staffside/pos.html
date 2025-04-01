@@ -6,7 +6,7 @@
   class="container-fluid"
   style="font-family: Nunito, serif; font-weight: 800"
 >
-  <!-- {% if messages %}
+  {% if messages %}
   <div id="toastContainer">
     {% for message in messages %}
     <div class="custom-alert alert alert-{{ message.tags }}">
@@ -35,11 +35,11 @@
       setTimeout(() => alert.remove(), 500);
     }
   </script>
-  {% endif %} -->
-  <div class="row">
+  {% endif %}
+  <div class="left-section">
     <!-- Left Section: Categories & Products -->
 
-    <div class="col-md-9 left-section">
+    <div class="section">
       <div class="row" id="category-container">
         <div class="col-auto text-center category-col">
           <form method="POST">
@@ -74,71 +74,63 @@
         <p>No categories found.</p>
         {% endif %}
       </div>
-      <div class="row mt-3" id="product-container">
+      <div class="products mt-3" id="product-container">
         {% if products %} {% for product in products %}
         <div
-          class="col-md-6 mb-4 d-flex justify-content-center"
+          class="product-col mb-4 d-flex"
           data-category="{{ product.category.categories_name|lower|default:'' }}"
         >
           <div
-            class="card d-flex flex-row align-items-center p-3"
+            class="card"
             style="width: 100%"
           >
+          <div class=" card-logo d-flex flex-column align-items-center">
             <img
               src="{{ product.image.url }}"
-              class="card-img-left"
-              style="
-                width: 100px;
-                height: 100px;
-                object-fit: cover;
-                border-radius: 10px;
-              "
+              class="card-img"
             />
+            <h4 class="card-title">{{ product.food_item.food_item }}</h4>
+          </div>
             <div class="card-body d-flex flex-column">
-              <h4 class="card-title">{{ product.food_item.food_item }}</h4>
-              <p class="card-text">₹{{ product.sell_price }}</p>
 
               <!-- Size Options -->
-              <div class="size-options mb-2">
-                <button
-                  class="btn btn-sm btn-outline-secondary size-btn"
-                  data-product="{{ product.inventory_id }}"
-                  data-size="Small"
-                  onclick="selectSize(event, '{{ product.inventory_id }}', 'Small')"
-                >
-                  Small
-                </button>
-                <button
-                  class="btn btn-sm btn-outline-secondary size-btn"
-                  data-product="{{ product.inventory_id }}"
-                  data-size="Medium"
-                  onclick="selectSize(event, '{{ product.inventory_id }}', 'Medium')"
-                >
-                  Medium
-                </button>
-                <button
-                  class="btn btn-sm btn-outline-secondary size-btn"
-                  data-product="{{ product.inventory_id }}"
-                  data-size="Large"
-                  onclick="selectSize(event, '{{ product.inventory_id }}', 'Large')"
-                >
-                  Large
-                </button>
+              <div class="size-options d-flex flex-column">
+                <div class="size-labels">
+                  <button
+                    class="btn btn-sm size-btn"
+                    data-product="{{ product.inventory_id }}"
+                    data-size="Small"
+                    onclick="selectSize(event, '{{ product.inventory_id }}', 'Small')"
+                  >
+                    Small
+                  </button>
+                  <span class="d-block size-price">₹{% widthratio product.sell_price 100 80 %}</span>
+                  </div>
+                  <div class="size-labels">
+                  <button
+                    class="btn btn-sm size-btn"
+                    data-product="{{ product.inventory_id }}"
+                    data-size="Medium"
+                    onclick="selectSize(event, '{{ product.inventory_id }}', 'Medium')"
+                  >
+                    Medium
+                  </button>
+                  <span class="d-block size-price">₹{{ product.sell_price|floatformat:2 }}</span>
+                  </div>
+                  <div class="size-labels">
+                  <button
+                    class="btn btn-sm size-btn"
+                    data-product="{{ product.inventory_id }}"
+                    data-size="Large"
+                    onclick="selectSize(event, '{{ product.inventory_id }}', 'Large')"
+                  >
+                    Large
+                  </button>
+                  <span class="d-block size-price">₹{% widthratio product.sell_price 100 120 %}</span>
+                </div>
               </div>
-              <input
-                type="hidden"
-                name="size"
-                id="size-{{ product.inventory_id }}"
-              />
 
-              <!-- Add to Cart Button -->
-              <!-- <button
-                class="btn add-to-cart-button mt-2"
-                onclick="validateCart('{{ product.inventory_id }}')"
-                style="background-color: #4e598c; color: white"
-              >
-                Add to Cart
-              </button> -->
+              <input type="hidden" name="size" id="size-{{ product.inventory_id }}" />
               <form
                 method="POST"
                 action="{% url 'staffside:pos' %}"
@@ -160,14 +152,18 @@
                   id="size-{{ product.inventory_id }}"
                 />
                 <input type="hidden" name="quantity" value="1" />
-                <input type="hidden" name="price" value="{{ product.sell_price }}" data-original-price="{{ product.sell_price }}">
+                <input
+                  type="hidden"
+                  name="price"
+                  value="{{ product.sell_price }}"
+                  data-original-price="{{ product.sell_price }}"
+                />
 
                 <button
                   type="submit"
-                  class="btn add-to-cart-button mt-2"
+                  class="btn add-to-cart-button "
                   data-product-id="{{ product.inventory_id }}"
                   onclick="validateCart('{{ product.inventory_id }}')"
-                  style="background-color: #4e598c; color: white"
                 >
                   Add to Cart
                 </button>
@@ -180,9 +176,21 @@
         {% endif %}
       </div>
     </div>
-
-    <!-- Right Section: Cart & Table Selection -->
-    <div class="col-md-3 cart-container p-4">
+  </div>
+  <!-- Right Section: Cart & Table Selection -->
+  <div class="right-section">
+    <div class="search-container">
+      <input
+        type="text"
+        id="searchInput"
+        class="search-input"
+        placeholder="Search by food-item name"
+      />
+      <button class="search-btn" onclick="toggleSearch()">
+        <i class="fa fa-search"></i>
+      </button>
+    </div>
+    <div class="cart-container p-4">
       <div
         class="cart-header d-flex justify-content-between align-items-center"
       >
@@ -198,9 +206,9 @@
       </div>
 
       <div class="order-options d-flex justify-content-between">
-        <button class="btn btn-light" onclick="setOrderType('delivery')">
+        <!-- <button class="btn btn-light" onclick="setOrderType('delivery')">
           Delivery
-        </button>
+        </button> -->
         <button class="btn btn-light" onclick="setOrderType('dinein')">
           Dine In
         </button>
@@ -215,13 +223,22 @@
         <div
           class="cart-item d-flex justify-content-between align-items-center p-2"
         >
-          <div>
-            <h5>{{ item.order_item }}</h5>
-            <p>Size: {{ item.size }}</p>
-            <p>₹{{ item.price }} x {{ item.quantity }}</p>
+          <div class="cart-item-body ">
+            <div class="body-title ">
+              <div>
+              <h5>{{ item.order_item }}</h5>
+            </div>
+            <div>
+              <p>Size: {{ item.size }}</p>
+            </div>
+            </div>
+            <div>
+              <p>₹{{ item.price }} x {{ item.quantity }}</p>
+            </div>
           </div>
           <!-- Quantity Selector -->
-          <div class="d-flex align-items-center">
+           <div class="footer-section">
+            <div class="d-flex align-items-center">
             <button
               type="submit"
               class="btn btn-sm btn-outline-secondary"
@@ -241,14 +258,18 @@
             >
               +
             </button>
-          </div>
-          <form method="POST" action="{% url 'staffside:pos' %}">
+            </div>
+            <form method="POST" action="{% url 'staffside:pos' %}">
             {% csrf_token %}
             <input type="hidden" name="action" value="remove_from_cart" />
             <input type="hidden" name="cart_id" value="{{ item.cart_id }}" />
             <input type="hidden" name="table_id" value="{{ item.table_id }}" />
-            <button type="submit" class="btn btn-sm btn-danger">Remove</button>
-          </form>
+            <button type="submit" class="btn btn-sm">
+              <i class="fas fa-times"></i>
+            </button>
+            </form>
+           </div>
+          
         </div>
         {% endfor %} {% else %}
         <p class="text-center">Cart is empty</p>
@@ -256,10 +277,14 @@
       </div>
       <hr />
       <div class="cart-summary">
-        <p><strong>Items:</strong> <span id="cart-items-count">{{ total_items }}</span></p>
+        <p>
+          <strong>Items:</strong>
+          <span id="cart-items-count">{{ total_items }}</span>
+        </p>
         <!-- <p><strong>Discounts:</strong> <span id="cart-discount">₹0.00</span></p> -->
         <p class="total-price">
-          <strong>Total:</strong> <span id="cart-total-price">₹{{ total_price }}</span>
+          <strong>Total:</strong>
+          <span id="cart-total-price">₹{{ total_price }}</span>
         </p>
       </div>
       <!-- <button class="btn btn-primary w-100 place-order-btn">
@@ -272,20 +297,29 @@
       >
         {% csrf_token %}
         <input type="hidden" name="action" value="place_order" />
-        <input type="hidden" name="order_type" id="order_type" />
-        <input type="hidden" name="table_id" id="table_id" />
+        <!-- <input type="hidden" name="order_type" id="order_type" /> -->
+        <input
+          type="hidden"
+          name="table_id"
+          id="table_id"
+          value="{{selected_table}}"
+        />
         <button type="submit" class="btn btn-primary w-100 place-order-btn">
           Place an Order
         </button>
       </form>
       {% if selected_table %}
-        <a href="{% url 'staffside:bill_page' table_id=selected_table %}" target="_blank">
-            <button class="btn btn-primary w-100 payment-btn">Payment</button>
-        </a>
+      <a
+        href="{% url 'staffside:bill_page' table_id=selected_table %}"
+        target="_blank"
+      >
+        <button class="btn btn-primary w-100 payment-btn">Payment</button>
+      </a>
       {% else %}
-          <button class="btn btn-secondary w-100 payment-btn"  disabled>Select Table First</button>
+      <button class="btn btn-secondary w-100 payment-btn" disabled>
+        Select Table First
+      </button>
       {% endif %}
-
     </div>
   </div>
 </div>

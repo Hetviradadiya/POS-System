@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib import messages
 from adminside.models import*
 from adminside.forms import*
+from staffside.models import Sales
 import os
 import csv
 # import codecs
@@ -22,13 +23,15 @@ def home(request):
 
     try:
         staff_user = Staff.objects.get(staff_id=staff_id)
-        print(f"User accessing admin panel: {staff_user.staff_username}, Role: {staff_user.staff_role}")
+        print(f"User accessing admin panel: {staff_user.staff_username}, Role: {staff_user.staff_role}, image: {staff_user.staff_img}")
 
         # Store staff image in session
         if staff_user.staff_img:
             request.session["staff_img"] = f"/media/staff_images/{staff_user.staff_img}"
+
         else:
             request.session["staff_img"] = None
+
 
         if staff_user.staff_role.lower() != "admin":
             print("User is not an admin, redirecting to login...")
@@ -511,9 +514,19 @@ def tables(request):
         # print("Table added with seats:", seats)
         # Redirect back to the tables page to refresh the list
         return redirect("adminside:tables")
-    
     tables = Table.objects.all()
-    return render_page(request, "adminside/tables.html", {"tables": tables})
+
+    for table in tables:
+        has_orders = Cart.objects.filter(table=table).exists()
+        if has_orders:
+            table.status = "Occupied"
+        elif table.status != "Reserved":
+            table.status = "Vacant"
+
+    context = {
+        "tables": tables,
+    }
+    return render_page(request, 'adminside/tables.html', context)
 
 def customer(request):
     context = {}
@@ -603,12 +616,11 @@ def staff(request):
         context["form"] = form
 
         if form.is_valid():
+            print("validation successfully.")
             staff_username = form.cleaned_data.get("staff_username", "").strip()
             staff_fullname = form.cleaned_data.get("staff_fullname", "").strip()
             staff_email = form.cleaned_data.get("staff_email", "").strip()
             staff_password = form.cleaned_data.get("staff_password", "").strip()  # Hashing password
-            if staff_password:
-                staff_password = make_password(staff_password)
             staff_phone_no = form.cleaned_data.get("staff_phone_no", "").strip()
             print("Cleaned staff_phone_no:", form.cleaned_data.get("staff_phone_no"))
             staff_role = form.cleaned_data.get("staff_role", "").strip().lower()
@@ -616,8 +628,8 @@ def staff(request):
             staff_img = request.FILES.get("staff_img")  # Handling image upload
             
 
-            print(request.POST)
-            print(request.POST.get('staff_role')) 
+            # print(request.POST)
+            # print(request.POST.get('staff_role')) 
             if staff_id:   # update the existing branch row if form data valid
                 staff = form.save(commit=False)
                 staff = get_object_or_404(Staff, pk=staff_id)
@@ -628,11 +640,23 @@ def staff(request):
                 staff.staff_username=staff_username
                 staff.staff_fullname=staff_fullname
                 staff.staff_email=staff_email
-                staff.staff_password=staff_password
+                staff.staff_password = staff_password  # The form will handle hashing
+                # if staff_password:
+                #     if not check_password(staff_password, staff.staff_password):  # Ensure it's not already hashed
+                #         staff.staff_password = make_password(staff_password)
+                # else:
+                #     staff.staff_password = staff.staff_password  # Keep the existing hashed password
+
                 staff.staff_phone_no=staff_phone_no
                 staff.staff_role=staff_role
                 staff.branch=branch
                 staff.save()
+
+                print("password give",staff_password)
+
+                print("saved password",staff.staff_password)
+                print("Password Match:", check_password(staff_password, staff.staff_password))
+
                 messages.success(request, "Staff updated successfully!")
 
             else:# Create and save staff member
@@ -642,7 +666,7 @@ def staff(request):
                     staff_username=staff_username,
                     staff_fullname=staff_fullname,
                     staff_email=staff_email,
-                    staff_password=staff_password,
+                    staff_password = make_password(staff_password),
                     staff_phone_no=staff_phone_no,
                     staff_role=staff_role,
                     branch=branch,
@@ -653,7 +677,7 @@ def staff(request):
             return redirect("adminside:staff")  # Redirect to staff page after successful insert
 
         else:
-            print("Form validation failed:", form.errors)
+            print("Form validation failed. Errors:", form.errors) 
             messages.error(request, "Form submission failed. Please correct errors.")
             context["open_form"] = True  # form open with errors
         
@@ -673,14 +697,12 @@ def delete_staff(request, staff_id):
 
 
 def reports(request):
-    sales_data = [
-    {"product_id": "101", "product_name": "Neapolitan Pizaa", "calegories": "Pizaa", "email": "john.doe@example.com", "quentity": "450", "paid": "200", "balance": "250", "date": "01/15"},
-    {"product_id": "102", "product_name": "Veg. Burger", "calegories": "Burger", "email": "jane.smith@example.com", "quentity": "350", "paid": "150", "balance": "200", "date": "01/16"},
-    {"product_id": "103", "product_name": "French Fries", "calegories": "Fast Food", "email": "robert.brown@example.com", "quentity": "500", "paid": "250", "balance": "250", "date": "01/17"},
-    {"product_id": "104", "product_name": "Veg. Sandvich", "calegories": "Sandvich", "email": "emily.white@example.com", "quentity": "600", "paid": "300", "balance": "300", "date": "01/18"},
-    {"product_id": "105", "product_name": "Dosa (Butter)", "calegories": "South Indian", "email": "michael.green@example.com", "quentity": "750", "paid": "500", "balance": "250", "date": "01/19"},
-    ]
-    return render_page(request, 'adminside/reports.html', {'data':sales_data})
+    sales_data = Sales.objects.all()
+
+    context = {
+        'sales_data': sales_data
+    }
+    return render_page(request, 'adminside/reports.html', context)
 
 
 def adminside_settings_view(request):
@@ -697,7 +719,23 @@ def change_password(request):
     form = CustomPasswordChangeForm(request.user)
     return render_settings_page(request, "adminside/settings/change_password.html", {'form': form})
 
+
 def edit_profile(request):
+    staff_id = request.session.get("staff_id") 
+
+    if request.method == "POST" and request.FILES.get("profile_pic"):
+        staff = Staff.objects.get(staff_id=staff_id)
+
+        # Get uploaded image
+        image = request.FILES["profile_pic"]
+
+        staff.staff_img = image
+        staff.save()
+
+        # Update session data
+        request.session["staff_img"] = staff.staff_img.url # Full path for template use
+
+        return redirect("adminside:edit_profile")  # Redirect after saving
     return render_settings_page(request,"adminside/settings/edit_profile.html")
 
 def profile(request):

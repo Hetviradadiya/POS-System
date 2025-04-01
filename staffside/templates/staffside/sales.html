@@ -25,13 +25,13 @@
             <div class="col-md-3">
                 <div class="card p-3">
                     <h5>Total Sales</h5>
-                    <p class="fw-bold" style="color: #B5B95D ;">$2,450.00</p>
+                    <p class="fw-bold" style="color: #B5B95D ;">${{ total_sales }}</p>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card p-3">
                     <h5>Number of Orders</h5>
-                    <p class="fw-bold" style="color: #0d5cb6;">120</p>
+                    <p class="fw-bold" style="color: #0d5cb6;">{{ num_orders }}</p>
                 </div>
             </div>
             <div class="col-md-3">
@@ -43,58 +43,11 @@
             <div class="col-md-3">
                 <div class="card p-3">
                     <h5>Best-Selling Item</h5>
-                    <p class="fw-bold" style="color: #F89B34;">Cheese Burger</p>
+                    <p class="fw-bold" style="color: #F89B34;">{{ best_selling_item }}</p>
                 </div>
             </div>
         </div>
         
-        <!-- Payment Breakdown -->
-        <!-- <div class="row mt-4">
-            <div class="col-md-12">
-                <div class="card p-3">
-                    <h5>Payment Breakdown</h5>
-                    <ul class="list-group">
-                        <li class="list-group-item">Cash: $1,000.00</li>
-                        <li class="list-group-item">Card: $950.00</li>
-                        <li class="list-group-item">UPI: $500.00</li>
-                    </ul>
-                </div>
-            </div> -->
-            <!-- <div class="row mt-4">
-                <div class="col-md-12">
-                    <div class="card p-3">
-                        <h5>Payment Breakdown</h5>
-                        <ul class="list-group">
-                            <li class="list-group-item">
-                                <strong>Cash:</strong> $1,000.00 <br>
-                                <small>Customers: 15</small> <br>
-                                <small>Transaction Fees: $0.00</small>
-                            </li> -->
-                            <!-- <li class="list-group-item">
-                                <strong>Card:</strong> $950.00 <br>
-                                <small>Customers: 12</small> <br>
-                                <small>Transaction Fees: $10.00</small>
-                            </li>
-                            <li class="list-group-item">
-                                <strong>UPI:</strong> $500.00 <br>
-                                <small>Customers: 8</small> <br>
-                                <small>Transaction Fees: $5.00</small>
-                            </li> -->
-                        <!-- </ul>
-                    </div>
-                </div>
-            </div> -->
-            <!-- <div class="col-md-6">
-                <div class="card p-3">
-                    <h5>Staff Performance</h5>
-                    <ul class="list-group">
-                        <li class="list-group-item">John - $800.00</li>
-                        <li class="list-group-item">Emma - $700.00</li>
-                        <li class="list-group-item">Mike - $650.00</li>
-                    </ul>
-                </div>
-            </div> -->
-        </div>
 
         <!-- Order History & Search -->
         <div class="card mt-4 p-3">
@@ -112,7 +65,7 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Order ID</th>
+                        <th>Sales_ID</th>
                         <th>Customer</th>
                         <th>Total amount</th>
                         <th>Payment Method</th>
@@ -121,61 +74,22 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody >
+                <tbody>
+                    {% for sale in sales_data %}
                     <tr>
-                        <td>#1023</td>
-                        <td>Michael</td>
-                        <td>$45.00</td>
-                        <td>Cash</td>
-                        <td></td>
-                        <td></td>
+                        <td>#{{ sale.order_list__order_id }}</td>
+                        <td>Table {{ sale.table.table_id }}</td>
+                        <td>${{ sale.total_amount }}</td>
+                        <td>{{ sale.payment_method }}</td> 
+                        <td>{{ sale.date }}</td>
+                        <td>{{ sale.time }}</td>
                         <td><button class="btn btn-sm btn-primary">Reprint Receipt</button></td>
                     </tr>
-                    <tr>    
-                        <td>#1024</td>
-                        <td>Susan</td>
-                        <td>$30.00</td>
-                        <td>Cash</td>   
-                        <td></td>
-                        <td></td>
-                        <td><button class="btn btn-sm btn-primary">Reprint Receipt</button></td>
-                    </tr>
+                    {% empty %}
                     <tr>
-                        <td>#1025</td>
-                        <td>Rahil</td>
-                        <td>$30.00</td>
-                        <td>Cash</td>   
-                        <td></td>
-                        <td></td>
-                        <td><button class="btn btn-sm btn-primary">Reprint Receipt</button></td>
+                        <td colspan="7" class="text-center">No sales data available</td>
                     </tr>
-                    <tr>
-                        <td>#1050</td>
-                        <td>Vishal</td>
-                        <td>$30.00</td>
-                        <td>Cash</td>   
-                        <td></td>
-                        <td></td>
-                        <td><button class="btn btn-sm btn-primary">Reprint Receipt</button></td>
-                    </tr>
-                    <tr>
-                        <td>#1055</td>
-                        <td>Vijay</td>
-                        <td>$30.00</td>
-                        <td>Cash</td>   
-                        <td></td>
-                        <td></td>
-                        <td><button class="btn btn-sm btn-primary">Reprint Receipt</button></td>
-                    </tr>
-                    <tr>
-                        <td>#1059</td>
-                        <td>Logan</td>
-                        <td>$30.00</td>
-                        <td>Cash</td>   
-                        <td></td>
-                        <td></td>
-                        <td><button class="btn btn-sm btn-primary">Reprint Receipt</button></td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
           
             </table>
