@@ -31,27 +31,39 @@ def loginaccount(request):
                     request.session["staff_id"] = staff_user.staff_id  
                     request.session["staff_username"] = staff_user.staff_username  
                     request.session["staff_role"] = staff_user.staff_role 
+                    
                     # request.session["staff_img"] = staff_user.staff_img
                     if staff_user.staff_img:  
                         request.session["staff_img"] = staff_user.staff_img.url  # Store image URL
                     else:
                         request.session["staff_img"] = "/staff_images/default-profile.jpg"  # Default image
 
-                    request.session.modified = True  
                     
-                    request.session.save()
                     
-                    if staff_user.staff_role.lower() in ["admin", "manager"]:
+                    if staff_user.staff_role.lower() == "admin":
+                        print("Redirecting to admin dashboard")
+                        return redirect("adminside:dashboard")
+                    
+                    elif staff_user.staff_role.lower() == "manager":
+                        request.session["branch"] = staff_user.branch.branch_id
+                        request.session["branch_name"] = staff_user.branch.branch_name
                         print("Redirecting to admin dashboard")
                         return redirect("adminside:dashboard")
                     
                     elif staff_user.staff_role.lower() == "staff":
+                        request.session["branch"] = staff_user.branch.branch_id
+                        request.session["branch_name"] = staff_user.branch.branch_name
                         print("Redirecting to POS")
                         return redirect("staffside:pos")
                     
                     else:
                         print("Unauthorized access")
                         messages.error(request, "Unauthorized access.")
+
+
+                    request.session.modified = True  
+                    
+                    request.session.save()
                 else:
                     print("Invalid password")
                     messages.error(request, "Invalid password.")

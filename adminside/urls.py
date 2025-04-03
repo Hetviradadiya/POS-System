@@ -1,6 +1,6 @@
 from django.urls import path
 from django.http import HttpResponse
-from . import views,setting_views,tables_views,category_views
+from . import views,setting_views,tables_views,category_views,sales_views
 from . import branches_views,suppliers_views,customer_views,staff_views,purchase_views,inventory_views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -38,7 +38,7 @@ urlpatterns = [
     path('staff/', staff_views.staff, name='staff'),
     path("staff/delete/<int:staff_id>/", staff_views.delete_staff, name="delete_staff"),
 
-    path('reports/', views.reports, name='reports'),
+    path('reports/', sales_views.reports, name='reports'),
     path('settings/', setting_views.adminside_settings_view, name='settings'),
     path('profile/', setting_views.profile, name='profile'),
     path('edit_profile/', setting_views.edit_profile, name='edit_profile'),

@@ -57,30 +57,6 @@ def render_page(request, template, data=None):
     data.update({"template": template, "today_date": now().strftime("%Y-%m-%d"),"staff_username": request.session.get("staff_username", "Guest"),})
     return render(request, "staffside/base.html", data)
 
-from decimal import Decimal
-
-def bill_page(request, table_id):
-    cart_items = Cart.objects.filter(table_id=table_id)
-    total_price = sum(item.price * item.quantity for item in cart_items)
-    
-    discount_rate = Decimal("0.10")  # Convert to Decimal
-    gst_rate = Decimal("0.07")       # Convert to Decimal
-
-    discount = total_price * discount_rate  # Ensure Decimal * Decimal
-    gst = (total_price - discount) * gst_rate  # Ensure Decimal * Decimal
-    final_total = (total_price - discount) + gst  # Ensure all are Decimals
-
-
-    context = {
-        "cart_items": cart_items,
-        "total_price": total_price,
-        "discount": discount,
-        "gst": gst,
-        "final_total": final_total,
-        "table_id": table_id
-    }
-    return render(request, "staffside/bill_print.html", context)
-
 def logout_view(request):
     return redirect('accounts:loginaccount')
 

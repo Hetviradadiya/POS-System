@@ -26,11 +26,39 @@ document.addEventListener("DOMContentLoaded", function () {
       // Set order ID in hidden input
       document.getElementById("orderIdInput").value = orderId;
 
-      // Show the modal
-      let payModal = new bootstrap.Modal(document.getElementById("payModal"));
-      payModal.show();
+      document.getElementById("discountInput").value = "";
+
+      // Store table ID in hidden input
+      document.getElementById("printTableIdInput").value = tableId;
     });
   });
+
+  // Handle Confirm button click (ensure discount is sent)
+  document
+    .getElementById("confirmPayment")
+    .addEventListener("click", function () {
+      let discountValue = document.getElementById("discountInput").value;
+
+      // If no discount entered, set to 0
+      if (discountValue.trim() === "") {
+        document.getElementById("discountInput").value = "0";
+      }
+
+      // Submit the form
+      document.getElementById("paymentForm").submit();
+    });
+
+  // Automatically trigger print after form submission
+  let printTableId = document.getElementById("printTableIdInput").value;
+  if (printTableId) {
+    let printButton = document.querySelector(
+      `.btn-print[data-table-id="${printTableId}"]`
+    );
+    if (printButton) {
+      printButton.click();
+    }
+  }
+
   // Ensure modal and backdrop are properly removed when closed
   document
     .getElementById("payModal")
@@ -43,9 +71,22 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+function openPOS(tableId) {
+  if (tableId) {
+    window.location.href = `/staffside/pos?table_id=${tableId}`;
+  } else {
+    window.location.href = `/staffside/pos`;
+  }
+}
 
-
-
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".btn-edit").forEach((button) => {
+    button.addEventListener("click", function () {
+      let tableId = this.getAttribute("data-tableid"); // Get table_id from button
+      openPOS(tableId);
+    });
+  });
+});
 
 // Save Edit Changes (simulated)
 function saveChanges() {

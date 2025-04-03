@@ -11,11 +11,22 @@ class Order(models.Model):
 
     order_id = models.AutoField(primary_key=True)
     table = models.ForeignKey(Table, on_delete=models.CASCADE)  
+    customer = models.CharField(max_length=255, null=True, blank=True)
     ordered_items = models.TextField(null=True, blank=True)  
     price = models.DecimalField(max_digits=10, decimal_places=2,default=0.00)
     quantity = models.IntegerField(default=1)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    branch = models.ForeignKey("adminside.Branch", on_delete=models.CASCADE, null=True, blank=True)
+    discount = models.DecimalField(max_digits=5, decimal_places=2, default=0.00, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
+
+    def save(self, *args, **kwargs):
+        # Auto-set branch from the logged-in staff session (if available)
+        request = kwargs.pop("request", None)
+        if request and "branch_id" in request.session:
+            self.branch = request.session["branch_id"]
+        super().save(*args, **kwargs)
+
 
     def __str__(self):
         return f"Order {self.order_id} - Table {self.table.table_id} - {self.status}"
@@ -38,6 +49,7 @@ class Sales(models.Model):
     time = models.TimeField(auto_now_add=True) 
 
     def __str__(self):
-        return f"Sale {self.sales_id} - Table {self.table.table_id} - {self.total_amount} ({self.payment_method}) - Order {self.order_list.order_id}"
+        orders = ", ".join([str(order.order_id) for order in self.order_list.all()])
+        return f"Sale {self.sales_id} - Table {self.table.table_id} - {self.total_amount} ({self.payment_method}) - Orders [{orders}]"
 
     

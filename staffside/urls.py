@@ -9,7 +9,8 @@ urlpatterns = [
     path('orders/', order_views.orders, name='orders'),
     path('tables/', tables_views.tables, name='tables'),
     path('pos/', pos_views.pos, name='pos'),
-    path('bill_page/<int:table_id>/',views.bill_page,name='bill_page'),
+    path("staffside/pos/<int:table_id>/", pos_views.pos, name="pos_with_table"),
+    path('bill_page/<int:table_id>/',order_views.bill_page,name='bill_page'),
     path('sales/', sales_views.sales, name='sales'),
     
     path('customer/', customer_views.customer, name='customer'),

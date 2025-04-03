@@ -2,7 +2,8 @@ from django.db import models , connection
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.hashers import check_password
-from .models import*
+from adminside.models import*
+from django.apps import apps
 
 class Branch(models.Model):
     branch_id = models.AutoField(primary_key=True)
@@ -71,8 +72,6 @@ class Purchase(models.Model):
     def __str__(self):
         return f"{self.purchase_id} - {self.food_item}"
 
-    
-
 class Staff(models.Model):
 
     staff_id = models.AutoField(primary_key=True)
@@ -109,7 +108,6 @@ class Staff(models.Model):
 
     def __str__(self):
         return f"{self.staff_fullname}-{self.staff_role}"
-
 
 class Inventory(models.Model):
     inventory_id = models.AutoField(primary_key=True)
@@ -163,7 +161,6 @@ class Table(models.Model):
     def __str__(self):
         return f"Table {self.table_id} - {self.status}"
 
-
 class Cart(models.Model):
     cart_id = models.AutoField(primary_key=True)
     table = models.ForeignKey(Table, on_delete=models.CASCADE, db_column="table_id")
@@ -174,54 +171,6 @@ class Cart(models.Model):
 
     def __str__(self):
         return f"Cart {self.cart_id} - Table {self.table.table_id}"
-
-# class Table(models.Model):
-#     STATUS_CHOICES = [
-#         ('vacant', 'Vacant'),
-#         ('reserved', 'Reserved'),
-#         ('occupied', 'Occupied'),
-#     ]
-
-#     table_id = models.AutoField(primary_key=True)
-#     seats = models.IntegerField()
-#     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='vacant')
-
-#     def create_tablecart_table(self):
-#         """Dynamically create a new table for this specific table_id."""
-#         print(f"DEBUG: Table ID before creating table: {self.table_id}")  # Debug print
-
-#         if not self.table_id:  # Ensure table_id is set
-#             print("ERROR: Table ID is not available. Skipping table creation.")
-#             return
-
-#         table_name = f"table_{self.table_id}_cart"  # Unique table name
-#         with connection.cursor() as cursor:
-#             query = f"""
-#             CREATE TABLE IF NOT EXISTS {table_name} (
-#                 cart_id SERIAL PRIMARY KEY,
-#                 table_id INTEGER REFERENCES adminside_table(table_id) ON DELETE CASCADE,
-#                 order_item TEXT NOT NULL,
-#                 size INTEGER DEFAULT 0,
-#                 quantity INTEGER DEFAULT 0,
-#                 price DECIMAL(10,2) DEFAULT 0.00
-#             )
-#             """
-#             print(f"Executing SQL Query: {query}")  # Debug print
-#             cursor.execute(query)
-
-
-
-
-#     def save(self, *args, **kwargs):
-#         """Override save to create a unique table dynamically."""
-#         super().save(*args, **kwargs)
-#         print(f"DEBUG: Table saved with ID {self.table_id}") 
-#         self.create_tablecart_table() 
-
-#     def __str__(self):
-#         return f"Table {self.table_id} - {self.status}"
-
-  
 
 class Customer(models.Model):
   customer_id = models.AutoField(primary_key=True) 
@@ -235,14 +184,12 @@ class Customer(models.Model):
 
 class SalesReport(models.Model):
     sales_id = models.AutoField(primary_key=True)
-    product = models.ForeignKey(Inventory, on_delete=models.CASCADE, db_column="inventory_id")  # Link to Inventory
-    category = models.ForeignKey(Categories, on_delete=models.CASCADE, db_column="categories_id")
+    order = models.ForeignKey("staffside.Order", on_delete=models.CASCADE, db_column="order_id", null=True, blank=True)  # Link to Order
     quantity_sold = models.IntegerField()
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, db_column="branch_id")
-    supplier = models.ForeignKey(Supplier, on_delete=models.CASCADE, db_column="supplier_id", null=True, blank=True)
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, db_column="customer_id", null=True, blank=True)
-    staff = models.ForeignKey(Staff, on_delete=models.SET_NULL, db_column="staff_id", null=True, blank=True)
+    branch =  models.ForeignKey(Branch, on_delete=models.CASCADE,db_column="branch_id", null=True, blank=True)
+    customer = models.CharField(max_length=255, null=True, blank=True)
+    staff = models.CharField(max_length=255, null=True, blank=True)
     sale_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.product.food_item_name} - {self.quantity_sold} sold at {self.branch.branch_name}"
+        return f"{self.sales_id} - {self.quantity_sold} sold at {self.branch}"

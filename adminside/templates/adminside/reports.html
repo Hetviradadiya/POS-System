@@ -29,47 +29,55 @@
   </div>
   <div class="row">
     <div class="da-box">
-            <select id="incomeDropdown" class="dropdown">
-                <option value="today">Today</option>
-                <option value="monthly">Monthly</option>
-                <option value="yearly">Yearly</option>
-            </select>    
+            <select id="incomeDropdown" class="dropdown" onchange="filterReports()">
+            <option value="today" {% if selected_filter == 'today' %}selected{% endif %}>Today</option>
+            <option value="monthly" {% if selected_filter == 'monthly' %}selected{% endif %}>Monthly</option>
+            <option value="yearly" {% if selected_filter == 'yearly' %}selected{% endif %}>Yearly</option>
+        </select>    
     </div>
   </div>
     <br>
 
-  <table class="table">
-    <thead>
-        <tr>
-            <th>Sales ID</th>
-            <th>Table</th>
-            <th>Branch</th>
-            <th>Total Amount</th>
-            <th>Payment Method</th>
-            <th>Date</th>
-            <th>Time</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for sale in sales_data %}
-        <tr>
-            <td>{{ sale.sales_id }}</td>
-            <td>Table {{ sale.table.table_id }}</td>
-            <td>{{ sale.table.branch.branch_name }}</td>
-            <td>${{ sale.total_amount }}</td>
-            <td>{{ sale.get_payment_method_display }}</td>
-            <td>{{ sale.date }}</td>
-            <td>{{ sale.time }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="7" class="text-center">No sales data available</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Sales ID</th>
+                    <th>Order ID</th>
+                    <th>Quantity Sold</th>
+                    <th>Branch</th>
+                    <th>Customer</th>
+                    <th>Staff</th>
+                    <th>Sale Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sale in sales_data %}
+                <tr>
+                    <td>{{ sale.sales_id }}</td>
+                    <td>{{ sale.order_id|default:"-" }}</td>
+                    <td>{{ sale.quantity_sold }}</td>
+                    <td>{{ sale.branch_name }}</td>
+                    <td>{{ sale.customer }}</td>
+                    <td>{{ sale.staff }}</td>
+                    <td>{{ sale.sale_date }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">No sales data available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
 </div>
+
+
+<script>
+    function applyFilter() {
+        let filter = document.getElementById("filterSelect").value;
+        window.location.href = "?filter=" + filter;
+    }
+</script>
 <script src="{% static 'js/reports_scripts.js' %}"></script>
 
 

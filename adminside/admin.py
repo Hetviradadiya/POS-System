@@ -49,7 +49,7 @@ class CustomerAdmin(admin.ModelAdmin):
 admin.site.register(Customer,CustomerAdmin)
 
 class SalesAdmin(admin.ModelAdmin):
-    list_display=("sales_id", "product", "category", "quantity_sold", "branch", "supplier", "customer", "staff", "sale_date")
+    list_display=("sales_id", "order","quantity_sold", "branch","customer", "staff", "sale_date")
 admin.site.register(SalesReport,SalesAdmin)
 
 

@@ -20,80 +20,45 @@
     <div class="container mt-4">
         <h2 class="text-center mb-4">  Sales Report</h2>
         
-        <!-- Sales Summary -->
-        <div class="row text-center">
-            <div class="col-md-3">
-                <div class="card p-3">
-                    <h5>Total Sales</h5>
-                    <p class="fw-bold" style="color: #B5B95D ;">${{ total_sales }}</p>
-                </div>
+        <!-- Sales Table -->
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Sales ID</th>
+                            <th>Customer</th>
+                            <th>Table</th>
+                            <th>Ordered Items</th>
+                            <th>Total Amount</th>
+                            <th>Payment Method</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in sales_data %}
+                        <tr>
+                            <td>#{{ sale.order.order_id }}</td>
+                            <td>{{sale.customer}}</td>
+                            <td>Table {{ sale.order.table.table_id }}</td>
+                            <td>{{ sale.order.ordered_items }}</td>
+                            <td>${{ sale.order.price }}</td>
+                            <td>{{ sale.payment_method }}</td> 
+                            <td>{{ sale.sale_date|date:"Y-m-d" }}</td>
+                            <td>{{ sale.sale_date|time:"H:i:s" }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary">Reprint Receipt</button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center">No sales data available</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <div class="col-md-3">
-                <div class="card p-3">
-                    <h5>Number of Orders</h5>
-                    <p class="fw-bold" style="color: #0d5cb6;">{{ num_orders }}</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card p-3">
-                    <h5>Discounts & Refunds</h5>
-                    <p class=" fw-bold" style="color: #d12f0e;">$150.00</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card p-3">
-                    <h5>Best-Selling Item</h5>
-                    <p class="fw-bold" style="color: #F89B34;">{{ best_selling_item }}</p>
-                </div>
-            </div>
-        </div>
-        
-
-        <!-- Order History & Search -->
-        <div class="card mt-4 p-3">
-            <h3>Sales Details</h3>
-            <div class="d-flex mb-3" >
-                <input type="text" id="searchInput" class="form-control me-2" placeholder="Search by order id or Customer Name">
-                <span>
-                    <button class="search-btn btn btn-outline-primary" onclick="filterTable()">
-                    <i class="fa fa-search"></i>
-                    </button>
-                </span> 
-            </div>
-            <!-- <input type="text" class="form-control mb-3" placeholder="Search Order ID or Customer Name"> -->
-          <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Sales_ID</th>
-                        <th>Customer</th>
-                        <th>Total amount</th>
-                        <th>Payment Method</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for sale in sales_data %}
-                    <tr>
-                        <td>#{{ sale.order_list__order_id }}</td>
-                        <td>Table {{ sale.table.table_id }}</td>
-                        <td>${{ sale.total_amount }}</td>
-                        <td>{{ sale.payment_method }}</td> 
-                        <td>{{ sale.date }}</td>
-                        <td>{{ sale.time }}</td>
-                        <td><button class="btn btn-sm btn-primary">Reprint Receipt</button></td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="7" class="text-center">No sales data available</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-          
-            </table>
-          </div>
         </div>
     </div>
    

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404,reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.http import HttpResponseServerError
+from django.http import HttpResponse
 from .forms import CustomPasswordChangeForm
 from django.contrib.sessions.models import Session
 from django.utils.timezone import now
@@ -24,7 +24,7 @@ def render_page(request, template, data=None):
     data.update({"template": template, "today_date": now().strftime("%Y-%m-%d"),"staff_username": request.session.get("staff_username", "Guest"),})
     return render(request, "staffside/base.html", data)
 
-def pos(request):
+def pos(request, table_id=None):
     category_name = request.POST.get("category", "All") 
     # print(f"Selected Category: {category_name}") 
     # Get staff_id from session instead of using request.user.username
@@ -46,7 +46,7 @@ def pos(request):
         else:
             cart_items = Cart.objects.none()
 
-        # ✅ **Calculate total items and total price for the selected table**
+        # Calculate total items and total price for the selected table
         total_items = cart_items.aggregate(total=Sum("quantity"))["total"] or 0
         total_price = sum(item.price * item.quantity for item in cart_items)
 
@@ -112,7 +112,7 @@ def pos(request):
             
             elif action == "remove_from_cart":
                 cart_id = request.POST.get("cart_id")
-                table_id = request.POST.get("table_id")  # ✅ Keep the selected table
+                table_id = request.POST.get("table_id")  #  Keep the selected table
 
                 if cart_id:
                     Cart.objects.filter(cart_id=cart_id).delete()
@@ -140,30 +140,39 @@ def pos(request):
                 total_price = sum(item.price * item.quantity for item in cart_items)
                 total_quantity = sum(item.quantity for item in cart_items)
 
-                # ✅ Convert cart items to a custom text format (e.g., "product_id|size|quantity,product_id|size|quantity")
+                # Convert cart items to a custom text format (e.g., "product_id|size|quantity,product_id|size|quantity")
                 ordered_items_str = ",".join([
                     f"{item.order_item}-{item.size}-{item.quantity}"
                     for item in cart_items
                 ])
 
-                # ✅ Check if an order already exists for this table
+                #  Check if an order already exists for this table
                 existing_order = Order.objects.filter(table_id=table_id, status="pending").first()
+                branch_id = request.session.get("branch")
+                if not branch_id:
+                    return HttpResponse("No branch assigned", status=400)
+
+                try:
+                    branch_instance = Branch.objects.get(branch_id=branch_id)
+                except Branch.DoesNotExist:
+                    return HttpResponse("Branch not found", status=400)
 
                 if existing_order:
-                    # ✅ If order exists, update items instead of replacing
+                    #  If order exists, update items instead of replacing
                     # existing_items = existing_order.ordered_items
                     existing_order.ordered_items = ordered_items_str  # Append new items
                     existing_order.price = total_price
                     existing_order.quantity = total_quantity
                     existing_order.save()
                 else:
-                    # ✅ If no order exists, create a new one
+                    #  If no order exists, create a new one
                     order = Order.objects.create(
                         table_id=table_id,
                         ordered_items=ordered_items_str,
                         price=total_price,
                         quantity=total_quantity,
                         status="pending",
+                        branch=branch_instance,
                     )
 
                 messages.success(request, "Order placed successfully.")
@@ -196,6 +205,7 @@ def pos(request):
             "selected_table": selected_table,
             "total_items": total_items,
             "total_price": total_price,
+            "table_id": table_id,
         }
         
         return render_page(request, 'staffside/pos.html', context)

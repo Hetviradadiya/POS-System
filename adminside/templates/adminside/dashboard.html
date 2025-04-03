@@ -33,7 +33,8 @@
             <div class="stat-card-income">
                 <p class="sales-title">Total Income</p>
                 <div class="donut-chart-container">
-                    <div id="donut-chart"></div>
+                    <div id="donut-chart" data-total-income="{{ total_income }}" 
+                data-sales-data='{{ sales_data|safe }}'></div>
                 </div>
             </div>
         </div>
@@ -44,11 +45,11 @@
                         <div class="stat-icon stat-icon-green">
                             <i class="fas fa-users fa-lg" style="color: green;"></i>
                         </div>
-                        <p class="stat-title">New Customers</p>
-                        <p class="stat-percentage positive">+32.40%</p>
-                        <p class="stat-value">21,375</p>
+                        <p class="stat-title">Customers</p>
+                        <!-- <p class="stat-percentage positive">+32.40%</p> -->
+                        <p class="stat-value">{{ total_customers }}</p>
                         <div class="progress">
-                            <div class="progress-bar progress-bar-green" style="width: 85%;"></div>
+                            <div class="progress-bar progress-bar-green" style="width: {{ progress_customers }}%; min-width: 5%;"></div>
                         </div>
                     </div>
                 </div>
@@ -60,10 +61,10 @@
                             <i class="fas fa-box fa-lg" style="color: #FF8C42;"></i>
                         </div>
                         <p class="stat-title">Total Orders</p>
-                        <p class="stat-percentage negative">-2.3%</p>
-                        <p class="stat-value">21,375</p>
+                        <!-- <p class="stat-percentage negative">-2.3%</p> -->
+                        <p class="stat-value">{{ total_orders }}</p>
                         <div class="progress">
-                            <div class="progress-bar" style="width: 70%;"></div>
+                            <div class="progress-bar" style="width: {{ progress_orders }}%; min-width: 5%;"></div>
                         </div>
                     </div>
                 </div>        
@@ -74,23 +75,68 @@
     </div>
     <div class="row detail-row">
         <div class="col-md-6">
-            <div class="da-box">
+            <div class="da-box flex flex-column">
+                <div class="flex flex-row">
                 <p class="sales-title">Trending Dishes</p>
                 <select id="trendingDishesDropdown" class="dropdown">
                     <option value="today">Today</option>
                     <option value="monthly">Monthly</option>
                     <option value="yearly">Yearly</option>
                 </select>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Dish Name</th>
+                            <th>Price</th>
+                            <th>Sold Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dish in trending_dishes %}
+                        <tr>
+                            <td>{{ dish.ordered_items }}</td>
+                            <td>{{ dish.price }}</td> <!-- Assuming price field in Inventory -->
+                            <td>{{ dish.count }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center">No trending dishes found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="da-box best-employee-container">
-                <p class="sales-title">Best Employee</p>
-                <select id="bestEmployeeDropdown" class="dropdown">
-                    <option value="today">Today</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="yearly">Yearly</option>
-                </select>
+            <div class="da-box best-employee-container flex flex-column">
+                    <p class="sales-title">Best Employee</p>
+                    <!-- <select id="bestEmployeeDropdown" class="dropdown">
+                        <option value="today">Today</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                    </select> -->
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Employee Name</th>
+                            <th>Orders Handled</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for employee in employees %}
+                        <tr>
+                            <td>{{ employee.staff_fullname }}</td>
+                            <td>{{ employee.order_count }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2">No best employee data available</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
             </div>
 
         </div>

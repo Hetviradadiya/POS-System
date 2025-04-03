@@ -1,14 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseServerError
-from .forms import CustomPasswordChangeForm
 from django.contrib.sessions.models import Session
 from django.utils.timezone import now
-from django.conf import settings
 from django.contrib import messages
 from adminside.models import*
 from adminside.forms import*
-from staffside.models import Sales
+from staffside.models import Sales,Order
+from django.db.models import Sum
+
 
 def home(request):
     staff_id = request.session.get("staff_id")  # Get session data
@@ -59,15 +58,53 @@ def render_page(request, template, data=None):
     return render(request, "adminside/base.html", data)
 
 def dashboard(request):
-    return render_page(request, 'adminside/dashboard.html')
+     # Total Customers
+    total_customers = Customer.objects.count()
+    max_customers = 1000  # Set a reference max value
+    progress_customers = min((total_customers / max_customers) * 100, 100)
 
-def reports(request):
-    sales_data = Sales.objects.all()
+    # Total Orders
+    total_orders = Order.objects.count()
+    max_orders = 500  # Set a reference max value
+    progress_orders = min((total_orders / max_orders) * 100, 100)
+
+    # Get all orders and count items
+    order_items = Order.objects.values_list('ordered_items', flat=True)  
+    item_count = {}
+    for order in order_items:
+        for item in order.split(', '):  
+            item_count[item] = item_count.get(item, 0) + 1
+
+    # Trending Dishes
+    threshold = total_orders * 0.5  
+    trending_dishes = [
+        {"name": dish, "count": count}
+        for dish, count in sorted(item_count.items(), key=lambda x: x[1], reverse=True)
+        if count > threshold
+    ]
+
+    # Employees
+    employees = Staff.objects.filter(staff_role="staff")
+
+    # **Sales Data for Donut Chart**
+    total_income = Sales.objects.aggregate(Sum('total_amount'))['total_amount__sum'] or 0  
+    payment_data = Sales.objects.values('payment_method').annotate(total=Sum('total_amount'))  
+
+    sales_data = [
+        [sale['payment_method'], float(sale['total'])] for sale in payment_data
+    ]
 
     context = {
-        'sales_data': sales_data
+        "total_customers": total_customers,
+        "progress_customers": progress_customers,
+        "total_orders": total_orders,
+        "progress_orders": progress_orders,
+        "trending_dishes": trending_dishes,
+        "employees": employees,
+        "total_income": total_income,  # Pass total income
+        "sales_data": sales_data,  # Pass sales data
     }
-    return render_page(request, 'adminside/reports.html', context)
+    return render_page(request, 'adminside/dashboard.html',context)
 
 def logout_view(request):
     logout(request)
