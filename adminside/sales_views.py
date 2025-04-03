@@ -32,41 +32,64 @@ def render_page(request, template, data=None):
 
 
 def reports(request):
-    filter_type = request.GET.get("filter", "all")  # Default to "all"
-
-    # Fetch all sales data without date filter
+    filter_type = request.GET.get("filter", "all")
+    today = date.today()
+    
+    # Filtering logic
     if filter_type == "all":
-        sales_data = SalesReport.objects.all().order_by("sale_date", "branch", "staff")
-    else:
-        today = date.today()
-        start_date, end_date = today, today
+        sales_data = SalesReport.objects.all()
+    elif filter_type == "today":
+        sales_data = SalesReport.objects.filter(sale_date__date=today)
+    elif filter_type == "monthly":
+        sales_data = SalesReport.objects.filter(sale_date__year=today.year, sale_date__month=today.month)
+    elif filter_type == "yearly":
+        sales_data = SalesReport.objects.filter(sale_date__year=today.year)
 
-        if filter_type == "monthly":
-            start_date = today.replace(day=1)
-        elif filter_type == "yearly":
-            start_date = today.replace(month=1, day=1)
+    sales_data = sales_data.order_by("sale_date", "branch", "staff")
 
-        sales_data = SalesReport.objects.filter(
-            sale_date__date__gte=start_date, sale_date__date__lte=end_date
-        ).order_by("sale_date", "branch", "staff")
+    grouped_sales = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(int))))
+    date_rowspans = defaultdict(int)
+    branch_rowspans = defaultdict(lambda: defaultdict(int))
+    staff_rowspans = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
 
-    # Format sales data
-    formatted_sales = [
-        {
-            "sales_id": sale.sales_id,
-            "order_id": sale.order.order_id if sale.order else None,
-            "quantity_sold": sale.quantity_sold,
-            "branch_name": sale.branch.branch_name if sale.branch else "N/A",
-            "customer": sale.customer or "Walk-in",
-            "staff": sale.staff,
-            "sale_date": sale.sale_date.strftime("%Y-%m-%d %H:%M:%S"),
-        }
-        for sale in sales_data
-    ]
+    # Step 1: Group sales data by date → branch → staff → product
+    for sale in sales_data:
+        sale_date = sale.sale_date.date()
+        branch_name = sale.branch.branch_name if sale.branch else "N/A"
+        staff_name = sale.staff
+        items = sale.order.ordered_items.split(",")
+
+        for item in items:
+            product_name = item.split("-")[0]
+            grouped_sales[sale_date][branch_name][staff_name][product_name] += 1
+
+    final_sales_data = []
+
+    # Step 2: Compute rowspans
+    for sale_date, branches in grouped_sales.items():
+        total_date_rows = sum(len(products) for staff_data in branches.values() for products in staff_data.values())
+        date_rowspans[sale_date] = total_date_rows
+
+        for branch_name, staff_data in branches.items():
+            total_branch_rows = sum(len(products) for products in staff_data.values())
+            branch_rowspans[sale_date][branch_name] = total_branch_rows
+
+            for staff_name, products in staff_data.items():
+                staff_rowspans[sale_date][branch_name][staff_name] = len(products)
+
+                for product_name, total_quantity in products.items():
+                    final_sales_data.append({
+                        "sale_date": sale_date,
+                        "branch_name": branch_name,
+                        "staff_name": staff_name,
+                        "product_name": product_name,
+                        "total_quantity": total_quantity,
+                        "date_rowspan": date_rowspans[sale_date] if branch_name == list(branches.keys())[0] and staff_name == list(staff_data.keys())[0] and product_name == list(products.keys())[0] else 0,
+                        "branch_rowspan": branch_rowspans[sale_date][branch_name] if staff_name == list(staff_data.keys())[0] and product_name == list(products.keys())[0] else 0,
+                        "staff_rowspan": staff_rowspans[sale_date][branch_name][staff_name] if product_name == list(products.keys())[0] else 0,
+                    })
 
     context = {
-        "sales_data": formatted_sales,
-        "selected_filter": filter_type,
+        "sales_data": final_sales_data,
     }
     return render_page(request, "adminside/reports.html", context)
-

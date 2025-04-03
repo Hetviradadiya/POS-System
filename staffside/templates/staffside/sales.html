@@ -22,41 +22,44 @@
         
         <!-- Sales Table -->
             <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Sales ID</th>
-                            <th>Customer</th>
-                            <th>Table</th>
-                            <th>Ordered Items</th>
-                            <th>Total Amount</th>
-                            <th>Payment Method</th>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for sale in sales_data %}
-                        <tr>
-                            <td>#{{ sale.order.order_id }}</td>
-                            <td>{{sale.customer}}</td>
-                            <td>Table {{ sale.order.table.table_id }}</td>
-                            <td>{{ sale.order.ordered_items }}</td>
-                            <td>${{ sale.order.price }}</td>
-                            <td>{{ sale.payment_method }}</td> 
-                            <td>{{ sale.sale_date|date:"Y-m-d" }}</td>
-                            <td>{{ sale.sale_date|time:"H:i:s" }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary">Reprint Receipt</button>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="9" class="text-center">No sales data available</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
+<table class="table table-bordered border-dark">
+    <thead style="text-align: center;">
+        <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Customer</th>
+            <th>Ordered Items</th>
+            <th>Quantity</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody style="text-align: center; vertical-align: middle;">
+    {% if sales_data %}
+        {% for sale in sales_data %}
+            <tr>
+                {% if sale.date_rowspan > 0 %}
+                    <th rowspan="{{ sale.date_rowspan }}">{{ sale.sale_date }}</th>
+                {% endif %}
+                {% if sale.time_rowspan > 0 %}
+                    <th rowspan="{{ sale.time_rowspan }}">{{ sale.sale_time }}</th>
+                {% endif %}
+                {% if sale.customer_rowspan > 0 %}
+                    <td rowspan="{{ sale.customer_rowspan }}">{{ sale.customer_name }}</td>
+                {% endif %}
+                <td style="text-align: left;">{{ sale.product_name }}</td>
+                <td style="text-align: left;">{{ sale.total_quantity }}</td>
+                {% if sale.total_price is not None %}
+                        <td rowspan="{{ sale.customer_rowspan }}">{{ sale.total_price }}</td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td colspan="6" class="text-center">No sales data available.</td>
+        </tr>
+    {% endif %}
+</tbody>
+</table>
                 </table>
             </div>
         </div>

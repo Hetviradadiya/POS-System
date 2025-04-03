@@ -29,54 +29,69 @@
   </div>
   <div class="row">
     <div class="da-box">
-            <select id="incomeDropdown" class="dropdown" onchange="filterReports()">
+        <select id="incomeDropdown" class="dropdown" onchange="filterReports()">
             <option value="today" {% if selected_filter == 'today' %}selected{% endif %}>Today</option>
             <option value="monthly" {% if selected_filter == 'monthly' %}selected{% endif %}>Monthly</option>
             <option value="yearly" {% if selected_filter == 'yearly' %}selected{% endif %}>Yearly</option>
         </select>    
+        <!-- <select id="filterSelect" class="dropdown form-control" onchange="applyFilter()">
+            <option value="all" {% if selected_filter == "all" %}selected{% endif %}>All</option>
+            <option value="today" {% if selected_filter == "today" %}selected{% endif %}>Today</option>
+            <option value="monthly" {% if selected_filter == "monthly" %}selected{% endif %}>This Month</option>
+            <option value="yearly" {% if selected_filter == "yearly" %}selected{% endif %}>This Year</option>
+        </select> -->
     </div>
   </div>
     <br>
 
-<table class="table table-bordered table-striped">
-            <thead class="table-dark">
+    <table class="table table-bordered border-dark">
+        <thead style="text-align: center;">
+            <tr>
+                <th>Date</th>
+                <th>Branch</th>
+                <th>Staff</th>
+                <th>Product</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody style="text-align: center; vertical-align: middle;">
+        {% if sales_data %}
+            {% for sale in sales_data %}
                 <tr>
-                    <th>Sales ID</th>
-                    <th>Order ID</th>
-                    <th>Quantity Sold</th>
-                    <th>Branch</th>
-                    <th>Customer</th>
-                    <th>Staff</th>
-                    <th>Sale Date</th>
+                    {% if sale.date_rowspan > 0 %}
+                        <th rowspan="{{ sale.date_rowspan }}">{{ sale.sale_date }}</th>
+                    {% endif %}
+                    {% if sale.branch_rowspan > 0 %}
+                        <th rowspan="{{ sale.branch_rowspan }}">{{ sale.branch_name }}</th>
+                    {% endif %}
+                    {% if sale.staff_rowspan > 0 %}
+                        <td rowspan="{{ sale.staff_rowspan }}">{{ sale.staff_name }}</td>
+                    {% endif %}
+                    <td style="text-align: left;" >{{ sale.product_name }}</td>
+                    <td style="text-align: left;">{{ sale.total_quantity }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                {% for sale in sales_data %}
-                <tr>
-                    <td>{{ sale.sales_id }}</td>
-                    <td>{{ sale.order_id|default:"-" }}</td>
-                    <td>{{ sale.quantity_sold }}</td>
-                    <td>{{ sale.branch_name }}</td>
-                    <td>{{ sale.customer }}</td>
-                    <td>{{ sale.staff }}</td>
-                    <td>{{ sale.sale_date }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="7" class="text-center">No sales data available.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="5" class="text-center">No sales data available.</td>
+            </tr>
+        {% endif %}
+    </tbody>
+    </table>
+
+
+
+
+
 
 </div>
 
 
 <script>
-    function applyFilter() {
-        let filter = document.getElementById("filterSelect").value;
-        window.location.href = "?filter=" + filter;
-    }
+function filterReports() {
+    var filterValue = document.getElementById("incomeDropdown").value;
+    window.location.href = "?filter=" + filterValue;
+}
 </script>
 <script src="{% static 'js/reports_scripts.js' %}"></script>
 
