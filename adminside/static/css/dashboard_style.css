@@ -1,16 +1,24 @@
+*{
+  margin: 0;
+  padding: 0;
+}
+
+.part{
+  margin: 0;
+  padding: 15px;
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+.box{
+  width: 30%;
+}
+
+
+
 .dashboard-container {
   margin-left: 10px;
 }
-
-.title-row {
-  margin-top: 24px;
-}
-
-.graph-row {
-  margin-top: 10px;
-  width: 1290px;
-}
-
 .sales-box {
   background: #fff;
   border-radius: 10px;
@@ -37,7 +45,6 @@
 .sales-container {
   display: flex;
   flex-direction: column;
-
   gap: 3px;
 }
 
@@ -45,6 +52,10 @@
   margin: 0px;
   font-size: 15px;
   font-weight: 700;
+}
+.value{
+  position: absolute;
+  bottom: 20px;
 }
 
 .sales-value {

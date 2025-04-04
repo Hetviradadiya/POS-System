@@ -127,11 +127,8 @@ def orders(request):
 def bill_page(request, table_id):
     try:
         order = Order.objects.filter(table_id=table_id, status="Done").latest("created_at")
-
-        ordered_items_list = [
-            item.split("-") for item in order.ordered_items.split(",") if item
-        ]
-
+        branch = request.session.get("branch")
+        ordered_items_list = []
         total_price = order.price
         discount_value = order.discount
         discount_rate = discount_value / 100  # Convert discount to percentage
@@ -139,6 +136,42 @@ def bill_page(request, table_id):
         gst_rate = Decimal("0.05")  # 5% GST
         gst = (total_price - discount) * gst_rate
         final_total = (total_price - discount) + gst
+
+        # Extract product details and fetch actual prices from Inventory
+        for item in order.ordered_items.split(","):
+            if item:
+                try:
+                    name, size, quantity = item.split("-")
+                    quantity = int(quantity)  # Convert to integer
+                except ValueError:
+                    continue  # Skip invalid data
+
+                # Step 1: Find the Purchase record matching food_item name and branch
+                purchase = Purchase.objects.filter(food_item=name, branch=branch).first()
+
+                print("purchase",purchase)
+
+                # Step 2: Find the corresponding Inventory record (where Inventory.food_item = Purchase)
+                base_price = 0
+                if purchase:
+                    inventory = Inventory.objects.filter(food_item=purchase, branch=branch).first()
+                    print("inventory",inventory)
+                    base_price = inventory.sell_price if inventory else 0  # Get the sell price from Inventory
+
+                # Adjust price based on size
+                if size.lower() == "small":
+                    rate_per_unit = base_price * Decimal(0.8)  # 20% less
+                elif size.lower() == "medium":
+                    rate_per_unit = base_price  # Same price
+                elif size.lower() == "large":
+                    rate_per_unit = base_price * Decimal(1.2)  # 20% more
+                else:
+                    rate_per_unit = base_price  # Default case (if size is unexpected)
+
+                # Calculate total amount correctly
+                total_amount = rate_per_unit * Decimal(quantity)
+
+                ordered_items_list.append([name, quantity, rate_per_unit, total_amount])
 
         branch_id = request.session.get("branch")
         branch = Branch.objects.filter(branch_id=branch_id).first() if branch_id else None
@@ -150,7 +183,7 @@ def bill_page(request, table_id):
             "order": order,
             "ordered_items": ordered_items_list,
             "total_price": total_price,
-            "discount_value":discount_value,
+            "discount_value": discount_value,
             "discount": discount,
             "gst": gst,
             "final_total": final_total,
@@ -158,7 +191,7 @@ def bill_page(request, table_id):
             "now": now(),
             "branch_name": branch_name,
             "branch_location": branch_location,
-            "branch_phone_no":branch_phone_no
+            "branch_phone_no": branch_phone_no
         }
         return render(request, "staffside/bill_print.html", context)
 

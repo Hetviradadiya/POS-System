@@ -38,13 +38,26 @@ def pos(request, table_id=None):
         branch = staff.branch  # Get branch of staff
         tables = Table.objects.all()
         
-        selected_table = request.POST.get("table_id") or request.GET.get("table_id") or request.session.get("selected_table")
+        selected_table = request.POST.get("table_id") or request.GET.get("table_id")
 
         if selected_table:
             request.session["selected_table"] = selected_table  # Store selected table in session
             cart_items = Cart.objects.filter(table_id=selected_table)
         else:
             cart_items = Cart.objects.none()
+
+        # Fetch related images
+        cart_items_with_images = []
+        for item in cart_items:
+            purchase = Purchase.objects.filter(food_item=item.order_item).first()  # Get Purchase
+            inventory = Inventory.objects.filter(food_item=purchase).first() if purchase else None  # Get Inventory
+            print("inventory",inventory)
+            image_url = inventory.image.url if inventory and inventory.image else None  # Get Image URL
+            
+            cart_items_with_images.append({
+                "cart": item,
+                "image_url": image_url
+            })
 
         # Calculate total items and total price for the selected table
         total_items = cart_items.aggregate(total=Sum("quantity"))["total"] or 0
@@ -73,13 +86,7 @@ def pos(request, table_id=None):
                     product = get_object_or_404(Inventory, inventory_id=product_id)
                     table = get_object_or_404(Table, table_id=table_id) if table_id else None
 
-                    # Cart.objects.create(
-                    #     table=table,
-                    #     order_item=product,
-                    #     size=size,
-                    #     quantity=quantity,
-                    #     price=price,
-                    # )
+                    
                     cart_item, created = Cart.objects.get_or_create(
                         table=table,
                         order_item=product,
@@ -202,6 +209,7 @@ def pos(request, table_id=None):
             'products': products,
             'tables': tables,
             "cart_items": cart_items, 
+            "cart_items_with_images": cart_items_with_images, 
             "selected_table": selected_table,
             "total_items": total_items,
             "total_price": total_price,

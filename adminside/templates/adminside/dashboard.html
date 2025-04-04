@@ -15,37 +15,14 @@
     <div class="row title-row">
         <h2>DASHBOARD</h2>
     </div>
-    <div class="row graph-row">
-        <div class="col-6">
-            <div class="sales-box">
-                <a href="{% url 'adminside:reports' %}" class="btn-report">View Report</a>
-                <div class="sales-container">
-                    <p class="sales-title">Daily Sales</p>
-                    <p class="sales-value">2,568</p>
-                    <p class="sales-percentage">↑ 2.1% vs last week</p>
-                </div>
-                <div class="chart-container">
-                    <canvas id="salesChart"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-3">
-            <div class="stat-card-income">
-                <p class="sales-title">Total Income</p>
-                <div class="donut-chart-container">
-                    <div id="donut-chart" data-total-income="{{ total_income }}" 
-                data-sales-data='{{ sales_data|safe }}'></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-3">
-            <div class="row"></div>
-                <div class="col-md-5" style="width: 77.666667%;">
+    <div class="dashboard-body">
+        <div class="part">
+                <div class="box">
                     <div class="stat-card1">
                         <div class="stat-icon stat-icon-green">
                             <i class="fas fa-users fa-lg" style="color: green;"></i>
                         </div>
-                        <p class="stat-title">Customers</p>
+                        <p class="stat-title">Total Customers</p>
                         <!-- <p class="stat-percentage positive">+32.40%</p> -->
                         <p class="stat-value">{{ total_customers }}</p>
                         <div class="progress">
@@ -55,8 +32,8 @@
                 </div>
 
 
-                <div class="col-md-5" style="width: 77.666667%;">
-                    <div class="stat-card1 mt-2">
+                <div class="box">
+                    <div class="stat-card1">
                         <div class="stat-icon">
                             <i class="fas fa-box fa-lg" style="color: #FF8C42;"></i>
                         </div>
@@ -69,12 +46,36 @@
                     </div>
                 </div>        
             </div>
-
-
         </div>
+
     </div>
-    <div class="row detail-row">
-        <div class="col-md-6">
+    <div class="part">
+        <div class="graph-box">
+            <div class="sales-box">
+                <a href="{% url 'adminside:reports' %}" class="btn-report">View Report</a>
+                <div class="sales-container">
+                    <p class="sales-title">Daily Sales</p>
+                    <p class="sales-value">2,568</p>
+                    <p class="sales-percentage">↑ 2.1% vs last week</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="graph-box">
+            <div class="stat-card-income">
+                <p class="sales-title">Total Income</p>
+                <div class="donut-chart-container">
+                    <div id="donut-chart" data-total-income="{{ total_income }}" 
+                data-sales-data='{{ sales_data|safe }}'></div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    <div class="part">
+        <div class="detail-box">
             <div class="da-box flex flex-column">
                 <div class="flex flex-row">
                 <p class="sales-title">Trending Dishes</p>
@@ -108,7 +109,7 @@
                 </table>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="detail-box">
             <div class="da-box best-employee-container flex flex-column">
                     <p class="sales-title">Best Employee</p>
                     <!-- <select id="bestEmployeeDropdown" class="dropdown">

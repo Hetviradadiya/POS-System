@@ -5,6 +5,13 @@
 {% endblock %}
 
 <div class="food-items-page">
+  {% if form.errors %}
+  <div class="error-container">
+    {% for field, errors in form.errors.items %}
+      <p class="error-message">{{ field|title }}: {{ errors.0 }}</p>
+    {% endfor %}
+  </div>
+{% endif %}
   {% if messages %}
   <div id="toastContainer">
     {% for message in messages %}
@@ -100,8 +107,13 @@
         type="hidden"
         id="inventoryId"
         name="inventory_id"
-        value="{{ inventory.inventory_id|default:'' }}"
+        value="{{ inventory.inventory_id}}"
       />
+
+      <!-- Hidden field to store purchase_id -->
+      <input type="hidden" id="foodItemName" name="food_item">
+      <input type="hidden" id="purchaseId" name="purchase_id">
+
 
       <div class="form-group">
         <div class="input-group">
@@ -116,13 +128,25 @@
         </div>
         <div class="input-group">
           <label for="foodItem"><b>Name</b></label>
-          <select id="foodItem" name="food_item">
+          <select id="foodItem" name="food_item" onchange="populatePurchaseData()">
             <option value="" disabled selected hidden>Select Name</option>
-            {% for purchase in purchase_list %}
+            <!-- {% for purchase in purchase_list %}
             <option value="{{ purchase.purchase_id }}">
               {{ purchase.food_item }}
             </option>
-            {% endfor %}
+            {% endfor %} -->
+            {% for purchase in purchase_list %}
+          <option 
+            value="{{ purchase.purchase_id }}" 
+            data-food-item="{{ purchase.food_item }}" 
+            data-quantity="{{ purchase.quantity }}" 
+            data-branch="{{ purchase.branch_id }}" 
+            data-cost="{{ purchase.cost_price }}"
+            data-mfg="{{ purchase.purchased_date|date:'Y-m-d' }}" 
+          >
+            {{ purchase.food_item }}
+          </option>
+          {% endfor %}
           </select>
         </div>
       </div>
@@ -204,7 +228,7 @@
             type="date"
             id="mfgDate"
             name="mfg_date"
-            value="{{ form.mfg_date.value|default:'' }}"
+            value="{{ form.mfg_date.value|date:'Y-m-d'|default:'' }}"
           />
         </div>
         <div class="input-group">
@@ -213,7 +237,7 @@
             type="date"
             id="expDate"
             name="exp_date"
-            value="{{ form.exp_date.value|default:'' }}"
+            value="{{ form.exp_date.value|date:'Y-m-d'|default:'' }}"
           />
         </div>
       </div>

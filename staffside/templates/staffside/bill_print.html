@@ -39,21 +39,21 @@
     </div>
 
     <table class="table">
-        <tr>
-            <th>S.No</th>
-            <th>Item</th>
-            <th>Qty</th>
-            <th>Amt</th>
-        </tr>
-        {% for item in ordered_items %}
-        <tr>
-            <td>{{ forloop.counter }}</td>  <!-- Serial Number -->
-            <td>{{ item.0 }}</td>  <!-- Product Name -->
-            <td>{{ item.2 }}</td>  <!-- Quantity -->
-            <td>₹{{ order.price|floatformat:2 }}</td>  <!-- Price -->
-        </tr>
-        {% endfor %}
-    </table>
+    <tr>
+        <th>Item</th>
+        <th>Qty</th>
+        <th>Rate</th>
+        <th>Amt</th>
+    </tr>
+    {% for item in ordered_items %}
+    <tr>
+        <td>{{ item.0 }}</td>  <!-- Product Name -->
+        <td>{{ item.1 }}</td>  <!-- Quantity -->
+        <td>₹{{ item.2|floatformat:2 }}</td>  <!-- Adjusted price per unit -->
+        <td>₹{{ item.3|floatformat:2 }}</td>  <!-- Total Amount (Qty * Adjusted Price) -->
+    </tr>
+    {% endfor %}
+</table>
 
     <div class="total">
         (Tax Incl) Sub Total: ₹{{ total_price|floatformat:2 }} <br>

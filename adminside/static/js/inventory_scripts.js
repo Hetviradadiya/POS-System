@@ -219,98 +219,98 @@ document
 
     clearErrors(); // Clear errors
 
-    let requiredFields = [
-      { id: "itemImage", message: "FoodItem Image is required!" },
-      { id: "foodItem", message: "FoodItem is required!" },
-      { id: "category", message: "Category is required!" },
-      { id: "itemDescription", message: "Description is required!" },
-      { id: "quantity", message: "Quantity is required!" },
-      { id: "branch", message: "Branch is required!" },
-      { id: "costPrice", message: "CostPrice is required!" },
-      { id: "sellPrice", message: "SellPrice is required!" },
-      { id: "mfgDate", message: "MFG Date is required!" },
-      { id: "expDate", message: "EXP Date is required!" },
-    ];
+  //   let requiredFields = [
+  //     { id: "itemImage", message: "FoodItem Image is required!" },
+  //     { id: "foodItem", message: "FoodItem is required!" },
+  //     { id: "category", message: "Category is required!" },
+  //     { id: "itemDescription", message: "Description is required!" },
+  //     { id: "quantity", message: "Quantity is required!" },
+  //     { id: "branch", message: "Branch is required!" },
+  //     { id: "costPrice", message: "CostPrice is required!" },
+  //     { id: "sellPrice", message: "SellPrice is required!" },
+  //     { id: "mfgDate", message: "MFG Date is required!" },
+  //     { id: "expDate", message: "EXP Date is required!" },
+  //   ];
 
-    requiredFields.forEach(({ id, message }) => {
-      if (!document.getElementById(id).value.trim()) {
-        showError(id, message);
-        isValid = false;
-      }
-    });
+  //   requiredFields.forEach(({ id, message }) => {
+  //     if (!document.getElementById(id).value.trim()) {
+  //       showError(id, message);
+  //       isValid = false;
+  //     }
+  //   });
 
-    if (!isValid) {
-      event.preventDefault();
-      document.getElementById("overlay").style.display = "block";
-      document.getElementById("myForm").style.display = "block";
-    }
-  });
+  //   if (!isValid) {
+  //     event.preventDefault();
+  //     document.getElementById("overlay").style.display = "block";
+  //     document.getElementById("myForm").style.display = "block";
+  //   }
+  // });
 
-//   const itemImage = document.getElementById("itemImage").value.trim();
-//   if (!itemImage) {
-//     showError("itemImage", "FoodItem Image is required!");
-//     isValid = false;
-//   }
+  const itemImage = document.getElementById("itemImage").value.trim();
+  if (!itemImage) {
+    showError("itemImage", "FoodItem Image is required!");
+    isValid = false;
+  }
 
-//   const foodItem = document.getElementById("foodItem").value.trim();
-//   if (!foodItem) {
-//     showError("foodItem", "FoodItem is required!");
-//     isValid = false;
-//   }
-//   const category = document.getElementById("category").value.trim();
-//   if (!category) {
-//     showError("category", "Category is required!");
-//     isValid = false;
-//   }
-//   const itemDescription = document
-//     .getElementById("itemDescription")
-//     .value.trim();
-//   if (!itemDescription) {
-//     showError("itemDescription", "Description is required!");
-//     isValid = false;
-//   }
+  const foodItem = document.getElementById("foodItem").value.trim();
+  if (!foodItem) {
+    showError("foodItem", "FoodItem is required!");
+    isValid = false;
+  }
+  const category = document.getElementById("category").value.trim();
+  if (!category) {
+    showError("category", "Category is required!");
+    isValid = false;
+  }
+  const itemDescription = document
+    .getElementById("itemDescription")
+    .value.trim();
+  if (!itemDescription) {
+    showError("itemDescription", "Description is required!");
+    isValid = false;
+  }
 
-//   const quantity = document.getElementById("quantity").value.trim();
-//   if (!quantity) {
-//     showError("quantity", "Quantity is required!");
-//     isValid = false;
-//   }
+  const quantity = document.getElementById("quantity").value.trim();
+  if (!quantity) {
+    showError("quantity", "Quantity is required!");
+    isValid = false;
+  }
 
-//   const branch = document.getElementById("branch").value;
-//   if (!branch) {
-//     showError("branch", "Branch is required!");
-//     isValid = false;
-//   }
-//   const costPrice = document.getElementById("costPrice").value.trim();
-//   if (!costPrice) {
-//     showError("costPrice", "CostPrice is required!");
-//     isValid = false;
-//   }
-//   const sellPrice = document.getElementById("sellPrice").value.trim();
-//   if (!sellPrice) {
-//     showError("sellPrice", "SellPrice is required!");
-//     isValid = false;
-//   }
+  const branch = document.getElementById("branch").value;
+  if (!branch) {
+    showError("branch", "Branch is required!");
+    isValid = false;
+  }
+  const costPrice = document.getElementById("costPrice").value.trim();
+  if (!costPrice) {
+    showError("costPrice", "CostPrice is required!");
+    isValid = false;
+  }
+  const sellPrice = document.getElementById("sellPrice").value.trim();
+  if (!sellPrice) {
+    showError("sellPrice", "SellPrice is required!");
+    isValid = false;
+  }
 
-//   const mfgDate = document.getElementById("mfgDate").value;
-//   if (!mfgDate) {
-//     showError("mfgDate", "MFG Date is required!");
-//     isValid = false;
-//   }
+  const mfgDate = document.getElementById("mfgDate").value;
+  if (!mfgDate) {
+    showError("mfgDate", "MFG Date is required!");
+    isValid = false;
+  }
 
-//   const expDate = document.getElementById("expDate").value;
+  const expDate = document.getElementById("expDate").value;
 
-//   if (!expDate) {
-//     showError("expDate", "EXP Date is required!");
-//     isValid = false;
-//   }
+  if (!expDate) {
+    showError("expDate", "EXP Date is required!");
+    isValid = false;
+  }
 
-//   if (!isValid) {
-//     event.preventDefault(); // Prevent form submission if validation fails
-//     document.getElementById("overlay").style.display = "block"; // Keep the form open
-//     document.getElementById("myForm").style.display = "block";
-//   }
-// });
+  if (!isValid) {
+    event.preventDefault(); // Prevent form submission if validation fails
+    document.getElementById("overlay").style.display = "block"; // Keep the form open
+    document.getElementById("myForm").style.display = "block";
+  }
+});
 
 //message when try to delete row
 function confirmDelete() {
@@ -352,4 +352,24 @@ function closeAlert(button) {
   let alert = button.parentElement;
   alert.style.opacity = "0";
   setTimeout(() => alert.remove(), 500);
+}
+
+function populatePurchaseData() {
+  var selectedOption = document.getElementById("foodItem").selectedOptions[0];
+
+  if (selectedOption) {
+    document.getElementById("purchaseId").value = selectedOption.value; // Use purchase_id as the value
+    document.getElementById("foodItemName").value =
+      selectedOption.getAttribute("data-food-item"); // Display food name
+    document.getElementById("quantity").value =
+      selectedOption.getAttribute("data-quantity");
+    document.getElementById("branch").value =
+      selectedOption.getAttribute("data-branch");
+    document.getElementById("costPrice").value =
+      selectedOption.getAttribute("data-cost");
+    let mfgDate = selectedOption.getAttribute("data-mfg");
+    if (mfgDate) {
+      document.getElementById("mfgDate").value = mfgDate;
+    }
+  }
 }

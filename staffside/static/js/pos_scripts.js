@@ -120,19 +120,40 @@ function selectSize(event, productId, size) {
   event.preventDefault(); // Prevent default behavior if event exists
 
   let sizeInput = document.getElementById(`size-${productId}`);
-  if (!sizeInput) {
-    console.error(`Size input not found for product ID: ${productId}`);
+  let priceInput = document.querySelector(
+    `#add-to-cart-form-${productId} input[name="price"]`
+  );
+  let originalPrice = parseFloat(priceInput.dataset.originalPrice);
+
+  if (!sizeInput || !priceInput) {
+    console.error(`Required elements not found for product ID: ${productId}`);
     return;
   }
 
+  // Update the size input value
   sizeInput.value = size;
 
-  // Highlight selected size button
+  // Calculate new price based on size
+  let newPrice;
+  if (size === "Small") {
+    newPrice = originalPrice * 0.8; // 20% less
+  } else if (size === "Large") {
+    newPrice = originalPrice * 1.2; // 20% more
+  } else {
+    newPrice = originalPrice; // Medium, same price
+  }
+
+  // Update price input field
+  priceInput.value = newPrice.toFixed(2);
+
+  // Highlight the selected size button
   document
     .querySelectorAll(`[data-product="${productId}"]`)
     .forEach((btn) => btn.classList.remove("active-size"));
 
   event.target.classList.add("active-size");
+
+  console.log(`Selected Size: ${size}, Updated Price: ₹${newPrice.toFixed(2)}`);
 }
 
 // validateCart in global scope

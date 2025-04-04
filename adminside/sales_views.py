@@ -60,8 +60,15 @@ def reports(request):
         items = sale.order.ordered_items.split(",")
 
         for item in items:
-            product_name = item.split("-")[0]
-            grouped_sales[sale_date][branch_name][staff_name][product_name] += 1
+            parts = item.split("-")
+            if len(parts) == 3:  # Ensure correct format (name-size-quantity)
+                product_name, _, quantity = parts
+                try:
+                    quantity = int(quantity)  # Convert quantity to integer
+                except ValueError:
+                    quantity = 1  # Default to 1 if quantity is missing or invalid
+
+                grouped_sales[sale_date][branch_name][staff_name][product_name] += quantity  # Sum quantities
 
     final_sales_data = []
 
