@@ -23,12 +23,27 @@
         </li>
         <li class="nav-item">
           <a class="nav-link" data-bs-toggle="pill" href="#reserved"
-            >Disabled</a
+            >Reserved</a
           >
         </li>
       </ul>
+      
     </div>
   </div>
+      <form id="branchForm" method="GET" action="{% url 'adminside:tables' %}">
+        {%csrf_token%}
+  <label for="branchSelect"><strong>Select Branch:</strong></label>
+  <select id="branchSelect" class="form-select" name="branch_id" onchange="this.form.submit()">
+    <option value="" {% if not selected_branch %}selected{% endif %}>All Branches</option>
+    {% for branch in branches %}
+    <option value="{{ branch.branch_id }}" {% if branch.branch_id|stringformat:"s" == selected_branch %}selected{% endif %}>
+      {{ branch.branch_name }}
+    </option>
+    {% endfor %}
+  </select>
+  <!-- <input type="hidden" id="hiddenBranchInput" name="branch_id" value="{{ selected_branch }}"> -->
+</form>
+
   <button class="open-button add-table-button rounded-3" onclick="openForm()">
     <span class="btn-text">
       <i class="fa-solid fa-plus plus-icon"></i> Add Table
@@ -42,6 +57,7 @@
   <form id="tableForm" method="post" action="{% url 'adminside:tables' %}">
     {% csrf_token %}
     <input type="hidden" id="selectedSeats" name="seats" />
+    <input type="hidden" id="selectedBranchId" name="branch" value="{{ selected_branch }}">
     <div class="form-title">
       <h1 class="mb-3">Add Table</h1>
       <button
@@ -83,6 +99,8 @@
 <div class="tab-content">
   <div id="allTables" class="container tab-pane fade show active">
     <br />
+    {% if selected_branch %}
+    {% if tables %}
     <div class="d-flex flex-wrap justify-content-center">
       {% for table in tables %}
         {% if table.seats == 4 %}
@@ -116,6 +134,12 @@
       {% endif %}
       {% endfor %}
     </div>
+    {% else %}
+      <p class="text-center text-danger fw-bold">No tables for this branch.</p>
+    {% endif %}
+  {% else %}
+    <p class="text-center text-danger fw-bold">Please select a branch to view tables.</p>
+  {% endif %}
   </div>
   <div id="vacant" class="container tab-pane fade">
     <br />

@@ -26,23 +26,39 @@ def render_page(request, template, data=None):
 
 def tables(request):
     if request.method == "POST":
-        # print("Form Data:", request.POST) 
-        # table_number = request.POST.get("table_number")
         seats = request.POST.get("seats")
-        status = "Vacant"  # Default status
+        branch_id = request.POST.get("branch")
 
-        if not seats:  # Ensure seats is not empty
-            # print("not seats selected.")
+        print("branch_id")
+        status = "Vacant"
+
+        if not seats:
             messages.error(request, "Please select a table type before adding.")
             return redirect("adminside:tables")
 
-        # Save to Database
-        Table.objects.create(seats=seats, status=status)
-        # print("Table added with seats:", seats)
-        # Redirect back to the tables page to refresh the list
-        return redirect("adminside:tables")
-    tables = Table.objects.all()
+        branch = Branch.objects.filter(branch_id=branch_id).first() if branch_id else None
 
+        Table.objects.create(seats=seats, status=status, branch=branch)
+
+        return redirect("adminside:tables")
+
+    # GET: Filter by selected branch
+    selected_branch = request.GET.get("branch_id")
+    print("selected_branch",selected_branch)
+    branches = Branch.objects.all()
+
+    tables = []
+    if selected_branch:
+        try:
+            selected_branch = str(int(selected_branch))  # ensure it's valid
+            tables = Table.objects.filter(branch_id=selected_branch)
+        except ValueError:
+            selected_branch = None
+            tables = []
+    else:
+        tables = []
+
+    # Update statuses
     for table in tables:
         has_orders = Cart.objects.filter(table=table).exists()
         if has_orders:
@@ -52,5 +68,8 @@ def tables(request):
 
     context = {
         "tables": tables,
+        "branches": branches,
+        "selected_branch": selected_branch,
     }
+
     return render_page(request, 'adminside/tables.html', context)

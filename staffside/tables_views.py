@@ -19,7 +19,9 @@ def render_page(request, template, data=None):
     return render(request, "staffside/base.html", data)
 
 def tables(request):
-    tables = Table.objects.all()
+    
+    branch= request.session.get("branch")
+    tables = Table.objects.filter(branch_id=branch)
 
     for table in tables:
         has_orders = Cart.objects.filter(table=table).exists()

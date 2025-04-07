@@ -133,33 +133,60 @@ class Table(models.Model):
     ]
 
     table_id = models.AutoField(primary_key=True)
-    table_number = models.CharField(max_length=10, unique=True, blank=True, null=True)  # Store 'T-1', 'T-2'
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name="tables", null=True, blank=True, db_column="branch_id")
+    table_number = models.CharField(max_length=10, blank=True, null=True)  # Store 'T-1', 'T-2'
     seats = models.IntegerField(null=False)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='vacant')
 
+    class Meta:
+        unique_together = ("branch", "table_number")
+
     def save(self, *args, **kwargs):
-        """Auto-generate table_number if not provided."""
+        """Auto-generate table_number based on branch."""
         if not self.table_number:
-            last_table = Table.objects.order_by("-table_id").first()
+            last_table = Table.objects.filter(branch=self.branch).order_by("-table_id").first()
             next_number = 1
 
-        if last_table and last_table.table_number:
-            last_table_number = str(last_table.table_number)  # Ensure it's a string
-            if "-" in last_table_number:  # Prevents AttributeError
-                try:
-                    next_number = int(last_table_number.split("-")[1]) + 1
-                except (IndexError, ValueError):
-                    next_number = 1  # Fallback in case of parsing error
+            if last_table and last_table.table_number:
+                last_table_number = str(last_table.table_number)  # Ensure it's a string
+                if "-" in last_table_number:
+                    try:
+                        next_number = int(last_table_number.split("-")[1]) + 1
+                    except (IndexError, ValueError):
+                        next_number = 1  # Fallback in case of parsing error
 
-        self.table_number = f"T-{next_number}"
+            self.table_number = f"T-{next_number}"  # Format table number per branch
 
-        """Override save to clear cart when status is changed to vacant."""
         super().save(*args, **kwargs)
-        # if self.status == 'vacant':
-        #     Cart.objects.filter(table=self).delete()  # Clear cart when table becomes vacant
 
     def __str__(self):
-        return f"Table {self.table_id} - {self.status}"
+        return f"Table {self.table_number} ({self.branch.branch_name}) - {self.status}"
+    
+
+
+    # def save(self, *args, **kwargs):
+    #     """Auto-generate table_number if not provided."""
+    #     if not self.table_number:
+    #         last_table = Table.objects.order_by("-table_id").first()
+    #         next_number = 1
+
+    #     if last_table and last_table.table_number:
+    #         last_table_number = str(last_table.table_number)  # Ensure it's a string
+    #         if "-" in last_table_number:  # Prevents AttributeError
+    #             try:
+    #                 next_number = int(last_table_number.split("-")[1]) + 1
+    #             except (IndexError, ValueError):
+    #                 next_number = 1  # Fallback in case of parsing error
+
+    #     self.table_number = f"T-{next_number}"
+
+    #     """Override save to clear cart when status is changed to vacant."""
+    #     super().save(*args, **kwargs)
+    #     # if self.status == 'vacant':
+    #     #     Cart.objects.filter(table=self).delete()  # Clear cart when table becomes vacant
+
+    # def __str__(self):
+    #     return f"Table {self.table_id} - {self.status}"
 
 class Cart(models.Model):
     cart_id = models.AutoField(primary_key=True)

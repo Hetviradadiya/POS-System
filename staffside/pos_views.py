@@ -36,13 +36,13 @@ def pos(request, table_id=None):
         # Fetch staff details from session ID
         staff = Staff.objects.get(staff_id=staff_id)  
         branch = staff.branch  # Get branch of staff
-        tables = Table.objects.all()
+        tables = Table.objects.filter(branch_id=branch)
         
         selected_table = request.POST.get("table_id") or request.GET.get("table_id")
 
         if selected_table:
             request.session["selected_table"] = selected_table  # Store selected table in session
-            cart_items = Cart.objects.filter(table_id=selected_table)
+            cart_items = Cart.objects.filter(table_id=selected_table , table__branch_id=branch)
         else:
             cart_items = Cart.objects.none()
 
@@ -194,7 +194,7 @@ def pos(request, table_id=None):
             products = Inventory.objects.filter(branch=branch, category__categories_name=category_name)
         # Fetch categories and products that belong to the same branch
         categories = Categories.objects.filter(inventory__branch=branch).distinct()
-        tables = Table.objects.all()
+        tables = Table.objects.filter(branch_id=branch)
         
         # print(f"Staff: {staff}")
         # print(f"Branch: {branch}")
