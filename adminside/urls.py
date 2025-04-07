@@ -1,6 +1,6 @@
 from django.urls import path
 from django.http import HttpResponse
-from . import views,setting_views,tables_views,category_views,sales_views
+from . import views,setting_views,tables_views,category_views,sales_views,dashboard_views
 from . import branches_views,suppliers_views,customer_views,staff_views,purchase_views,inventory_views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -12,7 +12,7 @@ def empty_favicon(request):
 
 urlpatterns = [
     path('', views.home, name='home'),  
-    path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboard/', dashboard_views.dashboard, name='dashboard'),
 
     path('branches/', branches_views.branches, name='branches'),
     path("branches/delete/<int:branch_id>/", branches_views.delete_branch, name="delete_branch"),

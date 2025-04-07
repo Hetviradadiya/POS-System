@@ -24,9 +24,11 @@
                         </div>
                         <p class="stat-title">Total Customers</p>
                         <!-- <p class="stat-percentage positive">+32.40%</p> -->
+                        <div>
                         <p class="stat-value">{{ total_customers }}</p>
                         <div class="progress">
                             <div class="progress-bar progress-bar-green" style="width: {{ progress_customers }}%; min-width: 5%;"></div>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -44,26 +46,38 @@
                             <div class="progress-bar" style="width: {{ progress_orders }}%; min-width: 5%;"></div>
                         </div>
                     </div>
+                </div>
+                <div class="box">
+                    <div class="stat-card1">
+                        <div class="stat-icon stat-icon-green">
+                            <i class="fas fa-coins fa-lg" style="color: green;"></i>
+                        </div>
+                        <p class="stat-title">Total Profit (Today)</p>
+                        <p class="stat-value">₹{{ daily_profit }}</p>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-green" style="width: 100%; min-width: 5%;"></div>
+                        </div>
+                    </div>
                 </div>        
             </div>
         </div>
 
     </div>
     <div class="part">
-        <div class="graph-box">
+        <div class="graph-box" id="sale-chart">
             <div class="sales-box">
                 <a href="{% url 'adminside:reports' %}" class="btn-report">View Report</a>
                 <div class="sales-container">
                     <p class="sales-title">Daily Sales</p>
-                    <p class="sales-value">2,568</p>
-                    <p class="sales-percentage">↑ 2.1% vs last week</p>
+                    <p class="sales-value">₹{{ today_income }}</p>
+                    <!-- <p class="sales-percentage">↑ 2.1% vs last week</p> -->
                 </div>
                 <div class="chart-container">
                     <canvas id="salesChart"></canvas>
                 </div>
             </div>
         </div>
-        <div class="graph-box">
+        <!-- <div class="graph-box">
             <div class="stat-card-income">
                 <p class="sales-title">Total Income</p>
                 <div class="donut-chart-container">
@@ -71,20 +85,53 @@
                 data-sales-data='{{ sales_data|safe }}'></div>
                 </div>
             </div>
+        </div> -->
+        <div class="graph-box" id="category-chart">
+            <div class="stat-card-income">
+                <p class="sales-title">Sales by Category</p>
+                <div class="chart-container">
+                    <canvas id="categoryPieChart"></canvas>
+                </div>
+            </div>
         </div>
         
     </div>
     <div class="part">
+        <div class="graph-box" id="order-chart">
+            <div class="sales-box">
+                <div class="sales-container">
+                    <p class="sales-title">Orders - Last 7 Days</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="ordersChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="graph-box"id="visitor-chart">
+            <div class="sales-box" >
+                <div class="sales-container">
+                    <p class="sales-title">Visitors by Hour - Last 7 Days</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="dayHourChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="part">
         <div class="detail-box">
             <div class="da-box flex flex-column">
-                <div class="flex flex-row">
-                <p class="sales-title">Trending Dishes</p>
-                <select id="trendingDishesDropdown" class="dropdown">
-                    <option value="today">Today</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="yearly">Yearly</option>
-                </select>
-                </div>
+                
+                    <div class="trending-dish flex">
+                        <form method="get" id="filterForm">
+                        <p class="sales-title">Trending Dishes</p>
+                        <select name="filter" id="trendingDishesDropdown" class="dropdown" onchange="document.getElementById('filterForm').submit();">
+                            <option value="today" {% if request.GET.filter == "today" %}selected{% endif %}>Today</option>
+                            <option value="monthly" {% if request.GET.filter == "monthly" %}selected{% endif %}>Monthly</option>
+                            <option value="yearly" {% if request.GET.filter == "yearly" %}selected{% endif %}>Yearly</option>
+                        </select>
+                        </form>
+                    </div>
                 <table class="table">
                     <thead>
                         <tr>
@@ -110,7 +157,7 @@
             </div>
         </div>
         <div class="detail-box">
-            <div class="da-box best-employee-container flex flex-column">
+            <div class="da-box ">
                     <p class="sales-title">Best Employee</p>
                     <!-- <select id="bestEmployeeDropdown" class="dropdown">
                         <option value="today">Today</option>
@@ -143,5 +190,162 @@
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Wave (Line) Chart for Daily Income
+const salesCtx = document.getElementById('salesChart').getContext('2d');
+const salesChart = new Chart(salesCtx, {
+    type: 'line',  // changed from 'bar' to 'line'
+    data: {
+        labels: {{ sales_dates|safe }},
+        datasets: [{
+            label: 'Daily Income (Wave)',
+            data: {{ sales_totals|safe }},
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.5,  // controls wave smoothness (0 = sharp, 1 = smooth)
+            pointRadius: 3,
+            pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    precision: 0
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                position: 'top'
+            },
+            title: {
+                display: true,
+                text: 'Daily Income (Wave Chart)'
+            }
+        }
+    }
+});
+
+// Pie Chart
+const categoryCtx = document.getElementById('categoryPieChart').getContext('2d');
+const categoryPieChart = new Chart(categoryCtx, {
+    type: 'pie',
+    data: {
+        labels: {{ category_labels|safe }},
+        datasets: [{
+            label: 'Category-wise Sales',
+            data: {{ category_values|safe }},
+            backgroundColor: [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                '#FF9F40', '#66D9E8', '#F4A261', '#2A9D8F', '#E76F51'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'right',
+            },
+            title: {
+                display: true,
+                text: 'Total Sold Items by Category'
+            }
+        }
+    }
+});
+
+    const ctx = document.getElementById('ordersChart').getContext('2d');
+
+    const ordersChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ orders_dates|safe }},
+            datasets: [{
+                label: 'Total Orders',
+                data: {{ orders_counts|safe }},
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1,
+                borderRadius: 5,
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0  // Show whole numbers
+                    }
+                }
+            }
+        }
+    });
+
+    // Visitors by Hour - Last 7 Days (Multi-line Chart)
+const dayHourCtx = document.getElementById('dayHourChart').getContext('2d');
+
+const hourLabels = {{ hour_labels|safe }};
+const visitorsData = {{ day_hour_chart_data|safe }};
+
+const visitorDatasets = visitorsData.map(day => ({
+    label: day.day,
+    data: day.data,
+    borderColor: day.color,
+    backgroundColor: day.color,
+    fill: false,
+    tension: 0.3
+}));
+
+const dayHourChart = new Chart(dayHourCtx, {
+    type: 'line',
+    data: {
+        labels: hourLabels,
+        datasets: visitorDatasets
+    },
+    options: {
+        responsive: true,
+        interaction: {
+            mode: 'index',
+            intersect: false
+        },
+        stacked: false,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Visitors by Hour (Last 7 Days)'
+            },
+            legend: {
+                position: 'bottom'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Visitors (Orders)'
+                }
+            },
+            x: {
+                title: {
+                    display: true,
+                    text: 'Hour of Day'
+                }
+            }
+        }
+    }
+});
+
+
+</script>
 
 <script src="{% static 'js/dashboard_scripts.js' %}"></script>

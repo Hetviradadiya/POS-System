@@ -14,6 +14,25 @@
   width: 30%;
 }
 
+.detail-box{
+  width: 50%;
+}
+
+#sale-chart{
+  width: 60%;
+}
+
+#category-chart{
+  width: 40%;
+}
+
+#order-chart{
+  width: 50%;
+}
+
+#visitor-chart{
+  width: 50%;
+}
 
 
 .dashboard-container {
@@ -26,7 +45,7 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   position: relative;
   text-align: left;
-  width: 580px;
+  width: 100%;
   height: 347px;
 }
 
@@ -52,6 +71,7 @@
   margin: 0px;
   font-size: 15px;
   font-weight: 700;
+  margin-bottom: 10px;
 }
 .value{
   position: absolute;
@@ -74,7 +94,7 @@
 
 .chart-container {
   width: 100%;
-  height: 200px;
+  height: 80%;
 
   display: flex;
   justify-content: center;
@@ -169,7 +189,7 @@ h21 {
 }
 
 .stat-title {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 600;
   margin-bottom: 5px;
   color: #555;
@@ -215,7 +235,9 @@ h21 {
 
 .da-box {
   width: 100%;
+  height: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
   background: #fff;
@@ -223,20 +245,25 @@ h21 {
   padding: 15px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
 .best-employee-container {
   margin-left: -7px;
-}
-
-.sales-title {
-  margin: 0px;
-  font-size: 15px;
-  font-weight: 700;
 }
 
 .dropdown {
   float: right;
   padding: 5px;
   font-size: 14px;
+}
+.trending-dish{
+  width: 100%;
+}
+#filterForm{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 20px 0 20px;
 }
 
 @media (max-width: 1246px) and (min-width: 1218px) {
@@ -281,15 +308,6 @@ h21 {
     gap: 10px;
   }
 
-  .stat-card-income {
-    width: 500px;
-  }
-
-  .stat-card1 {
-    width: 500px !important;
-    height: auto !important;
-  }
-
   .donut-chart-container {
     height: auto;
   }
@@ -304,4 +322,51 @@ h21 {
   .best-employee-container {
     margin-left: 0px;
   }
+}
+@media (max-width: 970px) and (min-width: 770px){
+  .part{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .box{
+  width: 100%;
+}
+
+.detail-box{
+  width: 100%;
+}
+
+#sale-chart{
+  width: 100%;
+}
+
+#category-chart{
+  width: 100%;
+}
+}
+
+@media (max-width: 760px){
+  .part{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .box{
+  width: 100%;
+}
+
+.detail-box{
+  width: 100%;
+}
+
+#sale-chart{
+  width: 100%;
+}
+
+#category-chart{
+  width: 100%;
+}
 }

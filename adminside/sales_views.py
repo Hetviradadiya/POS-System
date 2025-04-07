@@ -34,7 +34,7 @@ def render_page(request, template, data=None):
 def reports(request):
     filter_type = request.GET.get("filter", "all")
     today = date.today()
-    
+
     # Filtering logic
     if filter_type == "all":
         sales_data = SalesReport.objects.all()
@@ -57,18 +57,18 @@ def reports(request):
         sale_date = sale.sale_date.date()
         branch_name = sale.branch.branch_name if sale.branch else "N/A"
         staff_name = sale.staff
-        items = sale.order.ordered_items.split(",")
+        items = sale.order.ordered_items.split(",") if sale.order and sale.order.ordered_items else []
 
         for item in items:
-            parts = item.split("-")
-            if len(parts) == 3:  # Ensure correct format (name-size-quantity)
-                product_name, _, quantity = parts
+            parts = item.strip().split("-")
+            if len(parts) == 3:  # Format: name-quantity-price
+                product_name, quantity, _ = parts
                 try:
-                    quantity = int(quantity)  # Convert quantity to integer
+                    quantity = int(quantity)
                 except ValueError:
-                    quantity = 1  # Default to 1 if quantity is missing or invalid
+                    quantity = 1  # Default to 1 if invalid
 
-                grouped_sales[sale_date][branch_name][staff_name][product_name] += quantity  # Sum quantities
+                grouped_sales[sale_date][branch_name][staff_name][product_name] += quantity
 
     final_sales_data = []
 
@@ -84,16 +84,23 @@ def reports(request):
             for staff_name, products in staff_data.items():
                 staff_rowspans[sale_date][branch_name][staff_name] = len(products)
 
-                for product_name, total_quantity in products.items():
+                for idx, (product_name, total_quantity) in enumerate(products.items()):
                     final_sales_data.append({
                         "sale_date": sale_date,
                         "branch_name": branch_name,
                         "staff_name": staff_name,
                         "product_name": product_name,
                         "total_quantity": total_quantity,
-                        "date_rowspan": date_rowspans[sale_date] if branch_name == list(branches.keys())[0] and staff_name == list(staff_data.keys())[0] and product_name == list(products.keys())[0] else 0,
-                        "branch_rowspan": branch_rowspans[sale_date][branch_name] if staff_name == list(staff_data.keys())[0] and product_name == list(products.keys())[0] else 0,
-                        "staff_rowspan": staff_rowspans[sale_date][branch_name][staff_name] if product_name == list(products.keys())[0] else 0,
+                        "date_rowspan": date_rowspans[sale_date] if (
+                            branch_name == list(branches.keys())[0] and
+                            staff_name == list(staff_data.keys())[0] and
+                            idx == 0
+                        ) else 0,
+                        "branch_rowspan": branch_rowspans[sale_date][branch_name] if (
+                            staff_name == list(staff_data.keys())[0] and
+                            idx == 0
+                        ) else 0,
+                        "staff_rowspan": staff_rowspans[sale_date][branch_name][staff_name] if idx == 0 else 0,
                     })
 
     context = {

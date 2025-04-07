@@ -25,100 +25,119 @@ def render_page(request, template, data=None):
     return render(request, "staffside/base.html", data)
 
 
+
 def orders(request):
     today = date.today()
-    orders_by_table = {}  # Store orders grouped by table
-    tables = Table.objects.filter(order__isnull=False).distinct()  # Get tables that have orders
+    orders_by_table = {}
+
+    staff_id = request.session.get("staff_id")
+    branch_id = request.session.get("branch")
+
+    if not branch_id:
+        return HttpResponse("No branch assigned", status=400)
+
+    branch_instance = Branch.objects.filter(branch_id=branch_id).first()
+    if not branch_instance:
+        return HttpResponse("Invalid branch", status=400)
+
+    # Get only tables with pending orders in the current branch
+    tables = Table.objects.filter(
+        order__branch=branch_instance,
+        order__status="pending"
+    ).distinct()
 
     for table in tables:
-        order = Order.objects.filter(table=table, status="pending").first()  # Get latest pending order for the table
+        order = Order.objects.filter(
+            table=table,
+            branch=branch_instance,
+            status="pending"
+        ).first()
         if order:
-            # Convert ordered_items string to a list
             ordered_items_list = [
                 item.split("-") for item in order.ordered_items.split(",") if item
             ]
 
             orders_by_table[table.table_id] = {
-                "order_id":order.order_id,
+                "order_id": order.order_id,
                 "items": ordered_items_list,
                 "price": order.price,
                 "quantity": order.quantity,
-                "status":order.status,
+                "status": order.status,
                 "discount": order.discount,
             }
 
-            # print("orderId:" ,order.order_id)
-
-     # Get logged-in staff details from session
-    staff_id = request.session.get("staff_id")
-    branch = request.session.get("branch", "Unknown")  # Default to "Unknown" if not found
-
+    staff_name = "Unknown"
     if staff_id:
         staff = Staff.objects.filter(staff_id=staff_id).first()
-        staff_name = staff.staff_username if staff else "Unknown"
-    else:
-        staff_name = "Unknown"
-     # Handle form submission when "Confirm" is clicked
+        if staff:
+            staff_name = staff.staff_username
+
     if request.method == "POST":
         order_id = request.POST.get("order_id")
-        branch = request.session.get("branch")  # Get branch from session
-        print("branch_id",branch)
-        branch_instance = Branch.objects.get(branch_id=branch)
-        if not branch_instance:
-            return HttpResponse("No branch assigned", status=400)
-        
-        discount_value = request.POST.get("discount", "0")  # Get discount from form
-        print(f"Discount Received: {discount_value}")
+        discount_value = request.POST.get("discount", "0")
+
         try:
-            discount_value = Decimal(discount_value)  # Convert to Decimal
+            discount_value = Decimal(discount_value)
         except:
             discount_value = Decimal("0")
 
-        # Fetch the order and update status
         try:
-            order = Order.objects.get(order_id=order_id)
+            order = Order.objects.get(order_id=order_id, branch=branch_instance)
             order.status = "Done"
-            order.discount = discount_value  # Save discount in the order
+            order.discount = discount_value
+            discount_amount = order.price * (discount_value / Decimal("100"))
+            order.price = order.price - discount_amount
             order.save()
 
+            for item in order.ordered_items.split(","):
+                if item:
+                    try:
+                        name, quantity, price = item.split("-")
+                        quantity = int(quantity)
+                    except ValueError:
+                        continue
 
-            # Store order in SalesReport (adminside)
+                    purchase = Purchase.objects.filter(
+                        food_item=name,
+                        branch=branch_instance
+                    ).first()
+                    if not purchase:
+                        continue
+
+                    inventory = Inventory.objects.filter(
+                        food_item=purchase,
+                        branch=branch_instance
+                    ).first()
+                    if inventory:
+                        inventory.quantity -= quantity
+                        inventory.quantity = max(inventory.quantity, 0)
+                        inventory.save()
+
             SalesReport.objects.create(
-                order=order,  # Store order reference
-                quantity_sold=order.quantity,  
-                branch=branch_instance,  # Fetched from session
+                order=order,
+                quantity_sold=order.quantity,
+                branch=branch_instance,
                 customer=order.customer.customer_name if order.customer else "Unknown",
-                staff=staff_name,  # Fetched from session
-                sale_date=order.created_at,  
+                staff=staff_name,
+                sale_date=order.created_at,
             )
 
-            # Delete all cart items for this table
             Cart.objects.filter(table_id=order.table).delete()
-
-            # Store the table_id in session to trigger print after reload
             request.session["print_table_id"] = order.table.table_id
+            return redirect(f"/staffside/bill_page/{order.table.table_id}/")
 
-            print("table_id which is send to bill_page",order.table.table_id)
-
-            return redirect(f"/staffside/bill_page/{order.table.table_id}/")  # Reload the page 
         except Order.DoesNotExist:
-            pass  # Handle case where order doesn't exist
+            return HttpResponse("Order not found", status=404)
 
-
-    branch = request.session.get("branch")  # Get branch from session
-
-    if not branch:
-        return HttpResponse("No branch assigned", status=400)
-
-    # Filter orders based on available data
+    #  Get only today's orders from this branch
     orders_today = Order.objects.filter(
         created_at__date=today,
-        branch=branch
+        branch=branch_instance
     ).order_by("-created_at")
 
     context = {
         "orders_by_table": orders_by_table,
-        "orders_today" : orders_today,
+        "orders_today": orders_today,
     }
 
     return render_page(request, "staffside/orders.html", context)
@@ -127,57 +146,34 @@ def orders(request):
 def bill_page(request, table_id):
     try:
         order = Order.objects.filter(table_id=table_id, status="Done").latest("created_at")
-        branch = request.session.get("branch")
+        branch_id = request.session.get("branch")
+
         ordered_items_list = []
         total_price = order.price
         discount_value = order.discount
-        discount_rate = discount_value / 100  # Convert discount to percentage
+        discount_rate = discount_value / Decimal(100)
         discount = total_price * discount_rate
-        gst_rate = Decimal("0.05")  # 5% GST
+        gst_rate = Decimal("0.05")
         gst = (total_price - discount) * gst_rate
         final_total = (total_price - discount) + gst
 
-        # Extract product details and fetch actual prices from Inventory
         for item in order.ordered_items.split(","):
             if item:
                 try:
-                    name, size, quantity = item.split("-")
-                    quantity = int(quantity)  # Convert to integer
+                    name, quantity, total_item_price = item.split("-")
+                    quantity = int(quantity)
+                    total_item_price = Decimal(total_item_price)
+                    rate = total_item_price / quantity if quantity else 0
+                    amount = total_item_price
                 except ValueError:
-                    continue  # Skip invalid data
+                    continue
 
-                # Step 1: Find the Purchase record matching food_item name and branch
-                purchase = Purchase.objects.filter(food_item=name, branch=branch).first()
+                ordered_items_list.append([name, quantity, rate, amount])
 
-                print("purchase",purchase)
-
-                # Step 2: Find the corresponding Inventory record (where Inventory.food_item = Purchase)
-                base_price = 0
-                if purchase:
-                    inventory = Inventory.objects.filter(food_item=purchase, branch=branch).first()
-                    print("inventory",inventory)
-                    base_price = inventory.sell_price if inventory else 0  # Get the sell price from Inventory
-
-                # Adjust price based on size
-                if size.lower() == "small":
-                    rate_per_unit = base_price * Decimal(0.8)  # 20% less
-                elif size.lower() == "medium":
-                    rate_per_unit = base_price  # Same price
-                elif size.lower() == "large":
-                    rate_per_unit = base_price * Decimal(1.2)  # 20% more
-                else:
-                    rate_per_unit = base_price  # Default case (if size is unexpected)
-
-                # Calculate total amount correctly
-                total_amount = rate_per_unit * Decimal(quantity)
-
-                ordered_items_list.append([name, quantity, rate_per_unit, total_amount])
-
-        branch_id = request.session.get("branch")
         branch = Branch.objects.filter(branch_id=branch_id).first() if branch_id else None
         branch_name = branch.branch_name if branch else "Unknown"
         branch_location = branch.branch_location if branch else "Unknown"
-        branch_phone_no = branch.branch_phone_no 
+        branch_phone_no = branch.branch_phone_no if branch else "N/A"
 
         context = {
             "order": order,

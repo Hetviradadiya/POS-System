@@ -86,6 +86,10 @@ def pos(request, table_id=None):
                     product = get_object_or_404(Inventory, inventory_id=product_id)
                     table = get_object_or_404(Table, table_id=table_id) if table_id else None
 
+                    # Check inventory quantity
+                    if product.quantity <= 0:
+                        messages.error(request, "Inventory not available for this product.")
+                        return redirect(f"{reverse('staffside:pos')}?table_id={table_id}")
                     
                     cart_item, created = Cart.objects.get_or_create(
                         table=table,
@@ -149,7 +153,7 @@ def pos(request, table_id=None):
 
                 # Convert cart items to a custom text format (e.g., "product_id|size|quantity,product_id|size|quantity")
                 ordered_items_str = ",".join([
-                    f"{item.order_item}-{item.size}-{item.quantity}"
+                    f"{item.order_item}-{item.quantity}-{item.price * item.quantity}"
                     for item in cart_items
                 ])
 
