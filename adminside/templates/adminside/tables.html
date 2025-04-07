@@ -30,6 +30,8 @@
       
     </div>
   </div>
+  {% if request.session.staff_role != "manager" %}
+    <!-- Show dropdown for admin or other roles -->
       <form id="branchForm" method="GET" action="{% url 'adminside:tables' %}">
         {%csrf_token%}
   <label for="branchSelect"><strong>Select Branch:</strong></label>
@@ -43,6 +45,10 @@
   </select>
   <!-- <input type="hidden" id="hiddenBranchInput" name="branch_id" value="{{ selected_branch }}"> -->
 </form>
+{% else %}
+    <!-- Optional: Show only label or static text -->
+    <p>Branch: {{ request.session.branch_name }}</p>
+{% endif %}
 
   <button class="open-button add-table-button rounded-3" onclick="openForm()">
     <span class="btn-text">

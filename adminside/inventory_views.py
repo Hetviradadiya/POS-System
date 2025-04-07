@@ -191,10 +191,21 @@ def render_page(request, template, data=None):
 
 
 def inventory(request):
-    purchase_list = Purchase.objects.all()
-    branches = Branch.objects.all()
+    staff_role = request.session.get("staff_role")
+    branch_id = request.session.get("branch")  # From session
+    
+    # Filter data based on manager's branch
+    if staff_role == "manager":
+        purchase_list = Purchase.objects.filter(branch__branch_id=branch_id)
+        branches = Branch.objects.filter(branch_id=branch_id)
+        food_items = Inventory.objects.filter(branch__branch_id=branch_id)
+    else:
+        purchase_list = Purchase.objects.all()
+        branches = Branch.objects.all()
+        food_items = Inventory.objects.all()
+
+
     categories = Categories.objects.all()
-    food_items = Inventory.objects.all()
     form = InventoryForm()
 
     context = {
@@ -378,5 +389,15 @@ def delete_fooditem(request, inventory_id):
 
 def fooditems(request):
     context={}
-    context['food_items'] = Inventory.objects.all()  # Fetch only stored food items from inventory
+    staff_role = request.session.get("staff_role")
+    branch_id = request.session.get("branch")
+
+    if staff_role == "manager":
+        food_items = Inventory.objects.filter(branch__branch_id=branch_id)
+    else:
+        food_items = Inventory.objects.all()
+
+    context = {
+        "food_items": food_items
+    }
     return render_page(request, 'adminside/fooditems.html',context)

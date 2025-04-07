@@ -47,8 +47,16 @@ def tables(request):
     print("selected_branch",selected_branch)
     branches = Branch.objects.all()
 
+    staff_role = request.session.get("staff_role")
+
     tables = []
-    if selected_branch:
+    if staff_role == "manager":
+        manager_branch_id = request.session.get("branch")
+        if manager_branch_id:
+            selected_branch = str(int(manager_branch_id))
+            branches = Branch.objects.filter(branch_id=selected_branch)
+            tables = Table.objects.filter(branch_id=selected_branch)
+    elif selected_branch:
         try:
             selected_branch = str(int(selected_branch))  # ensure it's valid
             tables = Table.objects.filter(branch_id=selected_branch)

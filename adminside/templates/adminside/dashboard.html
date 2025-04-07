@@ -55,7 +55,7 @@
                         <p class="stat-title">Total Profit (Today)</p>
                         <p class="stat-value">₹{{ daily_profit }}</p>
                         <div class="progress">
-                            <div class="progress-bar progress-bar-green" style="width: 100%; min-width: 5%;"></div>
+                            <div class="progress-bar progress-bar-green" style="width: {{ progress_profit }}%; min-width: 5%;"></div>
                         </div>
                     </div>
                 </div>        
@@ -132,6 +132,7 @@
                         </select>
                         </form>
                     </div>
+
                 <table class="table">
                     <thead>
                         <tr>

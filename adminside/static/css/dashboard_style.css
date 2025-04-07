@@ -250,6 +250,7 @@ h21 {
   margin-left: -7px;
 }
 
+
 .dropdown {
   float: right;
   padding: 5px;
@@ -345,6 +346,13 @@ h21 {
 #category-chart{
   width: 100%;
 }
+#order-chart{
+  width: 100%;
+}
+
+#visitor-chart{
+  width: 100%;
+}
 }
 
 @media (max-width: 760px){
@@ -367,6 +375,13 @@ h21 {
 }
 
 #category-chart{
+  width: 100%;
+}
+#order-chart{
+  width: 100%;
+}
+
+#visitor-chart{
   width: 100%;
 }
 }

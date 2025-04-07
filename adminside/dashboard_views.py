@@ -10,6 +10,7 @@ from django.db.models import Sum
 from collections import Counter
 from django.db.models import Count
 from django.db.models.functions import TruncDate
+from django.db.models.functions import ExtractHour
 
 def render_page(request, template, data=None):
     data=data or {}
@@ -54,40 +55,34 @@ def dashboard(request):
     elif filter_type == "yearly":
         sales_data = sales_data.filter(sale_date__year=now().year)
 
-    # # Dish sales and staff tracking
-    # dish_counter = Counter()
-    # dish_prices = {}
-    # total_sales_count = 0
-    # staff_sales_count = Counter()
+        # Total Profit and Income of the Day
+    daily_profit = 0
+    today_income = 0
+    today = now().date()
+    daily_sales_reports = SalesReport.objects.filter(sale_date__date=today)
 
-    # for sale in sales_data:
-    #     if sale.order and sale.order.ordered_items:
-    #         ordered_items = sale.order.ordered_items.split(",")
-    #         for item in ordered_items:
-    #             parts = item.strip().split("-")
-    #             if len(parts) == 3:
-    #                 dish_name, quantity, price = parts[0].strip(), parts[1].strip(), parts[2].strip()
-    #                 try:
-    #                     quantity = int(quantity)
-    #                     price = float(price)
-    #                 except ValueError:
-    #                     continue
-    #                 dish_counter[dish_name] += quantity
-    #                 total_sales_count += quantity
-    #                 dish_prices[dish_name] = price
-    #                 staff_sales_count[sale.staff] += quantity
+    for report in daily_sales_reports:
+        if report.order and report.order.ordered_items:
+            today_income += float(report.order.price)
+            items = report.order.ordered_items.split(",")
+            for item in items:
+                try:
+                    name, quantity, selling_price = item.strip().split("-")
+                    quantity = int(quantity)
+                    selling_price = float(selling_price)
 
-    # # Trending dishes
-    # threshold = total_sales_count * 0.2
-    # trending_dishes = sorted(
-    #     [
-    #         {"ordered_items": dish, "price": dish_prices.get(dish, 0), "count": count}
-    #         for dish, count in dish_counter.items()
-    #         if count >= threshold
-    #     ],
-    #     key=lambda x: x["count"],
-    #     reverse=True
-    # )
+                    inventory_item = Inventory.objects.filter(
+                        food_item__food_item__iexact=name.strip()
+                    ).select_related("food_item").first()
+
+                    if inventory_item:
+                        cost_price = float(inventory_item.food_item.cost_price)
+                        profit = (selling_price - cost_price) * quantity
+                        daily_profit += profit
+                except:
+                    continue
+    max_profit = 5000  # set your target profit for full bar
+    progress_profit = min((daily_profit / max_profit) * 100, 100)
 
     # Top 5 most sold dishes based on quantity (no threshold)
     dish_counter = Counter()
@@ -164,32 +159,6 @@ def dashboard(request):
     sales_dates = [entry['date'].strftime("%Y-%m-%d") for entry in daily_sales]
     sales_totals = [float(entry['total']) for entry in daily_sales]
 
-    # Total Profit and Income of the Day
-    daily_profit = 0
-    today_income = 0
-    today = now().date()
-    daily_sales_reports = SalesReport.objects.filter(sale_date__date=today)
-
-    for report in daily_sales_reports:
-        if report.order and report.order.ordered_items:
-            today_income += float(report.order.price)
-            items = report.order.ordered_items.split(",")
-            for item in items:
-                try:
-                    name, quantity, selling_price = item.strip().split("-")
-                    quantity = int(quantity)
-                    selling_price = float(selling_price)
-
-                    inventory_item = Inventory.objects.filter(
-                        food_item__food_item__iexact=name.strip()
-                    ).select_related("food_item").first()
-
-                    if inventory_item:
-                        cost_price = float(inventory_item.food_item.cost_price)
-                        profit = (selling_price - cost_price) * quantity
-                        daily_profit += profit
-                except:
-                    continue
 
     # Last 7 Days Orders Chart (date vs total orders)
     last_7_days = now().date() - timedelta(days=6)
@@ -206,8 +175,6 @@ def dashboard(request):
     orders_counts = [entry['order_count'] for entry in last_7_days_orders]
     
     # Today visitor chart to show which time visitor more come
-
-    from django.db.models.functions import ExtractHour
 
     today = now().date()
     seven_days_ago = today - timedelta(days=6)
@@ -248,6 +215,7 @@ def dashboard(request):
         "sales_dates": sales_dates,
         "sales_totals": sales_totals,
         "daily_profit": round(daily_profit, 2),
+        "progress_profit": progress_profit,
         "today_income": round(today_income, 2),
         "orders_dates": orders_dates,
         "orders_counts": orders_counts,

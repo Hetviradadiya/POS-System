@@ -27,6 +27,8 @@ def render_page(request, template, data=None):
 
 def purchase(request):  
     context = {}
+    staff_role = request.session.get("staff_role")
+    branch_id = request.session.get("branch")
 
     if request.method == "POST":
         purchase_id = request.POST.get("purchase_id", "").strip()
@@ -87,9 +89,16 @@ def purchase(request):
         form = PurchaseForm()
 
     context["form"] = form
-    context["branches"] = Branch.objects.all() 
+
+    # Filter branches and purchases based on staff role
+    if staff_role == "manager":
+        context["branches"] = Branch.objects.filter(branch_id=branch_id)
+        context["purchase_list"] = Purchase.objects.filter(branch__branch_id=branch_id)
+    else:
+        context["branches"] = Branch.objects.all()
+        context["purchase_list"] = Purchase.objects.all()
+        
     context["suppliers"] = Supplier.objects.all()
-    context["purchase_list"] = Purchase.objects.all() 
     return render_page(request, 'adminside/purchase.html',context)
 
 def delete_purchase(request, purchase_id):

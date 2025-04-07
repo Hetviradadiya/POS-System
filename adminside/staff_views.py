@@ -109,8 +109,17 @@ def staff(request):
     else:
         form = StaffForm()
 
-    context["branches"] = Branch.objects.all()  # Get all registered branches
-    context["staff_list"] = Staff.objects.all()  # Fetch all staff records
+
+
+    staff_role = request.session.get("staff_role")
+    branch_id = request.session.get("branch")
+
+    if staff_role == "manager":
+        context["staff_list"] = Staff.objects.filter(branch__branch_id=branch_id)
+        context["branches"] = Branch.objects.filter(branch_id=branch_id)
+    else:
+        context["staff_list"] = Staff.objects.all() # Fetch all staff records
+        context["branches"] = Branch.objects.all()  # Get all registered branches
 
     return render_page(request, "adminside/staff.html", context)
 

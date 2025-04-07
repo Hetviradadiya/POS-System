@@ -83,7 +83,13 @@ def branches(request):
         form = BranchForm()
 
     context["form"] = form
-    context["branches"] = Branch.objects.all()
+    staff_role = request.session.get("staff_role")
+    branch_id = request.session.get("branch")
+
+    if staff_role == "manager":
+        context["branches"] = Branch.objects.filter(branch_id=branch_id)
+    else:
+        context["branches"] = Branch.objects.all()
     return render_page(request, "adminside/branches.html", context)
 
 def delete_branch(request, branch_id):
