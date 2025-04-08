@@ -119,7 +119,6 @@ def orders(request):
                 branch=branch_instance,
                 customer=order.customer.customer_name if order.customer else "Unknown",
                 staff=staff_name,
-                sale_date=order.created_at,
             )
 
             Cart.objects.filter(table_id=order.table).delete()

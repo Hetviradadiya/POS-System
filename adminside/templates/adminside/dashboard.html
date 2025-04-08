@@ -12,8 +12,16 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/billboard.js/1.10.1/billboard.min.css">
 
 <div class="dashboard-container">
-    <div class="row title-row">
+    <div class="title-row">
         <h2>DASHBOARD</h2>
+
+        <form method="get" id="filterForm">
+            <select name="filter" id="trendingDishesDropdown" class="dropdown" onchange="document.getElementById('filterForm').submit();">
+                <option value="today" {% if request.GET.filter == "today" %}selected{% endif %}>Today</option>
+                <option value="monthly" {% if request.GET.filter == "monthly" %}selected{% endif %}>Monthly</option>
+                <option value="yearly" {% if request.GET.filter == "yearly" %}selected{% endif %}>Yearly</option>
+            </select>
+        </form>
     </div>
     <div class="dashboard-body">
         <div class="part">
@@ -123,14 +131,7 @@
             <div class="da-box flex flex-column">
                 
                     <div class="trending-dish flex">
-                        <form method="get" id="filterForm">
                         <p class="sales-title">Trending Dishes</p>
-                        <select name="filter" id="trendingDishesDropdown" class="dropdown" onchange="document.getElementById('filterForm').submit();">
-                            <option value="today" {% if request.GET.filter == "today" %}selected{% endif %}>Today</option>
-                            <option value="monthly" {% if request.GET.filter == "monthly" %}selected{% endif %}>Monthly</option>
-                            <option value="yearly" {% if request.GET.filter == "yearly" %}selected{% endif %}>Yearly</option>
-                        </select>
-                        </form>
                     </div>
 
                 <table class="table">

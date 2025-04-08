@@ -192,7 +192,7 @@
         <i class="fa fa-search"></i>
       </button>
     </div>
-    <div class="cart-container p-4">
+    <div class="cart-container p-3 pt-4">
       <div
         class="cart-header d-flex justify-content-between align-items-center"
       >
@@ -223,8 +223,8 @@
       <div id="cart-container" class="cart-items">
     {% if cart_items_with_images %}
         {% for item in cart_items_with_images %}
-        <div class="cart-item d-flex justify-content-between align-items-center p-2">
-            <div class="cart-item-body d-flex align-items-center">
+        <div class="cart-item">
+            <div class="cart-item-body">
                 <!-- Display Product Image -->
                 {% if item.image_url %}
                     <img src="{{ item.image_url }}" alt="{{ item.cart.order_item.inventory_name }}" class="cart-item-img">
@@ -232,30 +232,37 @@
                     <img src="{% static 'images/no-image.png' %}" alt="No Image Available" class="cart-item-img">
                 {% endif %}
 
-                <div class="body-title ml-3">
-                    <h5>{{ item.cart.order_item }}</h5>
-                    <p>Size: {{ item.cart.size }}</p>
+                <div class="body-title">
+                    <div>
+                      <h5>{{ item.cart.order_item }}</h5>
+                      <!-- Quantity Selector -->
+                      <div class="footer-section d-flex align-items-center">
+                          <button type="button" class="btn btn-sm btn-outline-secondary" onclick="updateQuantity('{{ item.cart.cart_id }}', '{{ item.cart.table_id }}', -1)">-</button>
+                          <span class="mx-2" id="quantity-{{ item.cart.cart_id }}">{{ item.cart.quantity }}</span>
+                          <button type="button" class="btn btn-sm btn-outline-secondary" onclick="updateQuantity('{{ item.cart.cart_id }}', '{{ item.cart.table_id }}', 1)">+</button>
+                      </div>
+                    </div>
+                      <div class="body-head">
+                      <p>Size: {{ item.cart.size }}</p>
+                    
                     <p>₹{{ item.cart.price }} x {{ item.cart.quantity }}</p>
+                    </div>
                 </div>
             </div>
-
-            <!-- Quantity Selector -->
-            <div class="footer-section d-flex align-items-center">
-                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="updateQuantity('{{ item.cart.cart_id }}', '{{ item.cart.table_id }}', -1)">-</button>
-                <span class="mx-2" id="quantity-{{ item.cart.cart_id }}">{{ item.cart.quantity }}</span>
-                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="updateQuantity('{{ item.cart.cart_id }}', '{{ item.cart.table_id }}', 1)">+</button>
-
-                <!-- Remove Item Form -->
-                <form method="POST" action="{% url 'staffside:pos' %}" class="ml-2">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="remove_from_cart" />
-                    <input type="hidden" name="cart_id" value="{{ item.cart.cart_id }}" />
-                    <input type="hidden" name="table_id" value="{{ item.cart.table_id }}" />
-                    <button type="submit" class="btn btn-sm">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </form>
+            <div>
+              
+                          <!-- Remove Item Form -->
+                          <form method="POST" action="{% url 'staffside:pos' %}" class="ml-2">
+                              {% csrf_token %}
+                              <input type="hidden" name="action" value="remove_from_cart" />
+                              <input type="hidden" name="cart_id" value="{{ item.cart.cart_id }}" />
+                              <input type="hidden" name="table_id" value="{{ item.cart.table_id }}" />
+                              <button type="submit" class="btn btn-md">
+                                  <i class="fas fa-times"></i>
+                              </button>
+                          </form>
             </div>
+
         </div>
         {% endfor %}
     {% else %}

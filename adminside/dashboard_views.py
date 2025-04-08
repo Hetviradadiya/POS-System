@@ -55,21 +55,25 @@ def dashboard(request):
     elif filter_type == "yearly":
         sales_data = sales_data.filter(sale_date__year=now().year)
 
-        # Total Profit and Income of the Day
+    # Total Profit and Income (based on filter)
     daily_profit = 0
     today_income = 0
-    today = now().date()
-    daily_sales_reports = SalesReport.objects.filter(sale_date__date=today)
 
-    for report in daily_sales_reports:
+    for report in sales_data:
+        # print(report)
         if report.order and report.order.ordered_items:
-            today_income += float(report.order.price)
             items = report.order.ordered_items.split(",")
             for item in items:
                 try:
                     name, quantity, selling_price = item.strip().split("-")
                     quantity = int(quantity)
+                    # print("quentity",quantity)
                     selling_price = float(selling_price)
+
+                    # print("price",selling_price)
+
+                    # Add to income: total selling price
+                    today_income += selling_price 
 
                     inventory_item = Inventory.objects.filter(
                         food_item__food_item__iexact=name.strip()
@@ -77,6 +81,8 @@ def dashboard(request):
 
                     if inventory_item:
                         cost_price = float(inventory_item.food_item.cost_price)
+                        selling_price = selling_price/quantity
+                        # print("selling_price",selling_price)
                         profit = (selling_price - cost_price) * quantity
                         daily_profit += profit
                 except:

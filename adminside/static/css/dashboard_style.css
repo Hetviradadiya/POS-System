@@ -2,6 +2,35 @@
   margin: 0;
   padding: 0;
 }
+.title-row{
+  display: flex;
+  /* justify-content: space-between; */
+  gap: 50px;
+  align-items: center;
+}
+
+#trendingDishesDropdown {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #4E598C; /* background of dropdown */
+    color: white; /* text color */
+    font-size: 16px;
+    cursor: pointer;
+    outline: none;
+}
+
+#trendingDishesDropdown option {
+    background-color: white; /* background of dropdown options */
+    color: black; /* text color inside options */
+}
+
+h2,h1 {
+  text-align: center;
+  font-family: "Verdana", sans-serif;
+  /* font-size: 40px; */
+  margin: 0;
+}
 
 .part{
   margin: 0;
@@ -158,12 +187,6 @@ canvas {
   height: 250px;
 }
 
-h21 {
-  text-align: center;
-  font-family: "Verdana", sans-serif;
-  font-size: 40px;
-}
-
 .stat-card1 {
   background: #fff;
   border-radius: 10px;
@@ -258,12 +281,12 @@ h21 {
 }
 .trending-dish{
   width: 100%;
+  text-align: center;
 }
 #filterForm{
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
   padding: 0 20px 0 20px;
 }
 
