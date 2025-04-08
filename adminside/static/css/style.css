@@ -17,7 +17,7 @@ body {
     top: 0;
     left: 250px;
     right: 0;
-    height: 85px;
+    height: 65px;
     z-index: 1000;
 }
 
@@ -57,7 +57,7 @@ body {
     text-align: center;
     font-size: 20px;
     font-weight: bold;
-    padding: 20px 0;
+    padding: 10px 0;
     color: black;
     border-bottom: 2px solid #555;
     flex-shrink: 0;

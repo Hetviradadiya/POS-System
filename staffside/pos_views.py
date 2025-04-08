@@ -148,17 +148,6 @@ def pos(request, table_id=None):
                     messages.error(request, "Cart is empty. Please add items before placing an order.")
                     return redirect("staffside:pos")
 
-                total_price = sum(item.price * item.quantity for item in cart_items)
-                total_quantity = sum(item.quantity for item in cart_items)
-
-                # Convert cart items to a custom text format (e.g., "product_id|size|quantity,product_id|size|quantity")
-                ordered_items_str = ",".join([
-                    f"{item.order_item}-{item.quantity}-{item.price * item.quantity}"
-                    for item in cart_items
-                ])
-
-                #  Check if an order already exists for this table
-                existing_order = Order.objects.filter(table_id=table_id, status="pending").first()
                 branch_id = request.session.get("branch")
                 if not branch_id:
                     return HttpResponse("No branch assigned", status=400)
@@ -168,16 +157,56 @@ def pos(request, table_id=None):
                 except Branch.DoesNotExist:
                     return HttpResponse("Branch not found", status=400)
 
+                # Check inventory availability
+                insufficient_items = []
+
+                for item in cart_items:
+                    try:
+                        purchase_entry = Purchase.objects.filter(
+                            food_item=item.order_item,
+                            branch=branch_instance
+                        ).first()
+
+                        if not purchase_entry:
+                            insufficient_items.append(f"{item.order_item} (No purchase record found)")
+                            continue
+
+                        inventory_item = Inventory.objects.get(
+                            food_item_id=purchase_entry,
+                            branch=branch_instance
+                        )
+
+                        if item.quantity > inventory_item.quantity:
+                            insufficient_items.append(
+                                f"{item.order_item} (Available: {inventory_item.quantity}, Requested: {item.quantity})"
+                            )
+                    except Purchase.DoesNotExist:
+                        insufficient_items.append(f"{item.order_item} (Not found in purchase records)")
+                    except Inventory.DoesNotExist:
+                        insufficient_items.append(f"{item.order_item} (Not available in inventory)")
+
+                if insufficient_items:
+                    messages.error(request, f"Order failed! Insufficient stock for: {', '.join(insufficient_items)}")
+                    return redirect(f"{reverse('staffside:pos')}?table_id={table_id}")
+
+                # All items are available, proceed with order
+                total_price = sum(item.price * item.quantity for item in cart_items)
+                total_quantity = sum(item.quantity for item in cart_items)
+
+                ordered_items_str = ",".join([
+                    f"{item.order_item}-{item.quantity}-{item.price * item.quantity}"
+                    for item in cart_items
+                ])
+
+                existing_order = Order.objects.filter(table_id=table_id, status="pending").first()
+
                 if existing_order:
-                    #  If order exists, update items instead of replacing
-                    # existing_items = existing_order.ordered_items
-                    existing_order.ordered_items = ordered_items_str  # Append new items
+                    existing_order.ordered_items = ordered_items_str
                     existing_order.price = total_price
                     existing_order.quantity = total_quantity
                     existing_order.save()
                 else:
-                    #  If no order exists, create a new one
-                    order = Order.objects.create(
+                    Order.objects.create(
                         table_id=table_id,
                         ordered_items=ordered_items_str,
                         price=total_price,
@@ -186,8 +215,29 @@ def pos(request, table_id=None):
                         branch=branch_instance,
                     )
 
-                messages.success(request, "Order placed successfully.")
+                # Deduct quantity from Inventory
+                for item in cart_items:
+                    try:
+                        purchase_entry = Purchase.objects.filter(
+                            food_item=item.order_item,
+                            branch=branch_instance
+                        ).first()
 
+                        if not purchase_entry:
+                            continue  # Already handled earlier
+
+                        inventory_item = Inventory.objects.get(
+                            food_item_id=purchase_entry,
+                            branch=branch_instance
+                        )
+
+                        inventory_item.quantity -= item.quantity
+                        inventory_item.save()
+
+                    except Exception as e:
+                        messages.error(request, f"Error updating inventory for {item.order_item}: {e}")
+
+                messages.success(request, "Order placed successfully.")
                 return redirect("staffside:orders")
 
             
