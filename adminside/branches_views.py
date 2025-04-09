@@ -90,6 +90,7 @@ def branches(request):
         context["branches"] = Branch.objects.filter(branch_id=branch_id)
     else:
         context["branches"] = Branch.objects.all()
+    
     return render_page(request, "adminside/branches.html", context)
 
 def delete_branch(request, branch_id):

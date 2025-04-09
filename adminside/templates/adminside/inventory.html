@@ -284,11 +284,11 @@
             />
             {% else %} No Image {% endif %}
           </td>
-          <td>{{ food_item.food_item}}</td>
-          <td>{{ food_item.category}}</td>
+          <td>{{ food_item.food_item.food_item}}</td>
+          <td>{{ food_item.category.categories_name}}</td>
           <td>{{ food_item.description}}</td>
           <td>{{ food_item.quantity}}</td>
-          <td>{{ food_item.branch}}</td>
+          <td>{{ food_item.branch.branch_name}}</td>
           <td>{{ food_item.cost_price}}</td>
           <td>{{ food_item.sell_price}}</td>
           <td>{{ food_item.mfg_date}}</td>
