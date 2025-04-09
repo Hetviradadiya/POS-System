@@ -17,3 +17,21 @@ document.addEventListener("DOMContentLoaded", function () {
     bindto: "#donut-chart",
   });
 });
+
+
+const bellIcon = document.querySelector(".notification");
+const box = document.getElementById("notificationBox");
+
+bellIcon.addEventListener("click", function (event) {
+  event.stopPropagation(); // prevent closing on same click
+  box.style.display = box.style.display === "none" ? "block" : "none";
+});
+
+document.addEventListener("click", function () {
+  box.style.display = "none";
+});
+
+box.addEventListener("click", function (event) {
+  event.stopPropagation(); // prevent box click from closing it
+});
+

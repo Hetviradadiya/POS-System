@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.sessions.models import Session
-from django.utils.timezone import now
+from django.utils.timezone import now,timezone
 from django.contrib import messages
 from adminside.models import*
 from adminside.forms import*
@@ -31,6 +31,21 @@ def home(request):
         else:
             request.session["staff_img"] = None
 
+        today = timezone.now().date()
+
+        if staff_user.staff_role.lower() == "admin":
+            expired_items = Inventory.objects.filter(
+                expiry_date__lt=today
+            ).values("food_item", "exp_date", "branch__branch")
+        else:  # For manager, show only their branch's expired items
+            expired_items = Inventory.objects.filter(
+                expiry_date__lt=today,
+                branch_id=staff_user.branch
+            ).values("food_item", "exp_date")
+
+        print("expiered_items",expired_items)
+        request.session["expired_items"] = list(expired_items)
+        request.session["today_date"] = str(today)
 
         if staff_user.staff_role.lower() != "admin":
             print("User is not an admin, redirecting to login...")

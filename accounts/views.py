@@ -1,24 +1,38 @@
 from django.shortcuts import render, redirect
 # from django.contrib.auth.models import User
-from django.contrib.auth import login, logout, authenticate
-# from django.core.mail import send_mail
+from django.contrib.auth import login, logout
+from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
-from .forms import CustomLoginForm
+from .forms import*
 from adminside.models import Staff
+import re
+import random
+from .models import PasswordResetOTP
+from django.utils.crypto import get_random_string
+from django.utils.timezone import now
 
 
 def loginaccount(request):
     if request.method == "POST":
         form = CustomLoginForm(data=request.POST)
         if form.is_valid():
-            username = form.cleaned_data["username"]  
+            user_input = form.cleaned_data["username"]  # Can be email or username
             password = form.cleaned_data["password"]
-            print(f"Login attempt: {username}")
+            print(f"Login attempt: {user_input}")
 
+            # Determine if input is an email
+            is_email = re.match(r"[^@]+@[^@]+\.[^@]+", user_input)
+            
             try:
-                staff_user = Staff.objects.get(staff_username=username)
+                if is_email:
+                    staff_user = Staff.objects.get(staff_email=user_input)
+                    print("Logging in with email")
+                else:
+                    staff_user = Staff.objects.get(staff_username=user_input)
+                    print("Logging in with username")
+
                 print(f"User found: {staff_user.staff_role}")
 
                 if check_password(password, staff_user.staff_password): 
@@ -81,6 +95,98 @@ def loginaccount(request):
     
     return render(request, "loginaccount.html", {'form': form})
 
+
+def forgot_password(request):
+    if request.method == 'POST':
+        form = ForgotPasswordForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                staff = Staff.objects.get(staff_email=email)
+                otp = get_random_string(length=6, allowed_chars='0123456789')
+
+                PasswordResetOTP.objects.create(staff=staff, otp=otp)
+
+                send_mail(
+                    'Your OTP for Password Reset',
+                    f'Use this OTP to reset your password: {otp}',
+                    'no-reply@example.com',
+                    [email],
+                    fail_silently=False,
+                )
+                return redirect('accounts:verify_otp', staff_id=staff.staff_id)
+            except Staff.DoesNotExist:
+                form.add_error('email', 'No user found with that email.')
+    else:
+        form = ForgotPasswordForm()
+    return render(request, 'forgot_password.html', {'form': form})
+
+
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
+
+def verify_otp(request, staff_id):
+    try:
+        staff = Staff.objects.get(staff_id=staff_id)
+    except Staff.DoesNotExist:
+        messages.error(request, "Invalid request.")
+        return redirect('accounts:forgot_password')
+
+    latest_otp = PasswordResetOTP.objects.filter(staff=staff).order_by('-created_at').first()
+
+    # Handle resend OTP
+    if request.method == 'POST' and 'resend' in request.POST:
+        new_otp = generate_otp()
+        PasswordResetOTP.objects.create(staff=staff, otp=new_otp)
+
+        # Optional: send new OTP via email
+        send_mail(
+            subject="Your OTP Code",
+            message=f"Your OTP is: {new_otp}",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[staff.staff_email],  # Assuming `staff_email` field exists
+            fail_silently=True
+        )
+
+        messages.success(request, "A new OTP has been sent to your email.")
+        return redirect('accounts:verify_otp', staff_id=staff_id)
+
+    elif request.method == 'POST':
+        entered_otp = ''.join([request.POST.get(f'otp{i}', '') for i in range(1, 7)])
+
+        if not latest_otp:
+            messages.error(request, "No OTP found.")
+        elif latest_otp.is_expired():
+            messages.error(request, "OTP has expired.")
+        elif latest_otp.otp != entered_otp:
+            messages.error(request, "Invalid OTP.")
+        else:
+            return redirect('accounts:reset_password', staff_id=staff_id)
+
+    otp_created_at = latest_otp.created_at if latest_otp else now()
+    return render(request, 'verify_otp.html', {
+        'otp_created_at': otp_created_at,
+    })
+
+def reset_password(request, staff_id):
+    try:
+        staff = Staff.objects.get(staff_id=staff_id)
+    except Staff.DoesNotExist:
+        messages.error(request, "Invalid request.")
+        return redirect('accounts:forgot_password')
+
+    if request.method == 'POST':
+        form = ResetPasswordForm(request.POST)
+        if form.is_valid():
+            staff.staff_password =form.cleaned_data['new_password']
+            print("staff_password",staff.staff_password)
+            staff.save()
+            messages.success(request, "Password reset successfully.")
+            return redirect('accounts:loginaccount')
+    else:
+        form = ResetPasswordForm()
+    return render(request, 'reset_password.html', {'form': form})
 
 
     # def send_confirmation_email(user):

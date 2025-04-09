@@ -41,6 +41,22 @@
       <div class="user-info">
         <!-- <span>{{ request.user.username }}</span> -->
         <span class="notification"><i class="fa-solid fa-bell"></i></span>
+        <div id="notificationBox" style="display: none; position: absolute; top: 70px; right: 20px; width: 300px; background: white; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); z-index: 9999; padding: 10px;">
+        <h6 style="font-weight: bold; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Expired Inventory</h6>
+        {% if request.session.expired_items %}
+          {% for item in request.session.expired_items %}
+            <div style="border-bottom: 1px solid #eee; padding: 5px 0;">
+              <strong>{{ item.name }}</strong><br>
+              Expired: {{ item.expiry_date }}<br>
+              {% if item.branch__branch_name %}
+                <small><i class="fa fa-location-dot"></i> {{ item.branch__branch_name }}</small>
+              {% endif %}
+            </div>
+          {% endfor %}
+        {% else %}
+          <p style="margin: 0;">No expired items.</p>
+        {% endif %}
+      </div>
         <span>{{ request.session.staff_username }}<br />{{ today_date }}</span>
         {% if request.session.staff_img %}
           <img src="{{ request.session.staff_img }}" alt="Staff Image" class="staff-img" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid #ccc;">
