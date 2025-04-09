@@ -3,36 +3,35 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.sessions.models import Session
 from django.utils.timezone import now
 from django.contrib import messages
-from adminside.models import*
-from adminside.forms import*
-from staffside.models import Sales,Order
+from adminside.models import *
+from adminside.forms import *
+from staffside.models import Sales, Order
 from django.db.models import Sum
 from collections import defaultdict
 from datetime import date, timedelta
 import json
 
-
 def render_page(request, template, data=None):
-    data=data or {}
-    # Retrieve session key from URL and apply it
+    data = data or {}
     session_key = request.GET.get("session_key")
     if session_key:
         try:
-            session_data = Session.objects.get(session_key=session_key)  # Fetch session
-            session_store = request.session.__class__(session_key)  # Load session store
-            session_store.load()  # Load session data
-            request.session.update(session_store)  # Apply session data to request.session
+            session_data = Session.objects.get(session_key=session_key)
+            session_store = request.session.__class__(session_key)
+            session_store.load()
+            request.session.update(session_store)
         except Session.DoesNotExist:
             print("Session not found, using default session.")
 
-    # Debug session data
-    # print(f"Current session data in render_page: {request.session.items()}")
-    data.update({"template": template, "today_date": now().strftime("%Y-%m-%d"),"staff_username": request.session.get("staff_username", "Guest"),})
+    data.update({
+        "template": template,
+        "today_date": now().strftime("%Y-%m-%d"),
+        "staff_username": request.session.get("staff_username", "Guest"),
+    })
     return render(request, "adminside/base.html", data)
 
-
 def reports(request):
-    filter_type = request.GET.get("filter", "all")
+    filter_type = request.GET.get("filter", "today")
     today = date.today()
 
     # Filtering logic
@@ -44,6 +43,8 @@ def reports(request):
         sales_data = SalesReport.objects.filter(sale_date__year=today.year, sale_date__month=today.month)
     elif filter_type == "yearly":
         sales_data = SalesReport.objects.filter(sale_date__year=today.year)
+    else:
+        sales_data = SalesReport.objects.none()
 
     sales_data = sales_data.order_by("sale_date", "branch", "staff")
 
@@ -52,7 +53,6 @@ def reports(request):
     branch_rowspans = defaultdict(lambda: defaultdict(int))
     staff_rowspans = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
 
-    # Step 1: Group sales data by date → branch → staff → product
     for sale in sales_data:
         sale_date = sale.sale_date.date()
         branch_name = sale.branch.branch_name if sale.branch else "N/A"
@@ -61,18 +61,16 @@ def reports(request):
 
         for item in items:
             parts = item.strip().split("-")
-            if len(parts) == 3:  # Format: name-quantity-price
+            if len(parts) == 3:
                 product_name, quantity, _ = parts
                 try:
                     quantity = int(quantity)
                 except ValueError:
-                    quantity = 1  # Default to 1 if invalid
-
+                    quantity = 1
                 grouped_sales[sale_date][branch_name][staff_name][product_name] += quantity
 
     final_sales_data = []
 
-    # Step 2: Compute rowspans
     for sale_date, branches in grouped_sales.items():
         total_date_rows = sum(len(products) for staff_data in branches.values() for products in staff_data.values())
         date_rowspans[sale_date] = total_date_rows
@@ -105,5 +103,6 @@ def reports(request):
 
     context = {
         "sales_data": final_sales_data,
+        "selected_filter": filter_type,  # ✅ Ensure dropdown reflects the current filter
     }
     return render_page(request, "adminside/reports.html", context)
