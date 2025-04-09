@@ -157,27 +157,29 @@
                 <td>{{ customer.customer_email|default:"-"}}</td>
                 <td>{{ customer.customer_phone_no|default:"-" }}</td>
                 <td>{{ customer.gender|default:"-" }}</td>
-                <td class="action-buttons">
-            <button
-                class="update-btn"
-                onclick="editcustomer('{{ customer.customer_id }}','{{ customer.customer_firstname}}','{{ customer.customer_lastname}}','{{ customer.customer_address}}','{{ customer.customer_phone_no }}','{{ customer.customer_email}}','{{ customer.gender}}')"
-            >
-                <i class="fas fa-edit"></i>
-            </button>
-            <form
-                method="post"
-                action="{% url 'adminside:delete_customer' customer.customer_id %}"
-                style="display: inline"
-                onsubmit="return confirmDelete(event)"
-            >
-                {% csrf_token %}
-                <button type="submit" class="delete-btn">
-                <i class="fas fa-trash"></i>
-                </button>
-            </form>
-            </td>
-        </tr>
-        {% endfor %}
+                <td>
+                  <div class="action-buttons">
+                    <button
+                        class="update-btn"
+                        onclick="editcustomer('{{ customer.customer_id }}','{{ customer.customer_firstname}}','{{ customer.customer_lastname}}','{{ customer.customer_address}}','{{ customer.customer_phone_no }}','{{ customer.customer_email}}','{{ customer.gender}}')"
+                    >
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <form
+                        method="post"
+                        action="{% url 'adminside:delete_customer' customer.customer_id %}"
+                        style="display: inline"
+                        onsubmit="return confirmDelete(event)"
+                    >
+                        {% csrf_token %}
+                        <button type="submit" class="delete-btn">
+                        <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
         {% else %}
             <tr>
                 <td colspan="8" style="text-align: center;">No customer found. Click 'Add customer' to add one!</td>

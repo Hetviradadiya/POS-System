@@ -12,13 +12,14 @@ function toggleSearch() {
 //search function
 document.getElementById("searchInput").addEventListener("keyup", function () {
   let filter = this.value.toLowerCase().trim();
-  let rows = document.querySelectorAll("#purchaseTableBody tr");
+  let rows = document.querySelectorAll("#foodTableBody tr");
   let matchFound = false;
 
   rows.forEach(function (row) {
     if (row.id === "noDataRow") return;
 
-    let food_item = row.cells[1].textContent.toLowerCase();
+    let food_item = row.cells[2].textContent.toLowerCase();
+    console.log(food_item)
 
     if (food_item.includes(filter)) {
       row.style.display = "";
@@ -35,7 +36,7 @@ document.getElementById("searchInput").addEventListener("keyup", function () {
     if (!noData) {
       noData = document.createElement("tr");
       noData.id = "noDataRow";
-      noData.innerHTML = `<td colspan="9" style="text-align: center;">No data found</td>`; //add no datafound row
+      noData.innerHTML = `<td colspan="12" style="text-align: center;">No data found</td>`; //add no datafound row
       tableBody.appendChild(noData);
     }
   } else {

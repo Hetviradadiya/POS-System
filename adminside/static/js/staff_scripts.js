@@ -17,10 +17,10 @@ document.getElementById("searchInput").addEventListener("keyup", function () {
   rows.forEach(function (row) {
     if (row.id === "noDataRow") return;
 
-    let firstname = row.cells[1].textContent.toLowerCase();
-    let lastname = row.cells[2].textContent.toLowerCase();
+    let fullname = row.cells[2].textContent.toLowerCase();
+    let username = row.cells[3].textContent.toLowerCase();
 
-    if (firstname.includes(filter) || lastname.includes(filter)) {
+    if (fullname.includes(filter) || username.includes(filter)) {
       row.style.display = "";
       matchFound = true;
     } else {
@@ -35,7 +35,7 @@ document.getElementById("searchInput").addEventListener("keyup", function () {
     if (!noData) {
       noData = document.createElement("tr");
       noData.id = "noDataRow";
-      noData.innerHTML = `<td colspan="8" style="text-align: center;">No data found</td>`; //add no datafound row
+      noData.innerHTML = `<td colspan="10" style="text-align: center;">No data found</td>`; //add no datafound row
       tableBody.appendChild(noData);
     }
   } else {

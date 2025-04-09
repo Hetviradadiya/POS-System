@@ -132,6 +132,7 @@
             {% endif %}
           </td>
           <td>
+            <div class="action-buttons">
             <button
               class="update-btn"
               onclick="editCategory('{{ category.categories_id }}', '{{ category.categories_name }}', '{{ category.status }}')"
@@ -149,6 +150,7 @@
                 <i class="fas fa-trash"></i>
               </button>
             </form>
+            </div>
           </td>
         </tr>
         {% endfor %}

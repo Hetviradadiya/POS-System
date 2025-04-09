@@ -170,7 +170,8 @@
             <td>{{ branch.get_manager }}</td>
             <td>{{ branch.branch_phone_no }}</td>
             <td>{{ branch.branch_status }}</td>
-            <td class="action-buttons">
+            <td>
+              <div class="action-buttons">
               <button
                 class="update-btn"
                 onclick="editBranch('{{branch.branch_id}}','{{ branch.branch_name}}','{{ branch.branch_location }}','{{ branch.branch_area }}','{{ branch.branch_phone_no }}','{{ branch.branch_status }}','{{ branch.get_manager }}')"
@@ -188,6 +189,7 @@
                   <i class="fas fa-trash"></i>
                 </button>
               </form>
+              </div>
             </td>
           </tr>
           {% endfor %}

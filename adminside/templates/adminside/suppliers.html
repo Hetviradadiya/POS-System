@@ -126,7 +126,8 @@
                 <td>{{ supplier.supplier_phone_no}}</td>
                 <td>{{ supplier.company_name }}</td>
                 <td>{{ supplier.address }}</td>
-                <td class="action-buttons">
+                <td >
+                    <div class="action-buttons">
             <button
                 class="update-btn"
                 onclick="editsupplier('{{ supplier.supplier_id }}','{{ supplier.supplier_name}}','{{ supplier.supplier_email}}','{{ supplier.supplier_phone_no}}','{{ supplier.company_name }}','{{ supplier.address }}')"
@@ -144,6 +145,7 @@
                 <i class="fas fa-trash"></i>
                 </button>
             </form>
+            </div>
             </td>
         </tr>
         {% endfor %}

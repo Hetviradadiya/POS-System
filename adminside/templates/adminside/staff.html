@@ -195,7 +195,7 @@
           <th>Action</th>
         </tr>
       </thead>
-      <tbody id="staffBody">
+      <tbody id="staffTableBody">
         {% if staff_list %}
         {% for staff in staff_list %}
         <tr>
@@ -216,7 +216,8 @@
           <td>{{ staff.staff_phone_no }}</td>
           <td>{{ staff.staff_role }}</td>
           <td>{{ staff.branch}}</td>
-          <td class="action-buttons">
+          <td>
+            <div class="action-buttons">
             <button
               class="update-btn"
               onclick="editstaff('{{ staff.staff_id }}','{{ staff.staff_img }}','{{ staff.staff_username }}','{{ staff.staff_fullname }}','{{ staff.staff_email }}','{{ staff.staff_password }}','{{ staff.staff_phone_no }}','{{ staff.staff_role }}','{{ staff.branch}}')"
@@ -234,6 +235,7 @@
                   <i class="fas fa-trash"></i>
                 </button>
             </form>
+            </div>
           </td>
         </tr>
         {% endfor %}

@@ -293,7 +293,8 @@
           <td>{{ food_item.sell_price}}</td>
           <td>{{ food_item.mfg_date}}</td>
           <td>{{ food_item.exp_date }}</td>
-          <td class="action-buttons">
+          <td>
+            <div  class="action-buttons">
             <button
               class="update-btn"
               onclick="editfooditem('{{ food_item.inventory_id }}','{{ food_item.image}}','{{food_item.food_item}}','{{ food_item.category}}','{{ food_item.description}}','{{ food_item.quantity}}',
@@ -312,6 +313,7 @@
                 <i class="fas fa-trash"></i>
               </button>
             </form>
+            </div>
           </td>
         </tr>
         {% endfor %} {% else %}

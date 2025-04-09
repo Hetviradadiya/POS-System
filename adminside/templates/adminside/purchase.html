@@ -187,7 +187,8 @@
                 <td>{{ purchase.supplier|default:"-" }}</td>
                 <td>{{ purchase.purchased_date|default:"-" }}</td>
                 <td>{{ purchase.payment_status|default:"-" }}</td>
-                <td class="action-buttons">
+                <td >
+                  <div class="action-buttons">
             <button
                 class="update-btn"
                 onclick="editpurchase('{{ purchase.purchase_id }}','{{ purchase.food_item}}','{{ purchase.quantity}}','{{ purchase.cost_price}}','{{ purchase.branch}}','{{ purchase.supplier}}','{{ purchase.purchased_date}}','{{ purchase.payment_status}}')"
@@ -205,6 +206,7 @@
                 <i class="fas fa-trash"></i>
                 </button>
             </form>
+            </div>
             </td>
         </tr>
         {% endfor %}

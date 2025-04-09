@@ -14,13 +14,15 @@ document.getElementById("searchInput").addEventListener("keyup", function () {
   let filter = this.value.toLowerCase().trim();
   // console.log("Search filter:", filter);
 
-  let productCards = document.querySelectorAll("#product-container .col-md-6");
+  let productCards = document.querySelectorAll(
+    "#product-container .product-col"
+  );
   // console.log("Total product cards found:", productCards.length);
 
   let matchFound = false;
 
   productCards.forEach(function (card, index) {
-    let foodItemElement = card.querySelector(".card-body .card-title");
+    let foodItemElement = card.querySelector(".card-title");
     let foodItemName = foodItemElement
       ? foodItemElement.textContent.toLowerCase().trim()
       : "";
@@ -33,10 +35,10 @@ document.getElementById("searchInput").addEventListener("keyup", function () {
     }
 
     if (foodItemName.includes(filter)) {
-      card.style.setProperty("display", "block", "important"); // ✅ Force show
+      card.style.setProperty("display", "flex", "important"); // Force show
       matchFound = true;
     } else {
-      card.style.setProperty("display", "none", "important"); // ✅ Force hide
+      card.style.setProperty("display", "none", "important"); // Force hide
     }
 
     // console.log(
@@ -65,7 +67,7 @@ document.getElementById("searchInput").addEventListener("keyup", function () {
   // Reset when search is cleared
   if (filter === "") {
     productCards.forEach((card) => {
-      card.style.setProperty("display", "block", "important"); // ✅ Reset visibility
+      card.style.setProperty("display", "flex", "important"); // Reset visibility
     });
     if (noData) noData.remove();
   }
