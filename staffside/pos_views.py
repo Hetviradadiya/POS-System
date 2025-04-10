@@ -78,7 +78,7 @@ def pos(request, table_id=None):
                 # customer = Customer.objects.get(customer_id=customer_id) if customer_id else None
                 if customer_id:
                     customer_id = int(customer_id)
-                print("Received customer_id:", request.POST.get('customer_id'))
+                
 
                 print(f"Table ID: {table_id}, Product ID: {product_id}, Size: {size}, Quantity: {quantity}, Price: {price}")
                 
@@ -187,10 +187,10 @@ def pos(request, table_id=None):
                             insufficient_items.append(f"{item.order_item} (No purchase record found)")
                             continue
 
-                        inventory_item = Inventory.objects.get(
+                        inventory_item = Inventory.objects.filter(
                             food_item_id=purchase_entry,
                             branch=branch_instance
-                        )
+                        ).first()
 
                         if item.quantity > inventory_item.quantity:
                             insufficient_items.append(
