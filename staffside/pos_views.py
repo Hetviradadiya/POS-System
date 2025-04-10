@@ -68,12 +68,17 @@ def pos(request, table_id=None):
 
             # **Handle Add to Cart**
             if action == "add_to_cart":
-                order_type = request.POST.get("order_type")
                 table_id = request.POST.get("table_id")
                 product_id = request.POST.get("product_id")
                 size = request.POST.get("size")
                 quantity = int(request.POST.get("quantity", 1))
                 price = float(request.POST.get("price"))
+                order_type = request.POST.get("order_type")
+                customer_id = request.POST.get("customer_id") or None
+                # customer = Customer.objects.get(customer_id=customer_id) if customer_id else None
+                if customer_id:
+                    customer_id = int(customer_id)
+                print("Received customer_id:", request.POST.get('customer_id'))
 
                 print(f"Table ID: {table_id}, Product ID: {product_id}, Size: {size}, Quantity: {quantity}, Price: {price}")
                 
@@ -95,6 +100,8 @@ def pos(request, table_id=None):
                         table=table,
                         order_item=product,
                         size= size,
+                        order_type=order_type,
+                        customer_id=customer_id,
                         defaults={ "quantity": quantity, "price": price}
                     )
                     if not created:
@@ -104,6 +111,7 @@ def pos(request, table_id=None):
                 
                 return redirect(f"{reverse('staffside:pos')}?table_id={table_id}")
             
+
             elif action == "update_quantity":
                 cart_id = request.POST.get("cart_id")
                 table_id = request.POST.get("table_id")
@@ -137,6 +145,7 @@ def pos(request, table_id=None):
                 print("Table ID for place order:", request.POST.get("table_id"))
 
                 table_id = request.POST.get("table_id")
+                customer_id = request.POST.get("customer_id")
 
                 if not table_id:
                     messages.error(request, "Please select a table before placing an order.")
@@ -156,6 +165,13 @@ def pos(request, table_id=None):
                     branch_instance = Branch.objects.get(branch_id=branch_id)
                 except Branch.DoesNotExist:
                     return HttpResponse("Branch not found", status=400)
+
+                customer = None
+                if customer_id:
+                    try:
+                        customer = Customer.objects.get(customer_id=customer_id)
+                    except Customer.DoesNotExist:
+                        customer = None  # Invalid ID passed
 
                 # Check inventory availability
                 insufficient_items = []
@@ -204,6 +220,7 @@ def pos(request, table_id=None):
                     existing_order.ordered_items = ordered_items_str
                     existing_order.price = total_price
                     existing_order.quantity = total_quantity
+                    existing_order.customer = customer
                     existing_order.save()
                 else:
                     Order.objects.create(
@@ -213,6 +230,7 @@ def pos(request, table_id=None):
                         quantity=total_quantity,
                         status="pending",
                         branch=branch_instance,
+                        customer=customer 
                     )
 
                 # Deduct quantity from Inventory
@@ -249,6 +267,7 @@ def pos(request, table_id=None):
         # Fetch categories and products that belong to the same branch
         categories = Categories.objects.filter(inventory__branch=branch).distinct()
         tables = Table.objects.filter(branch_id=branch)
+        customers = Customer.objects.all()
         
         # print(f"Staff: {staff}")
         # print(f"Branch: {branch}")
@@ -262,6 +281,7 @@ def pos(request, table_id=None):
             'categories': categories,
             'products': products,
             'tables': tables,
+            'customers':customers,
             "cart_items": cart_items, 
             "cart_items_with_images": cart_items_with_images, 
             "selected_table": selected_table,

@@ -64,6 +64,7 @@ def orders(request):
                 "quantity": order.quantity,
                 "status": order.status,
                 "discount": order.discount,
+                "customer": order.customer,
             }
 
     staff_name = "Unknown"
@@ -117,7 +118,7 @@ def orders(request):
                 order=order,
                 quantity_sold=order.quantity,
                 branch=branch_instance,
-                customer=order.customer.customer_name if order.customer else "Unknown",
+                customer=order.customer,
                 staff=staff_name,
             )
 
@@ -144,7 +145,7 @@ def orders(request):
 
 def bill_page(request, table_id):
     try:
-        order = Order.objects.filter(table_id=table_id, status="Done").latest("created_at")
+        order = Order.objects.filter(table_id=table_id).latest("created_at")
         branch_id = request.session.get("branch")
 
         ordered_items_list = []
@@ -168,7 +169,7 @@ def bill_page(request, table_id):
                     continue
 
                 ordered_items_list.append([name, quantity, rate, amount])
-
+        customer = order.customer
         branch = Branch.objects.filter(branch_id=branch_id).first() if branch_id else None
         branch_name = branch.branch_name if branch else "Unknown"
         branch_location = branch.branch_location if branch else "Unknown"
@@ -176,6 +177,7 @@ def bill_page(request, table_id):
 
         context = {
             "order": order,
+            "customer": customer,
             "ordered_items": ordered_items_list,
             "total_price": total_price,
             "discount_value": discount_value,

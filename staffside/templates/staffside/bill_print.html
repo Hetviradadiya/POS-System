@@ -34,7 +34,7 @@
         <strong>Bill No:</strong> INV{{ order.order_id }} <br>
         <strong>Date:</strong> {{ now|date:"d-m-Y, h:i A" }} <br>
         <!-- <strong>Table:</strong> {{ table_id }} <br> -->
-        <strong>Customer:</strong> {{ order.customer.customer_name|default:"Walk-in" }} <br>
+        <strong>Customer:</strong> {{ customer.customer_firstname|default:"-" }} <br>
         <strong>Payment Mode:</strong> Cash <br>
     </div>
 

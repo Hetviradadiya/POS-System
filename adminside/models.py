@@ -188,16 +188,7 @@ class Table(models.Model):
     # def __str__(self):
     #     return f"Table {self.table_id} - {self.status}"
 
-class Cart(models.Model):
-    cart_id = models.AutoField(primary_key=True)
-    table = models.ForeignKey(Table, on_delete=models.CASCADE, db_column="table_id")
-    order_item = models.CharField(max_length=255)
-    size = models.CharField(max_length=20, choices=[("Small", "Small"), ("Medium", "Medium"), ("Large", "Large")], default="Medium")
-    quantity = models.IntegerField(default=1)
-    price = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
 
-    def __str__(self):
-        return f"Cart {self.cart_id} - Table {self.table.table_id}"
 
 class Customer(models.Model):
   customer_id = models.AutoField(primary_key=True) 
@@ -208,13 +199,25 @@ class Customer(models.Model):
   customer_phone_no=PhoneNumberField(blank=True, null=True, error_messages={'invalid': "Enter a valid phone number (e.g., +919876543210)."})
   gender=models.CharField(max_length=50)
 
+class Cart(models.Model):
+    cart_id = models.AutoField(primary_key=True)
+    table = models.ForeignKey(Table, on_delete=models.CASCADE, db_column="table_id")
+    order_item = models.CharField(max_length=255)
+    size = models.CharField(max_length=20, choices=[("Small", "Small"), ("Medium", "Medium"), ("Large", "Large")], default="Medium")
+    quantity = models.IntegerField(default=1)
+    price = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
+    order_type = models.CharField(max_length=50, null=True, blank=True)  # New
+    customer = models.ForeignKey(Customer, null=True, blank=True, on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return f"Cart {self.cart_id} - Table {self.table.table_id}"
 
 class SalesReport(models.Model):
     sales_id = models.AutoField(primary_key=True)
     order = models.ForeignKey("staffside.Order", on_delete=models.CASCADE, db_column="order_id", null=True, blank=True)  # Link to Order
     quantity_sold = models.IntegerField()
     branch =  models.ForeignKey(Branch, on_delete=models.CASCADE,db_column="branch_id", null=True, blank=True)
-    customer = models.CharField(max_length=255, null=True, blank=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE,db_column="customer_id", null=True, blank=True)
     staff = models.CharField(max_length=255, null=True, blank=True)
     sale_date = models.DateTimeField(auto_now_add=True)
 

@@ -20,6 +20,7 @@
         <a href="#" class="order-id">#{{ order.order_id }}</a>
         <div class="order-container">
           <h3 class="table-title">Table No. {{ table_id }}</h3>
+          <p>Customer : {{ order.customer.customer_firstname| default:"-" }}</p>
 
           <p><strong>Order Items:</strong></p>
           <ul>
@@ -59,6 +60,7 @@
         <tr>
           <th>Order ID</th>
           <th>Table</th>
+          <th>Customer</th>
           <th>Ordered Items</th>
           <th>Price</th>
           <th>Quantity</th>
@@ -72,6 +74,7 @@
         <tr>
           <td>#{{ order.order_id }}</td>
           <td>Table {{ order.table.table_id }}</td>
+          <td>{{order.customer.customer_firstname|default:"-"}}</td>
           <td>{{ order.ordered_items }}</td>
           <td>${{ order.price }}</td>
           <td>{{ order.quantity }}</td>

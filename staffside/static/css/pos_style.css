@@ -2,6 +2,11 @@
     font-family: "Nunito", sans-serif;
 }
 
+.order-type-button.selected-order-type {
+  background-color: #f9c784; /* Bootstrap primary color */
+  color: black;
+  border: 1px solid #f9c784;
+}
 .container-fluid{
     display: flex;
     margin: 0;
@@ -177,7 +182,12 @@
 #table-selector{
     margin-top: -12px;
 }
-
+#customer-selector{
+    /* height: 35px; */
+    text-decoration: none;
+    box-shadow: none;
+    /* background-color: rgb(226, 228, 231); */
+}
 .order-options {
     margin-top: 10px;
     margin-bottom: 10px;
@@ -302,11 +312,26 @@
 }
 
 .place-order-btn:hover {
-    background-color: #a2a2a4;
+    background-color: #f9c784;
     color: black;
 }
 
-.payment-btn{
+
+.reset-btn {
+    margin-top: 10px;
+    background-color: #4E598C;
+    color: white;
+    border: none;
+    font-size: 16px;
+    padding: 10px;
+}
+
+.reset-btn:hover {
+    background-color: #f9c784;
+    color: black;
+}
+
+/* .payment-btn{
     margin-top: 10px;
     background-color: #4E598C;
     color: white;
@@ -318,7 +343,7 @@
 .payment-btn:hover {
     background-color: #a2a2a4;
     color: black;
-}
+} */
 .quantity-container {
     display: flex;
     align-items: center;

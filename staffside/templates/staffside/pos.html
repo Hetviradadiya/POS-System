@@ -130,7 +130,6 @@
                 </div>
               </div>
 
-              <input type="hidden" name="size" id="size-{{ product.inventory_id }}" />
               <form
                 method="POST"
                 action="{% url 'staffside:pos' %}"
@@ -158,6 +157,8 @@
                   value="{{ product.sell_price }}"
                   data-original-price="{{ product.sell_price }}"
                 />
+                <input type="hidden" name="customer_id" id="customer_id_input" value="{{customer.customer_id}}">
+                <input type="hidden" name="order_type" id="order_type_input" value="">
 
                 <button
                   type="submit"
@@ -207,17 +208,30 @@
         </select>
       </div>
 
+      <div class="select-customer full-width">
+        <select id="customer-selector" class="form-select full-width ">
+          <option value="" selected disabled>Select customer</option>
+          {% for customer in customers %}
+          <option value="{{ customer.customer_id }}">
+            {{ customer.customer_firstname }}  {{customer.customer_lastname}} (ID: {{ customer.customer_id }})
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+
       <div class="order-options d-flex justify-content-between">
         <!-- <button class="btn btn-light" onclick="setOrderType('delivery')">
           Delivery
         </button> -->
-        <button class="btn btn-light" onclick="setOrderType('dinein')">
+        <button class="btn btn-light order-type-button" value="Dine In" onclick="setOrderType('Dine In')">
           Dine In
         </button>
-        <button class="btn btn-light" onclick="setOrderType('takeaway')">
+        <button class="btn btn-light order-type-button" value="Take Away" onclick="setOrderType('Take Away')">
           Take Away
         </button>
-        <input type="hidden" name="order_type" />
+
+
       </div>
       <br />
       <div id="cart-container" class="cart-items">
@@ -251,16 +265,16 @@
             </div>
             <div>
               
-                          <!-- Remove Item Form -->
-                          <form method="POST" action="{% url 'staffside:pos' %}" class="ml-2">
-                              {% csrf_token %}
-                              <input type="hidden" name="action" value="remove_from_cart" />
-                              <input type="hidden" name="cart_id" value="{{ item.cart.cart_id }}" />
-                              <input type="hidden" name="table_id" value="{{ item.cart.table_id }}" />
-                              <button type="submit" class="btn btn-md">
-                                  <i class="fas fa-times"></i>
-                              </button>
-                          </form>
+            <!-- Remove Item Form -->
+              <form method="POST" action="{% url 'staffside:pos' %}" class="ml-2">
+                {% csrf_token %}
+                    <input type="hidden" name="action" value="remove_from_cart" />
+                    <input type="hidden" name="cart_id" value="{{ item.cart.cart_id }}" />
+                    <input type="hidden" name="table_id" value="{{ item.cart.table_id }}" />
+                    <button type="submit" class="btn btn-md">
+                      <i class="fas fa-times"></i>
+                  </button>
+              </form>
             </div>
 
         </div>
@@ -295,10 +309,13 @@
           id="table_id"
           value="{{selected_table}}"
         />
-        <button type="submit" class="btn btn-primary w-100 place-order-btn">
+        <input type="hidden" name="customer_id" id="customer_id_input" />
+        
+        <button type="submit" class="btn w-100 place-order-btn">
           Place an Order
         </button>
       </form>
+      <button id="reset-table" class="btn w-100 reset-btn" type="button">Reset Table</button>
       <!-- {% if selected_table %}
       <a
         href="{% url 'staffside:bill_page' table_id=selected_table %}"

@@ -117,6 +117,101 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
+// validateCart in global scope
+function validateCart(event, productId) {
+  if (event) event.preventDefault();
+
+  let tableSelector = document.getElementById("table-selector");
+  let selectedTable = tableSelector ? tableSelector.value : null;
+  let sizeInput = document.getElementById(`size-${productId}`);
+
+  if (!selectedTable) {
+    alert("Please select a table.");
+    return false;
+  }
+
+
+  // If no size is selected, auto-select "Medium"
+  if (!sizeInput || !sizeInput.value) {
+    let mediumSizeBtn = document.querySelector(
+      `[data-product="${productId}"][data-size="Medium"]`
+    );
+    if (mediumSizeBtn) {
+      sizeInput.value = "Medium"; // Set value to Medium
+      mediumSizeBtn.classList.add("active-size"); // Highlight the button
+      console.log(`Auto-selected Medium size for Product ID: ${productId}`);
+    } else {
+      alert("Please select a size.");
+      return false;
+    }
+  }
+
+  // Save table selection before form submission
+  localStorage.setItem("selectedTable", selectedTable);
+
+  // If all conditions are true, submit the form
+  let form = document.getElementById(`add-to-cart-form-${productId}`);
+  if (form) {
+    let tableField = form.querySelector('input[name="table_id"]');
+    let sizeField = form.querySelector('input[name="size"]');
+
+    if (tableField) tableField.value = selectedTable; // table_id is set
+    if (sizeField) sizeField.value = sizeInput.value; // size is set
+
+    console.log("Submitting Form with Table ID:", tableField.value);
+    console.log("Submitting Form with Size:", sizeField.value);
+
+    form.submit();
+  } else {
+    console.error(`Form not found for product ID: ${productId}`);
+  }
+
+  return true;
+}
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  let cartItemsCount = document.getElementById("cart-items-count");
+  let cartTotalPrice = document.getElementById("cart-total-price");
+
+  // update quantity of already added cart
+  function updateCartSummary(price) {
+    let currentCount = parseInt(cartItemsCount.textContent);
+    let currentTotal = parseFloat(cartTotalPrice.textContent.replace("₹", ""));
+
+    cartItemsCount.textContent = currentCount + 1;
+    cartTotalPrice.textContent = "₹" + (currentTotal + price).toFixed(2);
+  }
+
+  // Add-to-cart button
+  document.querySelectorAll(".add-to-cart").forEach((button) => {
+    button.addEventListener("click", function () {
+      let price = parseFloat(this.getAttribute("data-price"));
+      updateCartSummary(price);
+    });
+  });
+});
+
+ document
+   .getElementById("customer-selector")
+   .addEventListener("change", function () {
+     const selectedCustomer = this.value;
+     document.getElementById("customer_id_input").value = selectedCustomer;
+   });
+
+document.addEventListener("DOMContentLoaded", function () {
+  document
+    .getElementById("place-order-form")
+    .addEventListener("submit", function (event) {
+      let tableId = document.getElementById("table_id").value;
+      if (!tableId) {
+        alert("Table is not selected!");
+        event.preventDefault(); // Prevent form submission
+      } else {
+        console.log("Submitting order for table:", tableId);
+      }
+    });
+});
 // Define selectSize in global scope
 function selectSize(event, productId, size) {
   event.preventDefault(); // Prevent default behavior if event exists
@@ -158,59 +253,6 @@ function selectSize(event, productId, size) {
   console.log(`Selected Size: ${size}, Updated Price: ₹${newPrice.toFixed(2)}`);
 }
 
-// validateCart in global scope
-function validateCart(event, productId) {
-  if (event) event.preventDefault(); // Ensure event is properly handled
-
-  let tableSelector = document.getElementById("table-selector");
-  let selectedTable = tableSelector ? tableSelector.value : null;
-  let sizeInput = document.getElementById(`size-${productId}`);
-
-  console.log("Selected Table ID:", selectedTable);
-  console.log("Size Input Value:", sizeInput ? sizeInput.value : "Not Found");
-
-  // if (!selectedTable) {
-  //   alert("Please select a table first.");
-  //   return false;
-  // }
-
-  // If no size is selected, auto-select "Medium"
-  if (!sizeInput || !sizeInput.value) {
-    let mediumSizeBtn = document.querySelector(
-      `[data-product="${productId}"][data-size="Medium"]`
-    );
-    if (mediumSizeBtn) {
-      sizeInput.value = "Medium"; // Set value to Medium
-      mediumSizeBtn.classList.add("active-size"); // Highlight the button
-      console.log(`Auto-selected Medium size for Product ID: ${productId}`);
-    } else {
-      alert("Please select a size.");
-      return false;
-    }
-  }
-
-  // Save table selection before form submission
-  localStorage.setItem("selectedTable", selectedTable);
-
-  // If all conditions are true, submit the form
-  let form = document.getElementById(`add-to-cart-form-${productId}`);
-  if (form) {
-    let tableField = form.querySelector('input[name="table_id"]');
-    let sizeField = form.querySelector('input[name="size"]');
-
-    if (tableField) tableField.value = selectedTable; // table_id is set
-    if (sizeField) sizeField.value = sizeInput.value; // size is set
-
-    console.log("Submitting Form with Table ID:", tableField.value);
-    console.log("Submitting Form with Size:", sizeField.value);
-
-    form.submit();
-  } else {
-    console.error(`Form not found for product ID: ${productId}`);
-  }
-
-  return true;
-}
 
 function updateQuantity(cartId, tableId, change) {
   let quantityElement = document.getElementById(`quantity-${cartId}`);
@@ -265,38 +307,166 @@ function updateQuantity(cartId, tableId, change) {
   form.submit(); // Submit the form to update quantity in Django
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  let cartItemsCount = document.getElementById("cart-items-count");
-  let cartTotalPrice = document.getElementById("cart-total-price");
+function setOrderType(type) {
+  const tableId = document.getElementById("table-selector").value || "null";
+  localStorage.setItem(`order_type_table_${tableId}`, type);
 
-  // update quantity of already added cart
-  function updateCartSummary(price) {
-    let currentCount = parseInt(cartItemsCount.textContent);
-    let currentTotal = parseFloat(cartTotalPrice.textContent.replace("₹", ""));
+  // Update hidden input in all add-to-cart forms
+  document.querySelectorAll('input[name="order_type"]').forEach((input) => {
+    input.value = type;
+  });
 
-    cartItemsCount.textContent = currentCount + 1;
-    cartTotalPrice.textContent = "₹" + (currentTotal + price).toFixed(2);
+  // Update place order form too
+  const placeOrderFormOrderType = document.querySelector(
+    "#place-order-form input[name='order_type']"
+  );
+  if (placeOrderFormOrderType) {
+    placeOrderFormOrderType.value = type;
   }
 
-  // Add-to-cart button
-  document.querySelectorAll(".add-to-cart").forEach((button) => {
-    button.addEventListener("click", function () {
-      let price = parseFloat(this.getAttribute("data-price"));
-      updateCartSummary(price);
-    });
+  // Highlight selected button
+  document.querySelectorAll(".order-type-button").forEach((btn) => {
+    if (btn.value === type) {
+      btn.classList.add("selected-order-type");
+    } else {
+      btn.classList.remove("selected-order-type");
+    }
   });
+
+  // Try to save customer if both values are now set
+  trySaveOrderTypeAndCustomer(tableId);
+}
+
+// function trySaveOrderTypeAndCustomer(tableId) {
+//   const customerSelector = document.getElementById("customer-selector");
+//   const customerInput = document.getElementById("customer_id_input");
+
+//   const currentOrderType = localStorage.getItem(`order_type_table_${tableId}`);
+//   const currentCustomerId = customerSelector?.value;
+
+//   // Save only when both values are selected and not already saved
+//   if (
+//     currentOrderType &&
+//     currentCustomerId &&
+//     !localStorage.getItem(`customer_table_${tableId}`)
+//   ) {
+//     localStorage.setItem(`customer_table_${tableId}`, currentCustomerId);
+
+//     document.querySelectorAll("input[name='customer_id']").forEach((input) => {
+//       input.value = currentCustomerId;
+//     });
+
+//     // Lock both
+//     if (customerSelector) customerSelector.disabled = true;
+//     document.querySelectorAll(".order-type-button").forEach((btn) => {
+//       btn.disabled = true;
+//     });
+//   }
+// }
+
+function trySaveOrderTypeAndCustomer(tableId) {
+  const customerSelector = document.getElementById("customer-selector");
+  const customerInput = document.getElementById("customer_id_input");
+
+  const currentOrderType = localStorage.getItem(`order_type_table_${tableId}`);
+  const currentCustomerId = customerSelector?.value;
+
+  if (currentOrderType && currentCustomerId) {
+    localStorage.setItem(`customer_table_${tableId}`, currentCustomerId);
+
+    document.querySelectorAll("input[name='customer_id']").forEach((input) => {
+      input.value = currentCustomerId;
+    });
+
+    // Lock both
+    if (customerSelector) customerSelector.disabled = true;
+    document.querySelectorAll(".order-type-button").forEach((btn) => {
+      btn.disabled = true;
+    });
+  }
+}
+document.getElementById("reset-table").addEventListener("click", function () {
+  const tableId = document.getElementById("table-selector").value;
+  localStorage.removeItem(`order_type_table_${tableId}`);
+  localStorage.removeItem(`customer_table_${tableId}`);
+  location.reload(); // or reapply logic to unlock UI
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-  document
-    .getElementById("place-order-form")
-    .addEventListener("submit", function (event) {
-      let tableId = document.getElementById("table_id").value;
-      if (!tableId) {
-        alert("Table is not selected!");
-        event.preventDefault(); // Prevent form submission
-      } else {
-        console.log("Submitting order for table:", tableId);
+  const tableSelector = document.getElementById("table-selector");
+  const customerSelector = document.getElementById("customer-selector");
+  const customerInput = document.getElementById("customer_id_input");
+
+  function applySavedOrderAndCustomer(tableId) {
+    const savedOrderType = localStorage.getItem(`order_type_table_${tableId}`);
+    const savedCustomer = localStorage.getItem(`customer_table_${tableId}`);
+
+    if (savedOrderType) {
+      // Highlight selected order type button
+      document.querySelectorAll(".order-type-button").forEach((btn) => {
+        btn.classList.toggle(
+          "selected-order-type",
+          btn.value === savedOrderType
+        );
+      });
+
+      // Set hidden inputs
+      document.querySelectorAll('input[name="order_type"]').forEach((input) => {
+        input.value = savedOrderType;
+      });
+
+      const placeOrderFormOrderType = document.querySelector(
+        "#place-order-form input[name='order_type']"
+      );
+      if (placeOrderFormOrderType) {
+        placeOrderFormOrderType.value = savedOrderType;
       }
+    }
+
+    if (savedCustomer && customerSelector) {
+      customerSelector.value = savedCustomer;
+
+      // Update all customer_id inputs
+      document
+        .querySelectorAll("input[name='customer_id']")
+        .forEach((input) => {
+          input.value = savedCustomer;
+        });
+    }
+
+    // Disable if both are set
+    if (savedOrderType && savedCustomer) {
+      if (customerSelector) customerSelector.disabled = true;
+      document.querySelectorAll(".order-type-button").forEach((btn) => {
+        btn.disabled = true;
+      });
+    } else {
+      if (customerSelector) customerSelector.disabled = false;
+      document.querySelectorAll(".order-type-button").forEach((btn) => {
+        btn.disabled = false;
+      });
+    }
+  }
+
+  // On page load
+  if (tableSelector && tableSelector.value) {
+    applySavedOrderAndCustomer(tableSelector.value);
+  }
+
+  // Table change
+  if (tableSelector) {
+    tableSelector.addEventListener("change", function () {
+      const selectedTable = this.value;
+      applySavedOrderAndCustomer(selectedTable);
+      window.location.href = `?table_id=${selectedTable}`;
     });
+  }
+
+  // Customer change
+  if (customerSelector) {
+    customerSelector.addEventListener("change", function () {
+      const tableId = tableSelector?.value;
+      if (tableId) trySaveOrderTypeAndCustomer(tableId);
+    });
+  }
 });

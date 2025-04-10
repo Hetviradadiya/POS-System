@@ -40,7 +40,7 @@ def sales(request):
     for sale in sales_data:
         sale_date = sale.sale_date.date()
         sale_time = sale.sale_date.strftime("%H:%M")
-        customer_name = sale.customer if sale.customer else "Walk-in"
+        customer_name = sale.customer.customer_firstname if sale.customer else "-"
         order_price = sale.order.price if sale.order and sale.order.price else 0
 
         if sale.order and sale.order.ordered_items:

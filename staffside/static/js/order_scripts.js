@@ -50,6 +50,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Automatically trigger print after form submission
   let printTableId = document.getElementById("printTableIdInput").value;
+  const tableId = "{{ table_id }}";
+  localStorage.removeItem(`order_type_table_${tableId}`);
+  localStorage.removeItem(`customer_table_${tableId}`);
   if (printTableId) {
     let printButton = document.querySelector(
       `.btn-print[data-table-id="${printTableId}"]`
