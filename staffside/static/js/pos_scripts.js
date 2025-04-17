@@ -337,33 +337,6 @@ function setOrderType(type) {
   trySaveOrderTypeAndCustomer(tableId);
 }
 
-// function trySaveOrderTypeAndCustomer(tableId) {
-//   const customerSelector = document.getElementById("customer-selector");
-//   const customerInput = document.getElementById("customer_id_input");
-
-//   const currentOrderType = localStorage.getItem(`order_type_table_${tableId}`);
-//   const currentCustomerId = customerSelector?.value;
-
-//   // Save only when both values are selected and not already saved
-//   if (
-//     currentOrderType &&
-//     currentCustomerId &&
-//     !localStorage.getItem(`customer_table_${tableId}`)
-//   ) {
-//     localStorage.setItem(`customer_table_${tableId}`, currentCustomerId);
-
-//     document.querySelectorAll("input[name='customer_id']").forEach((input) => {
-//       input.value = currentCustomerId;
-//     });
-
-//     // Lock both
-//     if (customerSelector) customerSelector.disabled = true;
-//     document.querySelectorAll(".order-type-button").forEach((btn) => {
-//       btn.disabled = true;
-//     });
-//   }
-// }
-
 function trySaveOrderTypeAndCustomer(tableId) {
   const customerSelector = document.getElementById("customer-selector");
   const customerInput = document.getElementById("customer_id_input");

@@ -1,8 +1,4 @@
 
-
-
-
-
 document.addEventListener("DOMContentLoaded", function () {
   let totalIncome = document
     .getElementById("donut-chart")
