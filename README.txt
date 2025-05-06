@@ -87,7 +87,8 @@ Visit `http://127.0.0.1:8000` in your browser.
 
 ## 📂 Project Structure
 ```
-pos/
+POS/
+POS-System/
 ├── accounts/
     ├── templates/
     ├── static/
