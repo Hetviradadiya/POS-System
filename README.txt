@@ -24,18 +24,20 @@ A Point of Sale system for managing restaurant operations including table orders
 
 ## 🛠️ Setup Instructions
 
-### 1. Clone the Repository
-```
-git clone https://github.com/Hetviradadiya/POS-System
-cd pos-restaurant-system
-```
-
-### 2. Create Virtual Environment
+### 1. Create Virtual Environment
 ```
 python -m venv POS
 POS\Scripts\activate   # On Windows
 # OR
 source POS/bin/activate   # On Linux/macOS
+
+cd POS
+```
+
+### 2. Clone the Repository
+```
+git clone https://github.com/Hetviradadiya/POS-System
+cd POS-System
 ```
 
 ### 3. Install Requirements
